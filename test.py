@@ -12,6 +12,7 @@ import fileToList
 import clockTimeCalibrate
 import timeAnalysis
 import filter
+import satOrbit
 
 def dataPreprocessingTest(s):
     f,g,l=dataPreprocessing.getFileNime(s)
@@ -35,5 +36,7 @@ if __name__ == '__main__':
     # factor=clockTimeCalibrate.clockTimeFactor(List1)
     # timeList=clockTimeCalibrate.timeCalibrate(List1,factor)
     # print timeList
-    timeAnalysis.adjacentAnalysisTest()
+    # timeAnalysis.adjacentAnalysisTest()
     #filter.freqFilterTest()
+    satOrbit.satOrbSecTest()
+    #timeAnalysis.leastsqToSecTest()
