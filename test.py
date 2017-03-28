@@ -15,6 +15,7 @@ import filter
 import satOrbit
 import jdutil
 import calculate
+import gpsOrbit
 
 def dataPreprocessingTest(s):
     f,g,l=dataPreprocessing.getFileNime(s)
@@ -30,7 +31,7 @@ if __name__ == '__main__':
     #orbitDelayGps.timeCorrectByGpsTest(50,250,-21)
     #timeDataCoincidence.timeCoinTest()
     #orbitDelayGps.gpsDisDelayEasyModeTest()
-    timeDataCoincidence.timeCoinEasyModeTest(85,250,-17)
+    timeDataCoincidence.timeCoinEasyModeTest(130,160,-19)
     # List1=fileToList.fileToList(unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_GPSTime.txt','utf8'))
     # List2=fileToList.fileToList(unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_850Time.txt','utf8'))
     # for i in range(10000,1000000):
@@ -46,5 +47,6 @@ if __name__ == '__main__':
     #satOrbit.distanceTest()
     #calculate.gpsClock()
     #orbitDelayGps.delayOrbitFitTest()
+    #gpsOrbit.gpsLagInterTest()
 
 

@@ -17,7 +17,7 @@ ax = fig.add_subplot(111)
 #阶数为9阶
 order=9
 
-timeFile = unicode('G:\时频传输数据处理\双站数据处理\\3.2\\850coincidenceEM_0328.txt', 'utf8')
+timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\result\\synCoincidenceEM_0328.txt', 'utf8')
 timeList = fileToList.fileToList(timeFile)
 tau = 1000000000000
 xa=[]
@@ -27,9 +27,9 @@ for i in range(len(timeList)):
     xa.append(timeList[i][1]/tau)
     ya.append(timeList[i][0]-timeList[i][1])
 
-# xa=xa[:15500]
-# ya=ya[15000:15500]
-ax.plot(xa,ya,color='m',linestyle='',marker='.')
+# xa=xa[:80000]
+# ya=ya[:80000]
+#ax.plot(xa,ya,color='m',linestyle='',marker='.')
 
 
 #进行曲线拟合
@@ -78,7 +78,7 @@ for i in range(0,len(xxa)):
 		yy+=dy
 	yya.append(yy-ya[i])
 	print yy-ya[i]
-#ax.plot(xxa,yya,color='g',linestyle='-',marker='')
+ax.plot(xxa,yya,color='g',linestyle='-',marker='')
 
 ax.legend()
 plt.show()

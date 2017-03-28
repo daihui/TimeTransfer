@@ -4,6 +4,7 @@ __author__ = 'levitan'
 
 import lagInterpolation
 import matplotlib.pyplot as plt
+import fileToList
 
 
 def gpsLagInterFun(gpsTimeList, disList, startNo, Num, shift):  # gps距离list，插值秒数中点，前后各Num秒
@@ -14,6 +15,31 @@ def gpsLagInterFun(gpsTimeList, disList, startNo, Num, shift):  # gps距离list�
     gpsfun = lagInterpolation.get_Lxfunc(x, fx)
     return gpsfun
 
+def gpsLagInter(gpsTimeList1,gpsTimeList2,gpsDelList,interNum):
+    N=len(gpsDelList)
+    interGpsDel=[]
+    for i in range(N-2):
+        x = [i,i+1,i+2]
+        fx = [gpsDelList[i][2],gpsDelList[i+1][2],gpsDelList[i+2][2]]
+        gpsfun = lagInterpolation.get_Lxfunc(x, fx)
+        for j in range(interNum):
+            t1=gpsTimeList1[i][0]+1000000000000.0*j/interNum
+            t2 = gpsTimeList2[i][0] + 1000000000000.0*j / interNum
+            delay=gpsfun(i+float(j)/interNum)
+            interGpsDel.append([t1,t2,delay])
+    print 'gps delay have interpolation %s times'%interNum
+    return interGpsDel
+
+def gpsLagInterTest():
+    gpsTimeList1 = fileToList.fileToList(
+        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\send_fixed_GPSTime.txt', 'utf8'))
+    gpsTimeList2 = fileToList.fileToList(
+        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\recv_fixed_GPSTime.txt', 'utf8'))
+    List2Delay = fileToList.fileToList(
+        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\GPS_disDelay.txt', 'utf8'))
+    file=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\result\GPS_disDelay_inter10.txt', 'utf8')
+    gpsdelList=gpsLagInter(gpsTimeList1,gpsTimeList2,List2Delay,10)
+    fileToList.listToFile(gpsdelList,file)
 
 def gpsLagInterFunTest():
     gpsTimeFile = unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_GPSTime.txt', 'utf8')

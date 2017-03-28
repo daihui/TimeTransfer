@@ -29,7 +29,7 @@ def dataFilter(timeFile, freq, window, threshold):
 
 
 def freqFilterTest():
-    file = unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\LJ\\recv_fixed_850Time.txt', 'utf8')
+    file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\send_fixed_850Time.txt', 'utf8')
     # file = unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_850Time.txt', 'utf8')
     #dataFilter(file, 10000000, 100, 200000)
     dataFilter(file, 10000000, 100, 1000000)
