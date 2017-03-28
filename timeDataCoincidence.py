@@ -64,18 +64,18 @@ def timeCoincidence(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startS
 
 def timeCoincidenceEasyMode(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startSec, endSec, coinfile, gpsShift):
     coincidenceList = []
-    tolFirst = 1000000
+    tolFirst = 3000000
     tol = 100000
     timeCount1 = 0
     timeCount2 = 0
     coinCount = 0
 
-    timeFactor1 = clockTimeCalibrate.clockTimeFactor(gpsTimeList1)
-    timeFactor2 = clockTimeCalibrate.clockTimeFactor(gpsTimeList2)
-    List1 = clockTimeCalibrate.timeCalibrate(List1, timeFactor1)
-    List2 = clockTimeCalibrate.timeCalibrate(List2, timeFactor2)
-    gpsTimeList1 = clockTimeCalibrate.timeCalibrate(gpsTimeList1, timeFactor1)
-    gpsTimeList2 = clockTimeCalibrate.timeCalibrate(gpsTimeList2, timeFactor2)
+    # timeFactor1 = clockTimeCalibrate.clockTimeFactor(gpsTimeList1)
+    # timeFactor2 = clockTimeCalibrate.clockTimeFactor(gpsTimeList2)
+    # List1 = clockTimeCalibrate.timeCalibrate(List1, timeFactor1)
+    # List2 = clockTimeCalibrate.timeCalibrate(List2, timeFactor2)
+    # gpsTimeList1 = clockTimeCalibrate.timeCalibrate(gpsTimeList1, timeFactor1)
+    # gpsTimeList2 = clockTimeCalibrate.timeCalibrate(gpsTimeList2, timeFactor2)
     for i in range(startSec, endSec):
         inSec = True
         firstCoin = False
@@ -90,27 +90,29 @@ def timeCoincidenceEasyMode(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2
             timeCount2 += 1
         while List1[timeCount1][0] - timeBase1 < 0:
             timeCount1 += 1
-        # for i in range(20):
-        #     delay1 += (List1[timeCount1 + i][0] - timeBase1) % 10000000
-        #     delay2 += (List2[timeCount2 + i][0] - timeBase2) % 10000000
-        #     #print delay1 % 10000000
-        # delay1 = (delay1 / 20)
-        # delay2 = (delay2 / 20)
-        print 'sec ',i,timeBase1-timeBase2
+        for j in range(30):
+            delay1 += (List1[timeCount1 + j][0] - timeBase1- List2Delay[i + gpsShift][0]) % 10000000
+            delay2 += (List2[timeCount2 + j][0] - timeBase2- List2Delay[i + gpsShift][1]) % 10000000
+            #print delay1 % 10000000
+        delay1 = (delay1 / 30)
+        delay2 = (delay2 / 30)
+        #print 'sec ',i,delay1,delay2
         while inSec:
             if firstCoin == False:
-                firstime1 = List1[timeCount1][0] - List2Delay[i + gpsShift][0] - timeBase1
-                firstime2 = List2[timeCount2][0] - List2Delay[i + gpsShift][1] - timeBase2
+                firstime1 = List1[timeCount1][0] - List2Delay[i + gpsShift][0] - timeBase1-delay1
+                firstime2 = List2[timeCount2][0] - List2Delay[i + gpsShift][1] - timeBase2-delay2
                 detTime = firstime1 - firstime2
                 # print detTime
                 if abs(detTime) > tolFirst:
-                    if seachCount<40:
+                    if seachCount<150:
                         if detTime > 0:
                             timeCount2 += 1
                             seachCount+=1
+                            #print 't2 ', timeCount2,detTime,List1[timeCount1][0]
                         else:
                             timeCount1 += 1
                             seachCount+=1
+                            #print 't1 ',timeCount1,detTime,List2[timeCount2][0]
                     else:
                         print '0'
                         break
