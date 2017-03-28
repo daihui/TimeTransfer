@@ -13,6 +13,8 @@ import clockTimeCalibrate
 import timeAnalysis
 import filter
 import satOrbit
+import jdutil
+import calculate
 
 def dataPreprocessingTest(s):
     f,g,l=dataPreprocessing.getFileNime(s)
@@ -28,15 +30,21 @@ if __name__ == '__main__':
     #orbitDelayGps.timeCorrectByGpsTest(50,250,-21)
     #timeDataCoincidence.timeCoinTest()
     #orbitDelayGps.gpsDisDelayEasyModeTest()
-    #timeDataCoincidence.timeCoinEasyModeTest(50,250,-21)
-    #List1=fileToList.fileToList(unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\LJ\\recv_fixed_GPSTime.txt','utf8'))
+    timeDataCoincidence.timeCoinEasyModeTest(85,250,-17)
+    # List1=fileToList.fileToList(unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_GPSTime.txt','utf8'))
     # List2=fileToList.fileToList(unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_850Time.txt','utf8'))
     # for i in range(10000,1000000):
     #     print (List1[i]-List1[i-1])%10000000,(List2[i]-List2[i-1])%10000000
     # factor=clockTimeCalibrate.clockTimeFactor(List1)
-    # timeList=clockTimeCalibrate.timeCalibrate(List1,factor)
+    # timeList=clockTimeCalibrate.timeCalibrate(List2,factor)
     # print timeList
-    # timeAnalysis.adjacentAnalysisTest()
+    #timeAnalysis.adjacentAnalysisTest()
     #filter.freqFilterTest()
-    satOrbit.satOrbSecTest()
+    #satOrbit.satOrbSecTest()
     #timeAnalysis.leastsqToSecTest()
+    #satOrbit.groundSecTest()
+    #satOrbit.distanceTest()
+    #calculate.gpsClock()
+    #orbitDelayGps.delayOrbitFitTest()
+
+

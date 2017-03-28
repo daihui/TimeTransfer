@@ -7,14 +7,14 @@
 __author__ = 'levitan'
 
 def getFileNime(s):
-    filename=str(s)
-    gpsfilename=str(s)[:-4]+'_GPSTime.txt'
-    lightfilename=str(s)[:-4]+'_850Time.txt'
-    return filename,gpsfilename,lightfilename
+    filename=s
+    gpsfilename=s[:-4]+'_GPSTime.txt'
+    synfilename=s[:-4]+'_850Time.txt'
+    return filename,gpsfilename,synfilename
 
-def classifyData(filename,gpsfilename,lightfilename):
+def classifyData(filename, gpsfilename, synfilename):
     gps=open(gpsfilename,'w')
-    light=open(lightfilename,'w')
+    light=open(synfilename, 'w')
     try:
         with open(filename) as f:
             for line in f:
