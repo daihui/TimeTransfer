@@ -23,10 +23,17 @@ def freqFilter(timeList, freq, window, threshold):
 
 def dataFilter(timeFile, freq, window, threshold):
     timeList = fileToList.fileToList(timeFile)
-    filtered = freqFilter(timeList, freq, window, threshold)
+    filtered = freqFilter(timeList, freq, window, factor)
     fileToList.listToFile(filtered, timeFile[:-4] + '_filtered.txt')
     return filtered
 
+def detFilter(timeList,listCount,factor):
+    for i in range(2,len(timeList)):
+        det1=timeList[i-1][listCount]-timeList[i-2][listCount]
+        det2=timeList[i][listCount]-timeList[i-1][listCount]
+        if abs(det2)>abs(det1)*factor:
+            timeList[i][listCount]=timeList[i-1][listCount]+det1
+            print 'filter %s '%i
 
 def freqFilterTest():
     file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\send_fixed_850Time.txt', 'utf8')

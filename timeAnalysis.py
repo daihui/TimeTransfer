@@ -5,6 +5,8 @@ __author__ = 'levitan'
 import fileToList
 import matplotlib.pyplot as plt
 from scipy import optimize
+import fitting
+import filter
 
 
 def adjacentAnalysis(timeList,filename):
@@ -45,31 +47,42 @@ def minusAnalysis(timeList,filename):
     return detTime
 
 
-def leastsqToSec(timeList,tau):
+def leastsqToSec(timeList,tau,order):
     X = []
     Y = []
     R = []
     Sec = int(timeList[0][0] / tau)
     count = 0
 
-    def residuals(p):
-        k, b = p
-        return Y - (k * X + b)
+    # def residuals(p):
+    #     k, b = p
+    #     return Y - (k * X + b)
 
     for item in timeList:
         if int(item[0] / tau) == Sec:
-            X.append(item[0] / tau)
-            Y.append(item[2] )
+            X.append(item[1] / tau)
+            Y.append(item[0]-item[1] )
             count += 1
         else:
             if count >= 2:
-                r = optimize.leastsq(residuals, [1.0, 0.0])
-                k, p = r[0]
-                s = [Sec, (k * (Sec) + p)/1000000000000]
+                # r = optimize.leastsq(residuals, [1.0, 0.0])
+                # k, p = r[0]
+                # s = [Sec, (k * (Sec) + p)/1000000000000]
+                print count
+                mat=fitting.polyLeastFit(X,Y,order)
+                y=fitting.polyLeastFitCal([Sec+0.5],mat)
+                averY=sum(Y)/len(Y)
+                if y[0]>3*averY:
+                    s=[Sec+0.5,averY/1000000000000]
+                    print averY/1000000000000,'0'
+                else:
+                    s=[Sec+0.5,y[0]/1000000000000]
+                    print y[0]/1000000000000,'1'
                 #print s,k
                 R.append(s)
             else:
-                s = [Sec, item[2]/1000000000000]
+                s = [Sec+0.5, item[2]/1000000000000]
+                print item[2]/1000000000000,'2'
                 R.append(s)
             del X[:]
             del Y[:]
@@ -77,7 +90,8 @@ def leastsqToSec(timeList,tau):
             Y.append(item[2] )
             Sec = int(item[0] / tau)
             count = 1
-    print 'data reduced by leastsq to second.'
+    print 'data reduced by leastsq to second/%s.'%tau
+    #filter.detFilter(R,1,100)
     return R
 
 
@@ -99,7 +113,7 @@ def interSec(timeList):
 
 
 def adjacentAnalysisTest():
-    timeFile = unicode('G:\时频传输数据处理\双站数据处理\\3.2\\result\\synCoincidenceEM.txt', 'utf8')
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\result\\synCoincidenceEM.txt', 'utf8')
     timeList=fileToList.fileToList(timeFile)
     detTime = adjacentAnalysisNear(timeList,timeFile)
     # print len(detTime)
@@ -114,10 +128,10 @@ def adjacentAnalysisTest():
 
 
 def leastsqToSecTest():
-    timeFile = unicode('G:\时频传输数据处理\双站数据处理\\3.2\\result\\synCoincidenceEM_adjacentNear5.txt', 'utf8')
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\result\\synCoincidenceEM_0328.txt', 'utf8')
     timeList = fileToList.fileToList(timeFile)
-    tau=100000000000
-    R=leastsqToSec(timeList,tau)
+    tau=10000000000
+    R=leastsqToSec(timeList,tau,9)
     #R = interSec(R)
     #print R
-    fileToList.listToFileLong(R, timeFile[:-4] + '_milliSec0327.txt')
+    fileToList.listToFileLong(R, timeFile[:-4] + '_%smilliSec0329.txt'%(tau/1000000000))
