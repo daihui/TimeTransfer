@@ -127,8 +127,8 @@ def timeCorrectByGpsTest(startSec, endSec, shift):
 
 
 def gpsDisDelayEasyModeTest():
-    gpsdisfile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\GPS_Send.txt', 'utf8')
-    gpsdisfile2 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\GPS_Recv.txt', 'utf8')
+    gpsdisfile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\GPS_Send.txt', 'utf8')
+    gpsdisfile2 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\GPS_Recv.txt', 'utf8')
     gpsDisDelayEasyMode(gpsdisfile1, gpsdisfile2)
 
 

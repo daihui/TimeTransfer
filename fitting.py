@@ -5,6 +5,7 @@ import math
 import numpy
 import random
 import fileToList
+import filter
 
 def polyLeastFit(x,y,order):
     matA = []
@@ -50,31 +51,103 @@ def polyLeastFitCal(x,mat):
     #print 'fit calculation finished !'
     return y
 
+def polyLeastFitSegment(x,y,order,segmentCount):
+    count=0
+    s=0
+    fitList=[]
+    residual=[]
+    xTmp=[]
+    yTmp=[]
+    lastTime=x[0]
+    for i,time in enumerate(x):
+        if count<segmentCount and (time-lastTime)<100000000000:
+            xTmp.append(time)
+            yTmp.append(y[i])
+            lastTime=time
+            count += 1
+        else:
+            if len(xTmp)>2*order:
+                mat=polyLeastFit(xTmp,yTmp,order)
+                y_fit=polyLeastFitCal(xTmp,mat)
+                for j,yy in enumerate(y_fit):
+                    fitList.append([xTmp[j],yy,yTmp[j]-yy])
+                    residual.append([yTmp[j]-yy])
+                count=0
+                s+=1
+                del xTmp[:]
+                del yTmp[:]
+                xTmp.append(time)
+                yTmp.append(y[i])
+                lastTime=time
+                count += 1
+            else:
+                xTmp.append(time)
+                yTmp.append(y[i])
+                lastTime = time
+                count += 1
+    if xTmp:
+        mat = polyLeastFit(xTmp, yTmp, order)
+        y_fit = polyLeastFitCal(xTmp, mat)
+        for j, yy in enumerate(y_fit):
+            fitList.append([xTmp[j], yy, yTmp[j] - yy])
+            residual.append([yTmp[j] - yy])
+            count += 1
+        s+=1
+    print 'data fitting in %s segment.'%s
+    return fitList,residual
 
 
-def polyLeastFitTest():
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
+def polyLeastFitTest(date):
+
     order = 9
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\result\\synCoincidenceEM_10milliSec0329.txt', 'utf8')
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0329.txt'%date, 'utf8')
     timeList = fileToList.fileToList(timeFile)
-    tau = 1000000000000
     xa = []
     ya = []
+    y=[]
 
     for i in range(len(timeList)):
-        xa.append(timeList[i][0] )
-        ya.append(timeList[i][1])
+        xa.append(timeList[i][1] )
+        ya.append(timeList[i][0] - timeList[i][1])
 
-    # xa=xa[:80000]
-    # ya=ya[:80000]
-    #ax.plot(xa,ya,color='m',linestyle='',marker='.')
+    xa=xa[80000:120000]
+    ya=ya[80000:120000]
+
 
     matAA = polyLeastFit(xa, ya, order)
     yya = polyLeastFitCal(xa, matAA)
     for i in range(len(yya)):
-        yya[i]=yya[i]-ya[i]
-        print yya[i]
-    ax.plot(xa, yya, color='g', linestyle='-', marker='')
+        y.append([yya[i]-ya[i]])
+        # print yya[i]
+    filter.dotFilter(y,0,10000,3)
+    fileToList.listToFile(y,timeFile[:-4]+'_%s_residual_dotfilt.txt'%date)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(xa, y, color='g', linestyle='-', marker='')
+    # ax.plot(xa,ya,color='m',linestyle='',marker='.')
+    ax.legend()
+    plt.show()
+
+def polyLeastFitSegmentTest(date):
+    order = 9
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0329.txt' % date, 'utf8')
+    timeList = fileToList.fileToList(timeFile)
+    xa = []
+    ya = []
+    x=[]
+
+    for i in range(len(timeList)):
+        xa.append(timeList[i][1])
+        ya.append(timeList[i][0] - timeList[i][1])
+
+    # xa = xa[50000:70000]
+    # ya = ya[50000:70000]
+
+    fitList,residual=polyLeastFitSegment(xa,ya,order,10000)
+    filter.dotFilter(residual, 0, 10000, 3)
+    fileToList.listToFile(fitList, timeFile[:-4] + '_%s_residual_segment.txt' % date)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(xa, residual, color='g', linestyle='-', marker='')
     ax.legend()
     plt.show()

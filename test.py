@@ -32,7 +32,7 @@ if __name__ == '__main__':
     #orbitDelayGps.timeCorrectByGpsTest(50,250,-21)
     #timeDataCoincidence.timeCoinTest()
     #orbitDelayGps.gpsDisDelayEasyModeTest()
-    #timeDataCoincidence.timeCoinEasyModeTest(130,160,-19)
+    # timeDataCoincidence.timeCoinEasyModeTest(170,190,-19,'12.12')
     # List1=fileToList.fileToList(unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_GPSTime.txt','utf8'))
     # List2=fileToList.fileToList(unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_850Time.txt','utf8'))
     # for i in range(10000,1000000):
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     # factor=clockTimeCalibrate.clockTimeFactor(List1)
     # timeList=clockTimeCalibrate.timeCalibrate(List2,factor)
     # print timeList
-    #timeAnalysis.adjacentAnalysisTest()
+    #timeAnalysis.adjacentAnalysisTest('12.12')
     #filter.freqFilterTest()
     #satOrbit.satOrbSecTest()
     #timeAnalysis.leastsqToSecTest()
@@ -49,4 +49,5 @@ if __name__ == '__main__':
     #calculate.gpsClock()
     #orbitDelayGps.delayOrbitFitTest()
     #gpsOrbit.gpsLagInterTest()
-    fitting.polyLeastFitTest()
+    # fitting.polyLeastFitTest('3.2')
+    fitting.polyLeastFitSegmentTest('3.2')
