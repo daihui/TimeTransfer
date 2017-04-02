@@ -71,7 +71,7 @@ def polyLeastFitSegment(x,y,order,segmentCount):
                 y_fit=polyLeastFitCal(xTmp,mat)
                 for j,yy in enumerate(y_fit):
                     fitList.append([xTmp[j],yy,yTmp[j]-yy])
-                    residual.append([yTmp[j]-yy])
+                    residual.append([(yTmp[j] - yy)/1000000000000])
                 count=0
                 s+=1
                 del xTmp[:]
@@ -90,7 +90,7 @@ def polyLeastFitSegment(x,y,order,segmentCount):
         y_fit = polyLeastFitCal(xTmp, mat)
         for j, yy in enumerate(y_fit):
             fitList.append([xTmp[j], yy, yTmp[j] - yy])
-            residual.append([yTmp[j] - yy])
+            residual.append([(yTmp[j] - yy)/1000000000000])
             count += 1
         s+=1
     print 'data fitting in %s segment.'%s
@@ -130,22 +130,25 @@ def polyLeastFitTest(date):
 
 def polyLeastFitSegmentTest(date):
     order = 9
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0329.txt' % date, 'utf8')
+    # timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0329.txt' % date, 'utf8')
+    timeFile=unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\\4.1\解析\\recv_time-10k-100s-1_classified_diff.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
     ya = []
     x=[]
 
     for i in range(len(timeList)):
-        xa.append(timeList[i][1])
-        ya.append(timeList[i][0] - timeList[i][1])
+        # xa.append(timeList[i][1])
+        # ya.append(timeList[i][0] - timeList[i][1])
+        xa.append(timeList[i][0])
+        ya.append(timeList[i][1])
 
     # xa = xa[50000:70000]
     # ya = ya[50000:70000]
 
     fitList,residual=polyLeastFitSegment(xa,ya,order,10000)
-    filter.dotFilter(residual, 0, 10000, 3)
-    fileToList.listToFile(fitList, timeFile[:-4] + '_%s_residual_segment.txt' % date)
+    #filter.dotFilter(residual, 0, 10000, 3)
+    fileToList.listToFileLong(residual, timeFile[:-4] + '_%s_residual_segment.txt' % date)
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(xa, residual, color='g', linestyle='-', marker='')
