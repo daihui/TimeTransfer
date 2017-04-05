@@ -50,4 +50,4 @@ if __name__ == '__main__':
     #orbitDelayGps.delayOrbitFitTest()
     #gpsOrbit.gpsLagInterTest()
     # fitting.polyLeastFitTest('3.2')
-    fitting.polyLeastFitSegmentTest('4.1')
+    fitting.polyLeastFitSegmentTest('4.5')

@@ -35,7 +35,7 @@ def listToFileLong(List,filename):
     for i in xrange(N):
         J=len(List[i])
         for j in range(J):
-            file.write('%.12f\t'%List[i][j])
+            file.write('%.13f\t'%List[i][j])
         file.write('\n')
     file.flush()
     file.close()
