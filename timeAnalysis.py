@@ -91,7 +91,7 @@ def leastsqToSec(timeList,tau,order):
             Sec = int(item[0] / tau)
             count = 1
     print 'data reduced by leastsq to second/%s.'%tau
-    filter.dotFilter(R,1,0.00000001)
+    filter.dotFilter(R,1,0.00000001,3)
     return R
 
 

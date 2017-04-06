@@ -86,11 +86,26 @@ def timeAnalysis(datafile):
         timeList[i][1]=(timeList[i][1]-averTime)/1000000000000.0
     fileToList.listToFileLong(timeList,dataFile[:-4]+'_residual.txt')
 
+def dataReduce(timeList,factor):
+    listReduce=[]
+    lenght=len(timeList)
+    sum=0.0
+    for i in range(lenght/factor):
+        for j in range(factor):
+            sum+=timeList[i*factor+j][0]
+        listReduce.append([sum/factor])
+        sum=0.0
+    print 'data reduce finished !'
+    return listReduce
+
 if __name__=='__main__':
     # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\HydraHarp400\\10k-500s-1.ptu','utf8')
     # saveFile=dataFile[:-4]+'_parse.txt'
     # dataList=Hydraharp400DataToList(dataFile,8000)
     # Hydraharp400DataParse(dataList,saveFile)
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\HydraHarp400\\10k-500s-mode2-1_parse.txt','utf8')
-    dataCoincidence(dataFile)
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\\4.1\解析\\recv_time-10k-400s_classified_diff_4.5_residual_segment.txt','utf8')
+    #dataCoincidence(dataFile)
     #timeAnalysis(dataFile)
+    timeList=fileToList.fileToList(dataFile)
+    reduceList=dataReduce(timeList,5)
+    fileToList.listToFileLong(reduceList,dataFile[:-4]+'_reduce5.txt')

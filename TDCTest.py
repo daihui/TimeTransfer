@@ -32,7 +32,7 @@ def timeAnalysis(timeList):
 
 
 if __name__ == '__main__':
-    dataFile = unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\\4.1\解析\\recv_time-10k-100s-2.txt', 'utf8')
+    dataFile = unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\\4.1\解析\\recv_time-10k-400s.txt', 'utf8')
     dataClassify = classifyData(dataFile)
     timeList = fileToList.fileToList(dataClassify)
     diffList = timeAnalysis(timeList)
