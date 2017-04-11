@@ -2,9 +2,7 @@
 #-*- coding: utf-8 -*-
 __author__ = 'levitan'
 
-import struct
 import fileToList
-#print struct.unpack("b",fileData.read(1))
 
 def dataConvert(bufferByte):
     global carryBit
@@ -86,6 +84,67 @@ def dataCoinLight(dataFile,channelDelay,coinWidth):
     fileToList.listToFile(resultList,dataFile[:-4]+'_coinDiff.txt')
     return resultList
 
+def dataCoinLightSegment(dataFile,channelDelay,coinWidth,segmentLength,start,channelList):
+    global carryBit
+    carryBit=0
+    saveFile=open(dataFile[:-4]+'_coinDiff_segment.txt','w')
+    saveFile.close()
+    saveFile=open(dataFile[:-4]+'_coinDiff_segment.txt','a')
+    finish=False
+    data=open(dataFile,'rb')
+    data.read(start)
+    totCount=0
+
+    while not finish:
+        segmentList=[]
+        dataToConvert=[]
+        coinList=[]
+        for indexS in range(segmentLength):
+            bufferByte=data.read(4).encode('hex')
+            if len(bufferByte)==8:
+                dataToConvert.append(bufferByte)
+            else:
+                finish=True
+                print 'read file finished !'
+                break
+        for item in dataToConvert:
+            channel,time=dataConvert(item)
+            if channel in channelList:
+                segmentList.append([channel,time])
+        length= len(segmentList)
+        index=0
+        count=0
+        process=True
+        if length<2:
+            process=False
+        while process:
+            #print length,index
+            if segmentList[index][0]==segmentList[index+1][0]:
+                index+=1
+                if index>length-2:
+                    process=False
+            elif abs(segmentList[index][1]-segmentList[index+1][1]-channelDelay)<coinWidth:
+                coinList.append([segmentList[index][1],(segmentList[index][1]-segmentList[index+1][1])])
+                count+=1
+                index+=2
+                if index>length-2:
+                    process=False
+            else:
+                index+=1
+                if index>length-2:
+                    process=False
+        print 'segment data coincidence finished: %s coincidences'%count
+        totCount+=count
+        Num=len(coinList)
+        for i in range(Num):
+            J=len(coinList[i])
+            for j in range(J):
+                saveFile.write('%.1f\t'%coinList[i][j])
+            saveFile.write('\n')
+    data.close()
+    saveFile.flush()
+    saveFile.close()
+    print 'data coincidence finished, %s coincidences'%totCount
 
 def dataCoincidence(dataFile):
     dataList=fileToList.fileToList(dataFile)
@@ -122,17 +181,18 @@ def dataReduce(timeList,factor):
             sum+=timeList[i*factor+j][0]
         listReduce.append([sum/factor])
         sum=0.0
-    print 'data reduce finished !'
+    print 'data reduce finished ! '
     return listReduce
 
 if __name__=='__main__':
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\4.11\\2-1200k-50M-100s-3_parse.txt','utf8')
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\4.10\\2-80k-50M-100s-1.ptu','utf8')
     # saveFile=dataFile[:-4]+'_parse.txt'
     # dataList=Hydraharp400DataToList(dataFile,8000)
     # Hydraharp400DataParse(dataList,saveFile,[0,1])
     # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\\4.1\解析\\recv_time-10k-400s_classified_diff_4.5_residual_segment.txt','utf8')
     #dataCoincidence(dataFile)
-    dataCoinLight(dataFile,0,500)
+    #dataCoinLight(dataFile,0,500)
+    dataCoinLightSegment(dataFile,0,500,1000000,8000,[0,2])
     #timeAnalysis(dataFile)
     # timeList=fileToList.fileToList(dataFile)
     # reduceList=dataReduce(timeList,5)

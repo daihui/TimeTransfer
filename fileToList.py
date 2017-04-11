@@ -5,7 +5,7 @@ __author__ = 'levitan'
 def fileToList(filename):
     List=[]
     count=0
-    file= open(filename)
+    file= open(filename,'r')
     for line in file:
         List.append([])
         N=len(line.split())
