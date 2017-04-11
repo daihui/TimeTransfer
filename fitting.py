@@ -60,7 +60,7 @@ def polyLeastFitSegment(x,y,order,segmentCount):
     yTmp=[]
     lastTime=x[0]
     for i,time in enumerate(x):
-        if count<segmentCount and (time-lastTime)<100000000000:
+        if count<segmentCount and (time-lastTime)<2000000000000:
             xTmp.append(time)
             yTmp.append(y[i])
             lastTime=time
@@ -131,7 +131,7 @@ def polyLeastFitTest(date):
 def polyLeastFitSegmentTest(date):
     order = 3
     # timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0329.txt' % date, 'utf8')
-    timeFile=unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\\4.1\解析\\recv_time-10k-400s_classified_diff.txt','utf8')
+    timeFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\4.10\\2-80k-50M-100s-2_parse_coinDiff.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
     ya = []
@@ -146,11 +146,12 @@ def polyLeastFitSegmentTest(date):
     # xa = xa[50000:70000]
     # ya = ya[50000:70000]
 
-    fitList,residual=polyLeastFitSegment(xa,ya,order,10000)
+    fitList,residual=polyLeastFitSegment(xa,ya,order,20)
     #filter.dotFilter(residual, 0, 10000, 3)
     fileToList.listToFileLong(residual, timeFile[:-4] + '_%s_residual_segment.txt' % date)
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # ax.plot(xa, residual, color='g', linestyle='-', marker='')
-    # ax.legend()
-    # plt.show()
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(xa, residual, color='g', linestyle='-', marker='')
+    #ax.plot(xa,ya,color='m',linestyle='',marker='.')
+    ax.legend()
+    plt.show()

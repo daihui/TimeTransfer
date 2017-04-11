@@ -32,7 +32,7 @@ def dataConvert(bufferByte):
         channelBits=int(channel,2)
         preTimeBit=int(bin(int(fourByte[1],16))[-1])
         timeTag=(int(fourByte[2:],16)+preTimeBit*16777216+carryBit*33554432)
-        # print channelBits,timeTag
+        #print channelBits,timeTag
     return channelBits,timeTag
 
 def Hydraharp400DataToList(dataFile,start):
@@ -48,17 +48,44 @@ def Hydraharp400DataToList(dataFile,start):
     print 'convert data to List, count: %s'%count
     return dataList
 
-def Hydraharp400DataParse(dataList,saveFile):
+def Hydraharp400DataParse(dataList,saveFile,channelList):
     fileSave=open(saveFile,'w')
     global carryBit
     carryBit=0
     for data in dataList:
         channel,time=dataConvert(data)
-        if channel==0 or channel==1:
+        if channel in channelList:
             fileSave.write(str(channel)+'\t'+str(time)+'\n')
     fileSave.flush()
     fileSave.close()
     print 'data parser finished, saved to %s'%saveFile
+
+def dataCoinLight(dataFile,channelDelay,coinWidth):
+    dataList=fileToList.fileToList(dataFile)
+    resultList=[]
+    index=0
+    count=0
+    length=len(dataList)
+    process=True
+    while process:
+        if dataList[index][0]==dataList[index+1][0]:
+            index+=1
+            if index>length-2:
+                process=False
+        elif abs(dataList[index][1]-dataList[index+1][1]-channelDelay)<coinWidth:
+            resultList.append([dataList[index][1],(dataList[index][1]-dataList[index+1][1])])
+            count+=1
+            index+=2
+            if index>length-2:
+                process=False
+        else:
+            index+=1
+            if index>length-2:
+                process=False
+    print 'data coincidence finished %s coincidences, and difference time are calculated !'%count
+    fileToList.listToFile(resultList,dataFile[:-4]+'_coinDiff.txt')
+    return resultList
+
 
 def dataCoincidence(dataFile):
     dataList=fileToList.fileToList(dataFile)
@@ -99,13 +126,14 @@ def dataReduce(timeList,factor):
     return listReduce
 
 if __name__=='__main__':
-    # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\HydraHarp400\\10k-500s-1.ptu','utf8')
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\4.11\\2-1200k-50M-100s-3_parse.txt','utf8')
     # saveFile=dataFile[:-4]+'_parse.txt'
     # dataList=Hydraharp400DataToList(dataFile,8000)
-    # Hydraharp400DataParse(dataList,saveFile)
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\\4.1\解析\\recv_time-10k-400s_classified_diff_4.5_residual_segment.txt','utf8')
+    # Hydraharp400DataParse(dataList,saveFile,[0,1])
+    # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\\4.1\解析\\recv_time-10k-400s_classified_diff_4.5_residual_segment.txt','utf8')
     #dataCoincidence(dataFile)
+    dataCoinLight(dataFile,0,500)
     #timeAnalysis(dataFile)
-    timeList=fileToList.fileToList(dataFile)
-    reduceList=dataReduce(timeList,5)
-    fileToList.listToFileLong(reduceList,dataFile[:-4]+'_reduce5.txt')
+    # timeList=fileToList.fileToList(dataFile)
+    # reduceList=dataReduce(timeList,5)
+    # fileToList.listToFileLong(reduceList,dataFile[:-4]+'_reduce5.txt')

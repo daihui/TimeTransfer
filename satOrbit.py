@@ -93,13 +93,13 @@ def groundSecTest():
     goundFile = unicode('G:\时频传输数据处理\双站数据处理\\3.2\\groundStationJ2000.txt', 'utf8')
     goundList = fileToList.fileToList(goundFile)
     startTime = (2017, 3, 2, 17, 12, 15)
-    groundSecList = groundStationSec(goundList, startTime, 400, 4)
+    groundSecList = groundStationSec(goundList, startTime, 400, 2)
     saveFile = goundFile[:-4] + '_Sec.txt'
     fileToList.listToFile(groundSecList, saveFile)
 
 def distanceTest():
-    goundFile = unicode('G:\时频传输数据处理\双站数据处理\\3.2\\groundStationJ2000_Sec.txt', 'utf8')
-    satFile = unicode('G:\时频传输数据处理\双站数据处理\\3.2\\satellite_Sec.txt', 'utf8')
+    goundFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\Result\\groundStationJ2000_Sec.txt', 'utf8')
+    satFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\Result\\satellite_Sec.txt', 'utf8')
     goundList = fileToList.fileToList(goundFile)
     satList=fileToList.fileToList(satFile)
     groSatDistance(goundList,satList)
