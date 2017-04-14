@@ -13,7 +13,7 @@ def dataConvert(bufferByte):
         channel = bin(int(fourByte[:2], 16))[3:-1]
         channelBits = int(channel, 2)
         if channelBits == 63:
-            carryBit += int(fourByte[-1], 16)
+            carryBit += (int(fourByte[2:], 16)+int(bin(int(fourByte[1], 16))[-1]))
             preTimeBit = int(bin(int(fourByte[1], 16))[-1])
             timeTag = int(fourByte[2:], 16) + preTimeBit * 16777216 + carryBit * 33554432
         elif channelBits == 0:
@@ -116,6 +116,8 @@ def dataCoinLightSegment(dataFile, channelDelay, coinWidth, segmentLength, start
             channel, time = dataConvert(item)
             if channel in channelList:
                 segmentList.append([channel, time])
+                #print channel,time
+        #break
         length = len(segmentList)
         index = 0
         count = 0
@@ -130,7 +132,7 @@ def dataCoinLightSegment(dataFile, channelDelay, coinWidth, segmentLength, start
                     process = False
             elif segmentList[index][0]<segmentList[index+1][0]:
                 if abs(segmentList[index][1] - segmentList[index + 1][1] - channelDelay) < coinWidth:
-                    coinList.append([segmentList[index][1], (segmentList[index][1] - segmentList[index + 1][1]-channelDelay)])
+                    coinList.append([segmentList[index],segmentList[index], (segmentList[index][1] - segmentList[index + 1][1]-channelDelay)])
                     count += 1
                     index += 2
                     if index > length - 2:
@@ -141,7 +143,7 @@ def dataCoinLightSegment(dataFile, channelDelay, coinWidth, segmentLength, start
                         process = False
             else:
                 if abs(segmentList[index+1][1] - segmentList[index][1] - channelDelay) < coinWidth:
-                    coinList.append([segmentList[index+1][1], (segmentList[index+1][1] - segmentList[index][1]-channelDelay)])
+                    coinList.append([segmentList[index+1],segmentList[index], (segmentList[index+1][1] - segmentList[index][1]-channelDelay)])
                     count += 1
                     index += 2
                     if index > length - 2:
@@ -156,12 +158,61 @@ def dataCoinLightSegment(dataFile, channelDelay, coinWidth, segmentLength, start
         for i in range(Num):
             J = len(coinList[i])
             for j in range(J):
-                saveFile.write('%.1f\t' % coinList[i][j])
+                saveFile.write('%s\t' % coinList[i][j])
             saveFile.write('\n')
     data.close()
     saveFile.flush()
     saveFile.close()
     print 'data coincidence finished, %s coincidences' % totCount
+
+#Hydraharp400采数文件计算每秒通道计数
+def dataSecCountSegment(dataFile, segmentLength, start, channelList):
+    global carryBit
+    carryBit = 0
+    saveFile = open(dataFile[:-4] + '_SecCount_segment.txt', 'w')
+    saveFile.close()
+    saveFile = open(dataFile[:-4] + '_SecCount_segment.txt', 'a')
+    finish = False
+    data = open(dataFile, 'rb')
+    data.read(start)
+    second=0
+    count1=0
+    count2=0
+
+    while not finish:
+        dataToConvert = []
+        secCountList = []
+        for indexS in range(segmentLength):
+            bufferByte = data.read(4).encode('hex')
+            if len(bufferByte) == 8:
+                dataToConvert.append(bufferByte)
+            else:
+                finish = True
+                print 'read file finished !'
+                break
+        for item in dataToConvert:
+            channel, time = dataConvert(item)
+            if channel in channelList:
+                if time/1000000000000<second:
+                    if int(channel)==int(channelList[0]):
+                        count1+=1
+                    else:
+                        count2+=1
+                else:
+                    secCountList.append([second,count1,count2])
+                    second+=1
+                    count1=0
+                    count2=0
+        Num = len(secCountList)
+        for i in range(1,Num):
+            J = len(secCountList[i])
+            for j in range(J):
+                saveFile.write('%s\t' % secCountList[i][j])
+            saveFile.write('\n')
+    data.close()
+    saveFile.flush()
+    saveFile.close()
+    print 'data second count finished !'
 
 
 def dataCoincidence(dataFile):
@@ -206,14 +257,15 @@ def dataReduce(timeList, factor):
 
 
 if __name__ == '__main__':
-    dataFile = unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\4.12\\test.-50s.ptu', 'utf8')
+    dataFile = unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.13\\4.13-lzx-lj.ptu', 'utf8')
     # saveFile=dataFile[:-4]+'_parse.txt'
     # dataList=Hydraharp400DataToList(dataFile,8000)
     # Hydraharp400DataParse(dataList,saveFile,[0,1])
     # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\\4.1\解析\\recv_time-10k-400s_classified_diff_4.5_residual_segment.txt','utf8')
     # dataCoincidence(dataFile)
     # dataCoinLight(dataFile,0,500)
-    dataCoinLightSegment(dataFile, -62, 300, 1000000, 8000, [0, 2])
+    dataCoinLightSegment(dataFile, 0, 10000, 2000000, 8000, [0, 2])
+    #dataSecCountSegment(dataFile,2000000,8000,[0,2])
     # timeAnalysis(dataFile)
     # timeList=fileToList.fileToList(dataFile)
     # reduceList=dataReduce(timeList,5)
