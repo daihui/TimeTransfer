@@ -48,6 +48,6 @@ if __name__ == '__main__':
     #satOrbit.distanceTest()
     #calculate.gpsClock()
     #orbitDelayGps.delayOrbitFitTest()
-    #gpsOrbit.gpsLagInterTest()
+    gpsOrbit.gpsLagInterTest()
     # fitting.polyLeastFitTest('3.2')
-    fitting.polyLeastFitSegmentTest('4.14')
+    #fitting.polyLeastFitSegmentTest('4.14')

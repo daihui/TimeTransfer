@@ -4,8 +4,9 @@ __author__ = 'levitan'
 
 import fileToList
 import clockTimeCalibrate
+import Hydraharp400DataConvert
 
-
+#合符函数，寻找两list的时间符合。
 def timeCoincidence(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startSec, endSec, coinfile):
     coincidenceList = []
     tolerate = 500000
@@ -144,6 +145,7 @@ def timeCoincidenceEasyMode(List1, List2, List2Delay, startSec, endSec, coinfile
     print 'time coincidence finished ! there are ' + str(coinCount) + ' pairs.'
     return coincidenceList
 
+
 def search(timeList1, timeList2, index1, index2, gate1, gate2, delay1, delay2, tolTime):
     if index1-gate1/2<0:
         print 'index1 is smaller than gate/2 !'
@@ -190,3 +192,12 @@ def timeCoinEasyModeTest(startSec, endSec, gpsShift,date):
     # gpsTimeList2 = fileToList.fileToList(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\recv_fixed_GPSTime.txt', 'utf8'))
     coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0329.txt'%date, 'utf8')
     timeCoincidenceEasyMode(List1, List2, List2Delay, startSec, endSec, coinfile, gpsShift)
+
+def timeCoinEasyModeEfficent(startSec, endSec, gpsShift,date,efficent):
+    List1 = fileToList.fileToList(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\send_fixed_850Time_filtered.txt'%date, 'utf8'))
+    List2 = fileToList.fileToList(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_850Time_filtered.txt'%date, 'utf8'))
+    List2Delay = fileToList.fileToList(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\GPS_disDelay_inter10.txt'%date, 'utf8'))
+    coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0329.txt'%date, 'utf8')
+    List1Ran=Hydraharp400DataConvert.randomList(List1,0,efficent)
+    List2Ran=Hydraharp400DataConvert.randomList(List2,0,efficent)
+    timeCoincidenceEasyMode(List1Ran, List2Ran, List2Delay, startSec, endSec, coinfile, gpsShift)
