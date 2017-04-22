@@ -334,9 +334,11 @@ def dataReduce(timeList, factor):
 
 def randomList(timeList,channel,factor):
     length=len(timeList)
+    print length
     ranList=[]
     for i in range(length/factor):
-        ranList.append([timeList[i*factor+random.randint(0,9)][channel]])
+        ranList.append([timeList[i*factor+random.randint(0,factor-1)][channel]])
+    print len(ranList)
     return ranList
 
 if __name__ == '__main__':

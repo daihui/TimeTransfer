@@ -66,11 +66,13 @@ def timeCoincidence(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startS
 def timeCoincidenceEasyMode(List1, List2, List2Delay, startSec, endSec, coinfile, gpsShift):
     tau=10
     coincidenceList = []
-    tolFirst = 4000000
-    tol = 100000
+    tolFirst = 2000000
+    tol = 80000
     timeCount1 = 0
     timeCount2 = 0
     coinCount = 0
+    ListLength1=len(List1)
+    ListLength2=len(List2)
 
     # timeFactor1 = clockTimeCalibrate.clockTimeFactor(gpsTimeList1)
     # timeFactor2 = clockTimeCalibrate.clockTimeFactor(gpsTimeList2)
@@ -88,10 +90,13 @@ def timeCoincidenceEasyMode(List1, List2, List2Delay, startSec, endSec, coinfile
         # seachCount=0
         # del1=0.0
         # del2=0.0
+        if timeCount2 > ListLength2 or timeCount1 > ListLength1:
+            break
         while List2[timeCount2][0] - timeBase2 < 0:
             timeCount2 += 1
         while List1[timeCount1][0] - timeBase1 < 0:
             timeCount1 += 1
+
         # for j in range(30):
         #     del1 += (List1[timeCount1 + j][0] - timeBase1- List2Delay[i + gpsShift][0]) % 10000000
         #     del2 += (List2[timeCount2 + j][0] - timeBase2- List2Delay[i + gpsShift][1]) % 10000000
@@ -107,7 +112,7 @@ def timeCoincidenceEasyMode(List1, List2, List2Delay, startSec, endSec, coinfile
                 # print detTime
                 delay1=List2Delay[i + gpsShift*tau][2]+ timeBase1
                 delay2=  timeBase2
-                timeCount1,timeCount2,find=search(List1,List2,timeCount1,timeCount2,2000,100,delay1,delay2,tolFirst)
+                timeCount1,timeCount2,find=search(List1,List2,timeCount1,timeCount2,2000,500,delay1,delay2,tolFirst,tau,ListLength2)
                 if find:
                     coinCount += 1
                     # print coinCount
@@ -146,7 +151,7 @@ def timeCoincidenceEasyMode(List1, List2, List2Delay, startSec, endSec, coinfile
     return coincidenceList
 
 
-def search(timeList1, timeList2, index1, index2, gate1, gate2, delay1, delay2, tolTime):
+def search(timeList1, timeList2, index1, index2, gate1, gate2, delay1, delay2, tolTime,tau,ListLenght2):
     if index1-gate1/2<0:
         print 'index1 is smaller than gate/2 !'
     else:
@@ -154,6 +159,8 @@ def search(timeList1, timeList2, index1, index2, gate1, gate2, delay1, delay2, t
         shift=-gate1/2
         id2=index2
         while not find:
+            if timeList2[index2][0]-delay2>1000000000000/tau:
+                break
             det=(timeList2[index2][0]-delay2)-(timeList1[index1+shift][0]-delay1)
             if abs(det)<tolTime:
                 find=True
@@ -163,9 +170,11 @@ def search(timeList1, timeList2, index1, index2, gate1, gate2, delay1, delay2, t
                     shift+=1
                 else:
                     index2+=1
+                    if index2>ListLenght2:
+                        break
                     shift=-gate1/2
                     if index2-id2==gate2:
-                        # print 'not find sec first, move to next sec.'
+                        #print 'not find sec first, move to next sec.'
                         shift=0
                         break
     return index1+shift,index2,find
@@ -197,7 +206,7 @@ def timeCoinEasyModeEfficent(startSec, endSec, gpsShift,date,efficent):
     List1 = fileToList.fileToList(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\send_fixed_850Time_filtered.txt'%date, 'utf8'))
     List2 = fileToList.fileToList(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_850Time_filtered.txt'%date, 'utf8'))
     List2Delay = fileToList.fileToList(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\GPS_disDelay_inter10.txt'%date, 'utf8'))
-    coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0329.txt'%date, 'utf8')
+    coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0422_eff%s.txt'%(date,efficent), 'utf8')
     List1Ran=Hydraharp400DataConvert.randomList(List1,0,efficent)
-    List2Ran=Hydraharp400DataConvert.randomList(List2,0,efficent)
-    timeCoincidenceEasyMode(List1Ran, List2Ran, List2Delay, startSec, endSec, coinfile, gpsShift)
+    #List2Ran=Hydraharp400DataConvert.randomList(List2,0,efficent)
+    timeCoincidenceEasyMode(List1Ran, List2, List2Delay, startSec, endSec, coinfile, gpsShift)

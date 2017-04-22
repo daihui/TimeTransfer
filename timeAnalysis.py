@@ -91,7 +91,7 @@ def leastsqToSec(timeList,tau,order):
             Sec = int(item[0] / tau)
             count = 1
     print 'data reduced by leastsq to second/%s.'%tau
-    filter.dotFilter(R,1,0.00000001,3)
+    filter.dotFilter(R,1,0.000000005,3)
     return R
 
 
@@ -128,10 +128,10 @@ def adjacentAnalysisTest(date):
 
 
 def leastsqToSecTest():
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\result\\synCoincidenceEM_0329_170-190_residual.txt', 'utf8')
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\result\\synCoincidenceEM_0422_eff5_3.2_residual_segment_dotfilter0422.txt', 'utf8')
     timeList = fileToList.fileToList(timeFile)
     tau=10000000000
     R=leastsqToSec(timeList,tau,1)
     #R = interSec(R)
     #print R
-    fileToList.listToFileLong(R, timeFile[:-4] + '_%smilliSec0329.txt'%(tau/1000000000))
+    fileToList.listToFileLong(R, timeFile[:-4] + '_%smilliSec0422.txt'%(tau/1000000000))
