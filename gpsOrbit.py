@@ -31,15 +31,15 @@ def gpsLagInter(gpsTimeList1,gpsTimeList2,gpsDelList,interNum):
     return interGpsDel
 
 def gpsLagInterTest():
-    date='3.2'
+    date='12.12'
     gpsTimeList1 = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\send_fixed_GPSTime.txt'%date, 'utf8'))
     gpsTimeList2 = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_GPSTime.txt'%date, 'utf8'))
     List2Delay = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\GPS_disDelay.txt'%date, 'utf8'))
-    file=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\GPS_disDelay_inter10.txt'%date, 'utf8')
-    gpsdelList=gpsLagInter(gpsTimeList1,gpsTimeList2,List2Delay,10)
+    file=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\GPS_disDelay_inter1.txt'%date, 'utf8')
+    gpsdelList=gpsLagInter(gpsTimeList1,gpsTimeList2,List2Delay,1)
     fileToList.listToFile(gpsdelList,file)
 
 def gpsLagInterFunTest():

@@ -71,7 +71,7 @@ def polyLeastFitSegment(x,y,order,segmentTime):
                 y_fit=polyLeastFitCal(xTmp,mat)
                 for j,yy in enumerate(y_fit):
                     fitList.append([yTmp[j]-yy])
-                    residual.append([xTmp[j]+0,(yTmp[j] - yy)])
+                    residual.append([(yTmp[j] - yy)])
                 count=0
                 s+=1
                 del xTmp[:]
@@ -90,7 +90,7 @@ def polyLeastFitSegment(x,y,order,segmentTime):
         y_fit = polyLeastFitCal(xTmp, mat)
         for j, yy in enumerate(y_fit):
             fitList.append([ yTmp[j] - yy])
-            residual.append([xTmp[j]+0,(yTmp[j] - yy)])
+            residual.append([(yTmp[j] - yy)])
             count += 1
         s+=1
     print 'data fitting in %s segment.'%s
@@ -129,8 +129,8 @@ def polyLeastFitTest(date):
     plt.show()
 
 def polyLeastFitSegmentTest(date):
-    order = 10
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0422_eff1-50-240.txt' % date, 'utf8')
+    order = 9
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0423EM_eff2_2.txt' % date, 'utf8')
     #timeFile=unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s_coinDiff_segment_search.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
@@ -146,12 +146,12 @@ def polyLeastFitSegmentTest(date):
     # xa = xa[50000:70000]
     # ya = ya[50000:70000]
 
-    fitList,residual=polyLeastFitSegment(xa,ya,order,100000000000)
-    filter.dotFilter(residual, 1, 5000.0, 3)
-    fileToList.listToFile(residual, timeFile[:-4] + '_%s_residual_segment_dotfilter0422.txt' % date)
+    fitList,residual=polyLeastFitSegment(xa,ya,order,1000000000)
+    filter.dotFilter(residual, 0, 10000.0, 3)
+    fileToList.listToFile(residual, timeFile[:-4] + '_%s_residual_segment_dotfilter0423.txt' % date)
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.plot(xa, fitList, color='g', linestyle='-', marker='')
+    ax.plot(xa, residual, color='g', linestyle='-', marker='')
     #ax.plot(xa,ya/1000000000,color='m',linestyle='',marker='.')
     ax.legend()
     plt.show()

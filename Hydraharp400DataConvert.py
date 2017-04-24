@@ -356,8 +356,8 @@ if __name__ == '__main__':
     # timeList=fileToList.fileToList(dataFile)
     # reduceList=dataReduce(timeList,5)
     # fileToList.listToFileLong(reduceList,dataFile[:-4]+'_reduce5.txt')
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\4.11\\2-1200k-50M-100s-1_coinDiff_segment-1clo.txt','utf8')
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\result\\synCoincidenceEM_0423_eff1-200nsok-符合.txt','utf8')
     timeList=fileToList.fileToList(dataFile)
     #ranList=randomList(timeList,0,10)
-    dataCountHistogram(timeList,50,2000)
+    dataCountHistogram(timeList,100,200000)
 
