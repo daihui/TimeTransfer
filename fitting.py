@@ -130,7 +130,7 @@ def polyLeastFitTest(date):
 
 def polyLeastFitSegmentTest(date):
     order = 9
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0423EM_eff2_2.txt' % date, 'utf8')
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0423_eff1-200nsok.txt' % date, 'utf8')
     #timeFile=unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s_coinDiff_segment_search.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
@@ -146,9 +146,10 @@ def polyLeastFitSegmentTest(date):
     # xa = xa[50000:70000]
     # ya = ya[50000:70000]
 
-    fitList,residual=polyLeastFitSegment(xa,ya,order,1000000000)
-    filter.dotFilter(residual, 0, 10000.0, 3)
-    fileToList.listToFile(residual, timeFile[:-4] + '_%s_residual_segment_dotfilter0423.txt' % date)
+    fitList,residual=polyLeastFitSegment(xa,ya,order,30000000000000)
+    #filter.dotFilter(residual, 0, 10000.0, 3)
+    xa,residual=filter.thresholdFilter(xa,residual,0,10000)
+    fileToList.listToFile(residual, timeFile[:-4] + '_%s_residual_segment_thresholdFilter0424.txt' % date)
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(xa, residual, color='g', linestyle='-', marker='')

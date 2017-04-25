@@ -51,5 +51,5 @@ if __name__ == '__main__':
     # gpsOrbit.gpsLagInterTest()
     # fitting.polyLeastFitTest('3.2')
     # fitting.polyLeastFitSegmentTest('12.12')
-    # timeDataCoincidence.timeCoinFinalEfficent(55, 75, -19, '12.12',1)
-    # timeDataCoincidence.timeCoinEasyModeTest(55, 75, -19, '12.12',1)
+    # timeDataCoincidence.timeCoinFinalEfficent(110, 150, -19, '12.12',1)
+    timeDataCoincidence.timeCoinEasyModeTest(90, 135, -19, '12.12',1)

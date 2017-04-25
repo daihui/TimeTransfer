@@ -337,7 +337,7 @@ def randomList(timeList,channel,factor):
     print length
     ranList=[]
     for i in range(length/factor):
-        ranList.append([timeList[i*factor+random.randint(0,factor-1)][channel]])
+        ranList.append([timeList[i*factor+random.randint(0,factor-1)][channel]/1000000000000.0])
     print len(ranList)
     return ranList
 
@@ -356,8 +356,10 @@ if __name__ == '__main__':
     # timeList=fileToList.fileToList(dataFile)
     # reduceList=dataReduce(timeList,5)
     # fileToList.listToFileLong(reduceList,dataFile[:-4]+'_reduce5.txt')
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\result\\synCoincidenceEM_0423_eff1-200nsok-符合.txt','utf8')
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\result\\synCoincidenceEM_0423_eff1-200nsok_12.12_residual_segment_thresholdFilter0424.txt','utf8')
+    saveFile=dataFile[:-4]+'_100.txt'
     timeList=fileToList.fileToList(dataFile)
-    #ranList=randomList(timeList,0,10)
-    dataCountHistogram(timeList,100,200000)
+    ranList=randomList(timeList,0,100)
+    fileToList.listToFileLong(ranList,saveFile)
+    # dataCountHistogram(timeList,100,200000)
 

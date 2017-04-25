@@ -40,6 +40,19 @@ def dotFilter(timeList,listCount,threshold,times):
         if abs(timeList[i][listCount]) > threshold:
             timeList[i][listCount] =threshold/2
 
+def thresholdFilter(x,timeList,listCount,threshold):
+    listFiltered=[]
+    xa=[]
+    lenght = len(timeList)
+    count=0
+    for i in range(lenght):
+        if abs(timeList[i][listCount])>threshold:
+            count+=1
+        else:
+            listFiltered.append(timeList[i])
+            xa.append(x[i])
+    print '%s data moved !'%count
+    return xa,listFiltered
 
 def freqFilterTest():
     file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\send_fixed_850Time.txt', 'utf8')
