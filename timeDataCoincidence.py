@@ -69,14 +69,14 @@ def timeCoincidence(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startS
 # 每秒寻找第一个符合，然后后面依次按与前面符合对的时间差来找符合
 def timeCoincidenceEasyMode(List1, List2, gpsTimeList1, gpsTimeList2, List2Delay, startSec, endSec, coinfile, gpsShift):
     coincidenceList = []
-    tolFirst = 3000000
+    tolFirst = 4000000
     tol = 200000
     step = 1
     timeCount1 = 0
     timeCount2 = 0
     coinCount = 0
-    checkCount = 1000
-    evaluateLength = 500
+    checkCount = 100
+    evaluateLength = 1000
     evaluateThreshold = 100000
     order = 3
     while List1[timeCount1][0] - gpsTimeList1[startSec][0] < 0:
@@ -119,24 +119,32 @@ def timeCoincidenceEasyMode(List1, List2, gpsTimeList1, gpsTimeList2, List2Delay
                 timeCount1, moveNext2, findCoin = searchCoin(List1, List2, timeCount1, timeCount2, 200,
                                                              priorTime1, priorTime2, tol)
                 if findCoin:
-                    coinCount += 1
                     checkCount -= 1
-                    priorTime1 = List1[timeCount1][0]
-                    priorTime2 = List2[timeCount2][0]
-                    coincidenceList.append(
-                        [List1[timeCount1][0], List2[timeCount2][0], List1[timeCount1][0] - List2[timeCount2][0]])
-                    timeCount1 += 1
-                    timeCount2 += 1
+                    if checkCount < 0:
+                        if len(coincidenceList) > evaluateLength:
+                            evaluateFeedback = fitEvaluate(coincidenceList[-evaluateLength:], List1[timeCount1][0],
+                                                           List2[timeCount2][0], evaluateThreshold, order)
+                            if evaluateFeedback == False:
+                                firstCoin = False
+                            else:
+                                priorTime1 = List1[timeCount1][0]
+                                priorTime2 = List2[timeCount2][0]
+                                coinCount += 1
+                                coincidenceList.append(
+                                    [List1[timeCount1][0], List2[timeCount2][0],
+                                     List1[timeCount1][0] - List2[timeCount2][0]])
+                                timeCount1 += 1
+                                timeCount2 += 1
+                        checkCount = 100
+                    else:
+                        priorTime1 = List1[timeCount1][0]
+                        priorTime2 = List2[timeCount2][0]
+                        coinCount += 1
+                        coincidenceList.append([List1[timeCount1][0], List2[timeCount2][0], List1[timeCount1][0] - List2[timeCount2][0]])
+                        timeCount1 += 1
+                        timeCount2 += 1
                 elif moveNext2:
                     timeCount2 += 1
-                if checkCount < 0:
-                    if len(coincidenceList) > evaluateLength:
-                        evaluateFeedback = fitEvaluate(coincidenceList[-evaluateLength:], coincidenceList[-1][0],
-                                                       coincidenceList[-1][1], evaluateThreshold, order)
-                        if evaluateFeedback == False:
-                            firstCoin = False
-                            # print 'search new first coin'
-                    checkCount = 1000
             if List2[timeCount2][0] - gpsTimeList2[i + 1][0] > 0:
                 print coinCount
                 inSec = False

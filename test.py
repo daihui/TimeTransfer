@@ -52,7 +52,7 @@ if __name__ == '__main__':
     # fitting.polyLeastFitTest('3.2')
     # fitting.polyLeastFitSegmentTest('3.2')
     # timeDataCoincidence.timeCoinFinalEfficent(180, 200, -19, '3.2',1)
-    timeDataCoincidence.timeCoinEasyModeTest(190, 220, -19, '3.2',1)
+    timeDataCoincidence.timeCoinEasyModeTest(150, 200, -19, '3.2',1)
     # for sec in range(10):
     #     print sec
     #     timeDataCoincidence.timeCoinEasyModeTest(55, 75, -sec-15, '3.2',1)
