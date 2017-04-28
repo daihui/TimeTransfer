@@ -54,6 +54,22 @@ def thresholdFilter(x,timeList,listCount,threshold):
     print '%s data moved !'%count
     return xa,listFiltered
 
+def preFilter(timeList,listCount,threshold):
+    listFiltered=[]
+    xa=[]
+    lenght = len(timeList)
+    count=0
+    listFiltered.append(timeList[0][0]-timeList[0][1])
+    xa.append(timeList[0][1])
+    for i in range(1,lenght):
+        if abs(timeList[i][listCount]-timeList[i-1][listCount])>threshold:
+            count+=1
+        else:
+            listFiltered.append(timeList[i][0]-timeList[i][1])
+            xa.append(timeList[i][1])
+    print '%s data moved !'%count
+    return xa,listFiltered
+
 def freqFilterTest():
     file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\send_fixed_850Time.txt', 'utf8')
     # file = unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_850Time.txt', 'utf8')

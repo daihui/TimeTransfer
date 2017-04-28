@@ -48,7 +48,7 @@ def gpsDisDelayEasyMode(gpsDisFile1, gpsDisFile2):
     gpsDisList1 = fileToList.fileToList(gpsDisFile1)
     gpsDisList2 = fileToList.fileToList(gpsDisFile2)
     gpsDelList = []
-    s = gpsDisFile2[:-8] + 'disDelay.txt'
+    s = gpsDisFile2[:-4] + '_disDelay.txt'
     delayFile = open(s, 'w')
     if len(gpsDisList1) < len(gpsDisList2):
         item = len(gpsDisList1)
@@ -126,9 +126,9 @@ def timeCorrectByGpsTest(startSec, endSec, shift):
     gpsDisDelay(datafile2, gpsTimeFile1, gpsTimeFile2, gpsdisfile1, gpsdisfile2, startSec, endSec, shift)
 
 
-def gpsDisDelayEasyModeTest():
-    gpsdisfile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\GPS_Send.txt', 'utf8')
-    gpsdisfile2 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\GPS_Recv.txt', 'utf8')
+def gpsDisDelayEasyModeTest(date):
+    gpsdisfile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\GPS_Send_Precise.txt'%date, 'utf8')
+    gpsdisfile2 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\GPS_Recv_Precise.txt'%date, 'utf8')
     gpsDisDelayEasyMode(gpsdisfile1, gpsdisfile2)
 
 

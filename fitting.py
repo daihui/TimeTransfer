@@ -70,7 +70,7 @@ def polyLeastFitSegment(x,y,order,segmentTime):
                 mat=polyLeastFit(xTmp,yTmp,order)
                 y_fit=polyLeastFitCal(xTmp,mat)
                 for j,yy in enumerate(y_fit):
-                    fitList.append([yTmp[j]-yy])
+                    fitList.append([yy])
                     residual.append([(yTmp[j] - yy)])
                 count=0
                 s+=1
@@ -89,7 +89,7 @@ def polyLeastFitSegment(x,y,order,segmentTime):
         mat = polyLeastFit(xTmp, yTmp, order)
         y_fit = polyLeastFitCal(xTmp, mat)
         for j, yy in enumerate(y_fit):
-            fitList.append([ yTmp[j] - yy])
+            fitList.append([  yy])
             residual.append([(yTmp[j] - yy)])
             count += 1
         s+=1
@@ -129,30 +129,33 @@ def polyLeastFitTest(date):
     plt.show()
 
 def polyLeastFitSegmentTest(date):
-    order = 9
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0423_eff1-200nsok.txt' % date, 'utf8')
+    order = 10
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0427EM_1.txt' % date, 'utf8')
     #timeFile=unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s_coinDiff_segment_search.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
     ya = []
     x=[]
 
-    for i in range(len(timeList)):
-        xa.append(timeList[i][1])
-        ya.append(timeList[i][0] - timeList[i][1])
+    # for i in range(len(timeList)):
+    #     xa.append(timeList[i][1])
+    #     ya.append(timeList[i][0] - timeList[i][1])
         # xa.append(timeList[i][0])
         # ya.append(timeList[i][1])
 
     # xa = xa[50000:70000]
     # ya = ya[50000:70000]
 
-    fitList,residual=polyLeastFitSegment(xa,ya,order,30000000000000)
+    # print len(xa), len(ya)
+    xa,ya =filter.preFilter(timeList,2,100000)
+    print len(xa),len(ya)
+    fitList,residual=polyLeastFitSegment(xa,ya,order,20000000000000)
     #filter.dotFilter(residual, 0, 10000.0, 3)
-    xa,residual=filter.thresholdFilter(xa,residual,0,10000)
-    fileToList.listToFile(residual, timeFile[:-4] + '_%s_residual_segment_thresholdFilter0424.txt' % date)
+    xa,residual=filter.thresholdFilter(xa,residual,0,4000)
+    fileToList.listToFile(residual, timeFile[:-4] + '_%s_residual_segment_thresholdFilter0427.txt' % date)
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(xa, residual, color='g', linestyle='-', marker='')
-    #ax.plot(xa,ya/1000000000,color='m',linestyle='',marker='.')
+    # ax.plot(xa,ya,color='m',linestyle='',marker='.')
     ax.legend()
     plt.show()

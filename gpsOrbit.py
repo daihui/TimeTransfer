@@ -7,13 +7,16 @@ import matplotlib.pyplot as plt
 import fileToList
 
 
-def gpsLagInterFun(gpsTimeList, disList, startNo, Num, shift):  # gps距离list，插值秒数中点，前后各Num秒
+def gpsLagInterFun(gpsTimeList1,gpsTimeList2, disDelayList, startNo, Num, shift):  # gps距离list，插值秒数中点，前后各Num秒
     if startNo < Num:
         print startNo + 'Must >= ' + Num
-    x = [float(gpsTimeList[i + startNo - Num][0]) / 1000000000000.0 for i in range(2 * Num + 1)]
-    fx = [disList[i + startNo - Num + shift][0] for i in range(2 * Num + 1)]
-    gpsfun = lagInterpolation.get_Lxfunc(x, fx)
-    return gpsfun
+    x1 = [float(gpsTimeList1[i + startNo - Num][0])  for i in range(2 * Num + 1)]
+    fx1 = [disDelayList[i + startNo - Num + shift][0] for i in range(2 * Num + 1)]
+    x2 = [float(gpsTimeList2[i + startNo - Num][0])  for i in range(2 * Num + 1)]
+    fx2 = [disDelayList[i + startNo - Num + shift][1] for i in range(2 * Num + 1)]
+    gpsfunc1 = lagInterpolation.get_Lxfunc(x1, fx1)
+    gpsfunc2 = lagInterpolation.get_Lxfunc(x2, fx2)
+    return gpsfunc1,gpsfunc2
 
 def gpsLagInter(gpsTimeList1,gpsTimeList2,gpsDelList,interNum):
     N=len(gpsDelList)
@@ -43,28 +46,22 @@ def gpsLagInterTest():
     fileToList.listToFile(gpsdelList,file)
 
 def gpsLagInterFunTest():
-    gpsTimeFile = unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_GPSTime.txt', 'utf8')
-    gpsDisFile = unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\GPS_Recv.txt', 'utf8')
-    gpsTimeList = []
-    gpsDisList = []
+    gpsTimeList1 = fileToList.fileToList(
+        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\send_fixed_GPSTime.txt', 'utf8'))
+    gpsTimeList2 = fileToList.fileToList(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\recv_fixed_GPSTime.txt', 'utf8'))
+    gpsDisList =fileToList.fileToList(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\GPS_Recv_Precise_disDelay.txt', 'utf8'))
     startNo = 7
     Num = 5
-    with open(gpsTimeFile) as gpstime:
-        for line in gpstime:
-            gpsTimeList.append(float(line.strip()))
-        print 'gps time list load finished!'
-    with open(gpsDisFile) as gpsdis:
-        for line in gpsdis:
-            gpsDisList.append(float(line.strip()))
-        print 'gps distance list load finished!'
-    Lx = gpsLagInterFun(gpsTimeList, gpsDisList, startNo, Num)  # 获得插值函数
-    tmp_x = [float(startNo + i / 10.0) for i in range(startNo, startNo + 100)]  # 测试用例
-    tmp_y = [Lx(float(i)) for i in tmp_x]  # 根据插值函数获得测试用例的纵坐标
-    print tmp_x, tmp_y
-    print tmp_y
-    x = [gpsTimeList[i] / 1000000000000.0 for i in range(startNo, startNo + 10)]
-    y = [gpsDisList[i] for i in range(startNo, startNo + 10)]
-    print x, y
+    tmp_x=[]
+    tmp_y=[]
+    x=[]
+    y=[]
+    for sec in range(100):
+        Lx1,Lx2 = gpsLagInterFun(gpsTimeList1,gpsTimeList2, gpsDisList, startNo+sec, Num,0)  # 获得插值函数
+        tmp_x += [float(startNo +sec+ i / 10.0)*1000000000000 for i in range(10)]  # 测试用例
+        tmp_y += [Lx1(float(startNo +sec+ i / 10.0)*1000000000000) for i in range(10)]  # 根据插值函数获得测试用例的纵坐标
+        x += [gpsTimeList1[startNo+sec][0] ]
+        y += [gpsDisList[startNo+sec][0]]
     ''' 画图 '''
     plt.figure("play")
     ax1 = plt.subplot(111)

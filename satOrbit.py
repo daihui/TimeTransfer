@@ -29,7 +29,7 @@ def satOrbSec(satFile, startTime, Num, shfit):
         for j in range(1, J):
             satFun = satLagInterFun(satList, Num, j, shfit + moveOne)
             silde.append(satFun(startTime + i))
-        satSecList.append(silde[i * J:])
+        satSecList.append(silde[i * (J):])
     fileToList.listToFile(satSecList, savefile)
     print 'satellte position interpolation calculate by second !'
     return satSecList
@@ -38,6 +38,7 @@ def groundStationSec(groundList, startTime, passSec, interNum):
     year, month, day, hour, minute, sec = startTime
     jd = jdutil.date_to_jd(year, month, day)
     mjd = jdutil.jd_to_mjd(jd)
+    print jd,mjd
     J = len(groundList[0])
     silde = []
     groundSecList = []
@@ -78,19 +79,20 @@ def groSatDistance(groundList, satList):
 
 
 def satLagInterFun(satList, Num, j, shift):
-    x = [float(satList[i - Num + shift][0]) for i in range(2 * Num + 1)]
+    # x = [float(satList[i - Num + shift][0]/1000000.0+satList[i - Num + shift][1]) for i in range(2 * Num + 1)]
+    x = [float( satList[i - Num + shift][0]) for i in range(2 * Num + 1)]
     fx = [satList[i - Num + shift][j] for i in range(2 * Num + 1)]
     satfun = lagInterpolation.get_Lxfunc(x, fx)
     return satfun
 
 
 def satOrbSecTest():
-    satFile = unicode('G:\时频传输数据处理\双站数据处理\\3.2\\satellite.txt', 'utf8')
-    satOrbSec(satFile, 163127533, 4, 7)
+    satFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\卫星过境实测坐标J2000.txt', 'utf8')
+    satOrbSec(satFile, 163127535, 4, 8)
 
 
 def groundSecTest():
-    goundFile = unicode('G:\时频传输数据处理\双站数据处理\\3.2\\groundStationJ2000.txt', 'utf8')
+    goundFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\Result\\groundStationJ2000.txt', 'utf8')
     goundList = fileToList.fileToList(goundFile)
     startTime = (2017, 3, 2, 17, 12, 15)
     groundSecList = groundStationSec(goundList, startTime, 400, 2)
