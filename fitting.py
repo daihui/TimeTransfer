@@ -129,7 +129,7 @@ def polyLeastFitTest(date):
     plt.show()
 
 def polyLeastFitSegmentTest(date):
-    order =3
+    order =10
     timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_00502EM190-200s.txt' % date, 'utf8')
     #timeFile=unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s_coinDiff_segment_search.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
