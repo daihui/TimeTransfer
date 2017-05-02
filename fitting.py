@@ -129,17 +129,17 @@ def polyLeastFitTest(date):
     plt.show()
 
 def polyLeastFitSegmentTest(date):
-    order = 10
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0428EM_1.txt' % date, 'utf8')
+    order =3
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_00502EM190-200s.txt' % date, 'utf8')
     #timeFile=unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s_coinDiff_segment_search.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
     ya = []
     x=[]
 
-    # for i in range(len(timeList)):
-    #     xa.append(timeList[i][1])
-    #     ya.append(timeList[i][0] - timeList[i][1])
+    for i in range(len(timeList)):
+        xa.append(timeList[i][1])
+        ya.append(timeList[i][0] - timeList[i][1])
         # xa.append(timeList[i][0])
         # ya.append(timeList[i][1])
 
@@ -147,12 +147,12 @@ def polyLeastFitSegmentTest(date):
     # ya = ya[50000:70000]
 
     # print len(xa), len(ya)
-    xa,ya =filter.preFilter(timeList,2,100000)
-    print len(xa),len(ya)
-    fitList,residual=polyLeastFitSegment(xa,ya,order,100000000000)
+    # xa,ya =filter.preFilter(timeList,2,100000)
+    # print len(xa),len(ya)
+    fitList,residual=polyLeastFitSegment(xa,ya,order,10000000000)
     #filter.dotFilter(residual, 0, 10000.0, 3)
-    xa,residual=filter.thresholdFilter(xa,residual,0,20000)
-    fileToList.listToFile(residual, timeFile[:-4] + '_%s_residual_segment_thresholdFilter0428.txt' % date)
+    xa,residual=filter.thresholdFilter(xa,residual,0,3000)
+    fileToList.listToFile(residual, timeFile[:-4] + '_%s_residual_segment_thresholdFilter0502.txt' % date)
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(xa, residual, color='g', linestyle='-', marker='')
