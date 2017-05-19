@@ -22,6 +22,58 @@ def classifyData(dataFile):
         print 'data classify successfully !'
     return filename
 
+def classifyData850(dataFile,channelList):
+    fileNames=[]
+    dataClassify=[]
+    for item in channelList:
+        fileNames.append(dataFile[:-4] + '_channel_%s_classified.txt'%item)
+        dataClassify.append(open(fileNames[-1],'w'))
+    try:
+        with open(dataFile) as f:
+            for line in f:
+                dataline=line.split()
+                for index,item in enumerate(channelList):
+                    if dataline[0]==str(item):
+                        dataClassify[index].write(dataline[1] + '\n')
+                        break
+            for item in dataClassify:
+                item.flush()
+                item.close()
+    finally:
+        print 'data classify successfully !'
+    return fileNames
+
+def coincidence850(list1,list2,channelDelay, coinWidth):
+    resultList=[]
+    index1=0
+    index2=0
+    count=0
+    finish=False
+    len1=len(list1)
+    len2=len(list2)
+    print len1,len2
+    while not finish:
+        if index1 > len1-1 or index2 > len2-1:
+            break
+        detTime=list1[index1][0]-list2[index2][0]-channelDelay
+        if abs(detTime)<coinWidth:
+            resultList.append([list1[index1][0],list2[index2][0],detTime])
+            count+=1
+            index1+=1
+            index2+=1
+        elif detTime>0:
+            index2+=1
+        else:
+            index1+=1
+    print 'coincidence finished! %s pairs'%count
+    return resultList
+
+def coindenceTest(dataFile1,dataFile2,channelDelay,coinWidth):
+    list1=fileToList.fileToList(dataFile1)
+    list2=fileToList.fileToList(dataFile2)
+    saveFile=dataFile1[:-4]+'_coindence.txt'
+    resultList=coincidence850(list1,list2,channelDelay,coinWidth)
+    fileToList.listToFile(resultList,saveFile)
 
 def timeAnalysis(timeList):
     diffList = []
@@ -32,8 +84,10 @@ def timeAnalysis(timeList):
 
 
 if __name__ == '__main__':
-    dataFile = unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\\4.1\解析\\recv_time-10k-400s.txt', 'utf8')
-    dataClassify = classifyData(dataFile)
-    timeList = fileToList.fileToList(dataClassify)
-    diffList = timeAnalysis(timeList)
-    fileToList.listToFile(diffList, dataClassify[:-4] + '_diff.txt')
+    dataFile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\5_17DLH\\recv_fixedchannel6_classified.txt', 'utf8')
+    dataFile2= unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\5_17DLH\\recv_fixedchannel9_classified.txt', 'utf8')
+    coindenceTest(dataFile1,dataFile2,-6000,4000)
+    # dataClassify = classifyData850(dataFile,[6,7,8,9])
+    # timeList = fileToList.fileToList(dataClassify)
+    # diffList = timeAnalysis(timeList)
+    # fileToList.listToFile(diffList, dataClassify[:-4] + '_diff.txt')

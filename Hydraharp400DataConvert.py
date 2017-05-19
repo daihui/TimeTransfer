@@ -342,10 +342,10 @@ def randomList(timeList,channel,factor):
     return ranList
 
 if __name__ == '__main__':
-    #dataFile = unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s.ptu', 'utf8')
+    # dataFile = unicode('E:\Experiment Data\时频传输数据处理\本地TDC测试\\5.12\\5.12-1k-externalREF-50s-1.ptu', 'utf8')
     # saveFile=dataFile[:-4]+'_parse.txt'
     # dataList=Hydraharp400DataToList(dataFile,8000)
-    # Hydraharp400DataParse(dataList,saveFile,[0,2])
+    # Hydraharp400DataParse(dataList,saveFile,[0])
     # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\4.11\\2-1200k-50M-100s-1.ptu','utf8')
     # dataCoincidence(dataFile)
     # dataCoinLight(dataFile,0,500)
@@ -356,10 +356,10 @@ if __name__ == '__main__':
     # timeList=fileToList.fileToList(dataFile)
     # reduceList=dataReduce(timeList,5)
     # fileToList.listToFileLong(reduceList,dataFile[:-4]+'_reduce5.txt')
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\result\\synCoincidenceEM_0423_eff1-200nsok_12.12_residual_segment_thresholdFilter0424.txt','utf8')
-    saveFile=dataFile[:-4]+'_100.txt'
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\5_17DLH\\recv_fixedchannel6_classified_coindence-col1.txt','utf8')
+    # saveFile=dataFile[:-4]+'_100.txt'
     timeList=fileToList.fileToList(dataFile)
-    ranList=randomList(timeList,0,100)
-    fileToList.listToFileLong(ranList,saveFile)
-    # dataCountHistogram(timeList,100,200000)
+    # ranList=randomList(timeList,0,100)
+    # fileToList.listToFileLong(ranList,saveFile)
+    dataCountHistogram(timeList,50,3000)
 

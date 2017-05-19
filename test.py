@@ -50,9 +50,10 @@ if __name__ == '__main__':
     #orbitDelayGps.delayOrbitFitTest()
     # gpsOrbit.gpsLagInterTest()
     # fitting.polyLeastFitTest('3.2')
-    fitting.polyLeastFitSegmentTest('3.2')
+    #fitting.polyLeastFitSegmentTest('3.2')
     # timeDataCoincidence.timeCoinFinalEfficent(180, 200, -19, '3.2',1)
     # timeDataCoincidence.timeCoinEasyModeTest(190, 200, -19, '3.2',1)
+    fitting.fitComObsTest('3.2')
     # for sec in range(10):
     #     print sec
     #     timeDataCoincidence.timeCoinEasyModeTest(55, 75, -sec-15, '3.2',1)

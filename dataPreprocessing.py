@@ -28,3 +28,4 @@ def classifyData(filename, gpsfilename, synfilename):
             light.flush()
             light.close()
     finally:print 'data classify successfully !'
+
