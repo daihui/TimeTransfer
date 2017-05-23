@@ -84,10 +84,15 @@ def timeAnalysis(timeList):
 
 
 if __name__ == '__main__':
-    dataFile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\5_17DLH\\recv_fixedchannel6_classified.txt', 'utf8')
-    dataFile2= unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\5_17DLH\\recv_fixedchannel9_classified.txt', 'utf8')
-    coindenceTest(dataFile1,dataFile2,-6000,4000)
+    # dataFile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\5_17DLH\\recv_fixedchannel6_classified.txt', 'utf8')
+    # dataFile2= unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\5_17DLH\\recv_fixedchannel9_classified.txt', 'utf8')
+    # coindenceTest(dataFile1,dataFile2,-6000,4000)
     # dataClassify = classifyData850(dataFile,[6,7,8,9])
     # timeList = fileToList.fileToList(dataClassify)
     # diffList = timeAnalysis(timeList)
     # fileToList.listToFile(diffList, dataClassify[:-4] + '_diff.txt')
+    # dataFile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\dat2txt\\recv_fixed.txt', 'utf8')
+    # f=open(dataFile1)
+    # for i in range(10000):
+    #     print f.readlines()
+

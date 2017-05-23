@@ -7,6 +7,7 @@ import clockTimeCalibrate
 import Hydraharp400DataConvert
 import fitting
 import gpsOrbit
+import filter
 
 
 # 合符函数，寻找两list的时间符合。
@@ -79,16 +80,19 @@ def timeCoincidenceEasyMode(List1, List2, gpsTimeList1, gpsTimeList2, List2Delay
     evaluateLength = 1000
     evaluateThreshold = 100000
     order = 3
+    List1 = filter.freqFilter(List1, 10000000, 10, 200000)
+    List2 = filter.freqFilter(List2, 10000000, 10, 200000)
     while List1[timeCount1][0] - gpsTimeList1[startSec][0] < 0:
         timeCount1 += 1
     while List2[timeCount2][0] - gpsTimeList2[startSec][0] < 0:
         timeCount2 += 1
-    timeFactor1 = clockTimeCalibrate.clockTimeFactor(gpsTimeList1)
-    timeFactor2 = clockTimeCalibrate.clockTimeFactor(gpsTimeList2)
-    List1 = clockTimeCalibrate.timeCalibrate(List1, timeFactor1)
-    List2 = clockTimeCalibrate.timeCalibrate(List2, timeFactor2)
-    gpsTimeList1 = clockTimeCalibrate.timeCalibrate(gpsTimeList1, timeFactor1)
-    gpsTimeList2 = clockTimeCalibrate.timeCalibrate(gpsTimeList2, timeFactor2)
+
+    # timeFactor1 = clockTimeCalibrate.clockTimeFactor(gpsTimeList1)
+    # timeFactor2 = clockTimeCalibrate.clockTimeFactor(gpsTimeList2)
+    # List1 = clockTimeCalibrate.timeCalibrate(List1, timeFactor1)
+    # List2 = clockTimeCalibrate.timeCalibrate(List2, timeFactor2)
+    # gpsTimeList1 = clockTimeCalibrate.timeCalibrate(gpsTimeList1, timeFactor1)
+    # gpsTimeList2 = clockTimeCalibrate.timeCalibrate(gpsTimeList2, timeFactor2)
     for i in range(startSec, endSec, step):
         inSec = True
         firstCoin = False
@@ -324,16 +328,16 @@ def timeCoinTest():
     gpsTimeList1 = fileToList.fileToList(unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\LJ\\recv_fixed_GPSTime.txt', 'utf8'))
     gpsTimeList2 = fileToList.fileToList(unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_GPSTime.txt', 'utf8'))
     coinfile = unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\850coincidence.txt', 'utf8')
-    startSec = 50
-    endSec = 250
+    startSec = 100
+    endSec = 240
     timeCoincidence(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startSec, endSec, coinfile)
 
 
 def timeCoinEasyModeTest(startSec, endSec, gpsShift, date, efficent):
     List1 = fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\send_fixed_850Time.txt' % date, 'utf8'))
+        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\send_fixed_850Time.txt' , 'utf8'))
     List2 = fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_850Time.txt' % date, 'utf8'))
+        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\recv_fixed_850Time.txt' , 'utf8'))
     List2Delay = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\GPS_Recv_Precise_disDelay.txt' % date, 'utf8'))
     gpsTimeList1 = fileToList.fileToList(
@@ -341,7 +345,7 @@ def timeCoinEasyModeTest(startSec, endSec, gpsShift, date, efficent):
     gpsTimeList2 = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_GPSTime.txt' % date, 'utf8'))
     coinfile = unicode(
-        'E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_00502EM_%s.txt' % (date, efficent), 'utf8')
+        'E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0523-%s-%s-EM.txt' % (date, startSec,endSec), 'utf8')
     # List1Ran = Hydraharp400DataConvert.randomList(List1, 0, efficent)
     # List2Ran = Hydraharp400DataConvert.randomList(List2, 0, efficent)
     timeCoincidenceEasyMode(List1, List2, gpsTimeList1, gpsTimeList2, List2Delay, startSec, endSec, coinfile, gpsShift)

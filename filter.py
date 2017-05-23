@@ -6,20 +6,25 @@ import fileToList
 
 def freqFilter(timeList, freq, window, threshold):
     N = len(timeList)
+    resultList=[]
     count = 0
     for i in xrange(N - window - 1):
-        averTime = 0.0
-        for j in range(window):
-            averTime+=timeList[i + j][0]%freq
-        averTime = averTime / window
-        if abs(timeList[i][0] % freq - averTime) < threshold:
-            timeList[i - count][0] = timeList[i][0]
+        okCount=0.0
+        for j in range(1,window):
+            residual=((timeList[i + j][0]-timeList[i][0])%freq)
+            if residual<threshold or (freq-residual)<threshold:
+                okCount+=1
+        if okCount > (window-1)/2:
+            resultList.append([timeList[i][0]])
         else:
             count += 1
-    del timeList[-count:]
+            #print okCount
     print 'time list filtered , %s data are moved out' % count
-    return timeList
+    return resultList
 
+def slopeFilter(timeList,threshold):
+    resultList=[]
+    #for
 
 def dataFilter(timeFile, freq, window, threshold):
     timeList = fileToList.fileToList(timeFile)
@@ -40,9 +45,10 @@ def dotFilter(timeList,listCount,threshold,times):
         if abs(timeList[i][listCount]) > threshold:
             timeList[i][listCount] =threshold/2
 
-def thresholdFilter(x,timeList,listCount,threshold):
+def thresholdFilter(x,y,timeList,listCount,threshold):
     listFiltered=[]
     xa=[]
+    ya=[]
     lenght = len(timeList)
     count=0
     for i in range(lenght):
@@ -51,10 +57,11 @@ def thresholdFilter(x,timeList,listCount,threshold):
         else:
             listFiltered.append(timeList[i])
             xa.append(x[i])
+            ya.append(y[i])
     print '%s data moved !'%count
-    return xa,listFiltered
+    return xa,ya,listFiltered
 
-def preFilter(timeList,listCount,threshold):
+def  preFilter(timeList,listCount,threshold):
     listFiltered=[]
     xa=[]
     lenght = len(timeList)
@@ -71,7 +78,8 @@ def preFilter(timeList,listCount,threshold):
     return xa,listFiltered
 
 def freqFilterTest():
-    file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\12.12\\send_fixed_850Time.txt', 'utf8')
+    file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\recv_fixed_850Time.txt', 'utf8')
     # file = unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_850Time.txt', 'utf8')
     #dataFilter(file, 10000000, 100, 200000)
-    dataFilter(file, 10000000, 100, 1000000)
+    timeList=fileToList.fileToList(file)
+    freqFilter(timeList,10000000,10,100000)

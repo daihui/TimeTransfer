@@ -11,6 +11,7 @@ import numpy as np
 import datetime
 import jdutil
 import math
+import random
 
 
 def satOrbSec(satFile, startTime, Num, shfit):
@@ -107,3 +108,29 @@ def distanceTest():
     groSatDistance(goundList,satList)
 
 
+#模拟计算定轨精度为X下，两地延时的误差范围
+def disUncertain(X,groStation,satellite,staCount):
+    distance=0
+    delay=0
+    for i in range(staCount):
+        newSatellite=[satellite[1]*1000+X*random.random(),satellite[2]*1000+X*random.random(),satellite[3]*1000+X*random.random()]
+        distance= math.sqrt((newSatellite[0]-satellite[1]*1000)**2+(newSatellite[1]-satellite[2]*1000)**2+(newSatellite[2]-satellite[3]*1000)**2)
+        newdistance1=math.sqrt((newSatellite[0]-groStation[1])**2+(newSatellite[1]-groStation[2])**2+(newSatellite[2]-groStation[3])**2)
+        newdistance2 = math.sqrt((newSatellite[0] - groStation[4]) ** 2 + (newSatellite[1] - groStation[5]) ** 2 + (
+        newSatellite[2] - groStation[6]) ** 2)
+        olddistance1 = math.sqrt((satellite[1]*1000 - groStation[1]) ** 2 + (satellite[2]*1000 - groStation[2]) ** 2 + (
+            satellite[3] * 1000 - groStation[3]) ** 2)
+        olddistance2 = math.sqrt((satellite[1]*1000 - groStation[4]) ** 2 + (satellite[2]*1000 - groStation[5]) ** 2 + (
+            satellite[3] * 1000 - groStation[6]) ** 2)
+        delay= abs(1000000000000.0 * ((newdistance1-olddistance1) - (newdistance2-olddistance2)) / 299792458)
+        print '%s\t%s\t%s'%((newdistance1-olddistance1),(newdistance2-olddistance2),delay)
+    #print '%s\t%s'%(distance/staCount,delay/staCount)
+
+def disUncertainTest(X,staCount,i):
+    goundFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\Result\\groundStationJ2000_Sec.txt', 'utf8')
+    satFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\Result\\satellite_Sec.txt', 'utf8')
+    goundList = fileToList.fileToList(goundFile)
+    satList=fileToList.fileToList(satFile)
+    #length=len(goundList)
+    #for i in range(length):
+    disUncertain(X,goundList[i],satList[i],staCount)

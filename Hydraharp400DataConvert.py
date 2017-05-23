@@ -356,10 +356,10 @@ if __name__ == '__main__':
     # timeList=fileToList.fileToList(dataFile)
     # reduceList=dataReduce(timeList,5)
     # fileToList.listToFileLong(reduceList,dataFile[:-4]+'_reduce5.txt')
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\5_17DLH\\recv_fixedchannel6_classified_coindence-col1.txt','utf8')
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\Result\\synCoincidenceEM_0523-190-235-EM_3.2_residual_segment_thresholdFilter0523-50.txt','utf8')
     # saveFile=dataFile[:-4]+'_100.txt'
     timeList=fileToList.fileToList(dataFile)
     # ranList=randomList(timeList,0,100)
     # fileToList.listToFileLong(ranList,saveFile)
-    dataCountHistogram(timeList,50,3000)
+    dataCountHistogram(timeList,50,2500)
 

@@ -27,7 +27,7 @@ def dataPreprocessingTest(s):
 
 if __name__ == '__main__':
     #filetest=open('G:\\test.txt','w')
-    #s=unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\LJ\\recv_fixed.txt','utf8')
+    # s=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\dat2txt\\send_fixed.txt','utf8')
     # dataPreprocessingTest(s)
     #orbitDelayGps.timeCorrectByGpsTest(50,250,-21)
     #timeDataCoincidence.timeCoinTest()
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     # timeList=clockTimeCalibrate.timeCalibrate(List2,factor)
     # print timeList
     #timeAnalysis.adjacentAnalysisTest('12.12')
-    #filter.freqFilterTest()
+    # filter.freqFilterTest()
     # satOrbit.satOrbSecTest()
     # timeAnalysis.leastsqToSecTest()
     # satOrbit.groundSecTest()
@@ -50,10 +50,11 @@ if __name__ == '__main__':
     #orbitDelayGps.delayOrbitFitTest()
     # gpsOrbit.gpsLagInterTest()
     # fitting.polyLeastFitTest('3.2')
-    #fitting.polyLeastFitSegmentTest('3.2')
+    # fitting.polyLeastFitSegmentTest('3.2')
     # timeDataCoincidence.timeCoinFinalEfficent(180, 200, -19, '3.2',1)
-    # timeDataCoincidence.timeCoinEasyModeTest(190, 200, -19, '3.2',1)
-    fitting.fitComObsTest('3.2')
+    # timeDataCoincidence.timeCoinEasyModeTest(85, 140, -19, '3.2',1)
+    # fitting.fitComObsTest('3.2')
     # for sec in range(10):
     #     print sec
     #     timeDataCoincidence.timeCoinEasyModeTest(55, 75, -sec-15, '3.2',1)
+    satOrbit.disUncertainTest(10,10000,200)
