@@ -113,7 +113,7 @@ def disUncertain(X,groStation,satellite,staCount):
     distance=0
     delay=0
     for i in range(staCount):
-        newSatellite=[satellite[1]*1000+X*random.random(),satellite[2]*1000+X*random.random(),satellite[3]*1000+X*random.random()]
+        newSatellite=[satellite[1]*1000+0*random.uniform(-1,1),satellite[2]*1000+0*random.uniform(-1,1),satellite[3]*1000+X*random.uniform(-1,1)]
         distance= math.sqrt((newSatellite[0]-satellite[1]*1000)**2+(newSatellite[1]-satellite[2]*1000)**2+(newSatellite[2]-satellite[3]*1000)**2)
         newdistance1=math.sqrt((newSatellite[0]-groStation[1])**2+(newSatellite[1]-groStation[2])**2+(newSatellite[2]-groStation[3])**2)
         newdistance2 = math.sqrt((newSatellite[0] - groStation[4]) ** 2 + (newSatellite[1] - groStation[5]) ** 2 + (
@@ -122,8 +122,8 @@ def disUncertain(X,groStation,satellite,staCount):
             satellite[3] * 1000 - groStation[3]) ** 2)
         olddistance2 = math.sqrt((satellite[1]*1000 - groStation[4]) ** 2 + (satellite[2]*1000 - groStation[5]) ** 2 + (
             satellite[3] * 1000 - groStation[6]) ** 2)
-        delay= abs(1000000000000.0 * ((newdistance1-olddistance1) - (newdistance2-olddistance2)) / 299792458)
-        print '%s\t%s\t%s'%((newdistance1-olddistance1),(newdistance2-olddistance2),delay)
+        delay= 1000000000000.0 * ((newdistance1-olddistance1) - (newdistance2-olddistance2)) / 299792458
+        print '%s\t%s\t%s\t%s'%(distance,(newdistance1-olddistance1),(newdistance2-olddistance2),delay)
     #print '%s\t%s'%(distance/staCount,delay/staCount)
 
 def disUncertainTest(X,staCount,i):
