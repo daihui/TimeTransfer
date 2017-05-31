@@ -63,21 +63,21 @@ demo:
 if __name__ == '__main__':
 
     ''' 插值节点, 这里用二次函数生成插值节点，每两个节点x轴距离位10 '''
-    gps = open(unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\GPS_Recv.txt', 'utf8'))
-    sr_x = [i for i in range(1, 10)]
+    gps = open(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\GPS_Recv_Precise.txt', 'utf8'))
+    sr_x = [i for i in range(1, 150)]
     sr_fx = []
-    for i in range(1, 10):
+    for i in range(1, 150):
         s = float(gps.readline().strip())
         sr_fx.append(s)
     gps.close()
     Lx = get_Lxfunc(sr_x, sr_fx)  # 获得插值函数
-    tmp_x = [float(i / 10000.0) for i in range(1, 100)]  # 测试用例
+    tmp_x = [float(i / 100.0) for i in range(5000, 10500)]  # 测试用例
     tmp_y = [Lx(float(i)) for i in tmp_x]  # 根据插值函数获得测试用例的纵坐标
     print tmp_y
     ''' 画图 '''
     plt.figure("play")
     ax1 = plt.subplot(111)
     plt.sca(ax1)
-    # plt.plot(sr_x, sr_fx, linestyle = ' ', marker='o', color='b')
+    plt.plot(sr_x, sr_fx, linestyle = ' ', marker='o', color='b')
     plt.plot(tmp_x, tmp_y, linestyle='--', color='r')
     plt.show()

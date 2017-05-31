@@ -12,9 +12,10 @@ def clockTimeFactor(timeList):
     return factor
 
 def timeCalibrate(timeList,factor):
+    timeListCal=[]
     for item in timeList:
-        item[0]=item[0]/factor
+        timeListCal.append([item[0]/factor])
     print 'time calibrate finished !'
-    return timeList
+    return timeListCal
 
 

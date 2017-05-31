@@ -7,16 +7,21 @@ import matplotlib.pyplot as plt
 import fileToList
 
 
-def gpsLagInterFun(gpsTimeList1,gpsTimeList2, disDelayList, startNo, Num, shift):  # gps距离list，插值秒数中点，前后各Num秒
+def gpsLagInterFun(gpsTimeList1,gpsTimeList2, disDelayList, startNo, Num, shift,sec):  # gps距离list，插值秒数中点，前后各Num秒
     if startNo < Num:
-        print startNo + 'Must >= ' + Num
-    x1 = [float(gpsTimeList1[i + startNo - Num][0])  for i in range(2 * Num + 1)]
-    fx1 = [disDelayList[i + startNo - Num + shift][0] for i in range(2 * Num + 1)]
-    x2 = [float(gpsTimeList2[i + startNo - Num][0])  for i in range(2 * Num + 1)]
-    fx2 = [disDelayList[i + startNo - Num + shift][1] for i in range(2 * Num + 1)]
+        print 'startNo should bigger than Num'
+    x1 = [float(gpsTimeList1[i + startNo - Num][0]/sec)  for i in range(2 * Num + 1)]
+    fx1 = [float(disDelayList[i + startNo - Num + shift][0]) for i in range(2 * Num + 1)]
+    x2 = [float(gpsTimeList2[i + startNo - Num][0]/sec)  for i in range(2 * Num + 1)]
+    fx2 = [float(disDelayList[i + startNo - Num + shift][1]) for i in range(2 * Num + 1)]
+    #print x1,fx1
+    delayX= [float(i+1)  for i in range(startNo-Num,startNo+Num+1)]
+    delayY = [float(disDelayList[i + startNo - Num + shift][2]) for i in range(2 * Num + 1)]
+    delayfunc=lagInterpolation.get_Lxfunc(delayX,delayY)
     gpsfunc1 = lagInterpolation.get_Lxfunc(x1, fx1)
     gpsfunc2 = lagInterpolation.get_Lxfunc(x2, fx2)
-    return gpsfunc1,gpsfunc2
+    #print gpsfunc1(gpsTimeList1[startNo][0]/sec)
+    return gpsfunc1,gpsfunc2,delayfunc
 
 def gpsLagInter(gpsTimeList1,gpsTimeList2,gpsDelList,interNum):
     N=len(gpsDelList)

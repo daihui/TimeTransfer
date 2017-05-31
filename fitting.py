@@ -6,6 +6,8 @@ import numpy
 import random
 import fileToList
 import filter
+import clockTimeCalibrate
+import gpsOrbit
 
 def polyLeastFit(x,y,order):
     matA = []
@@ -70,7 +72,7 @@ def polyLeastFitSegment(x,y,order,segmentTime):
             if len(xTmp)>2*order:
                 mat=polyLeastFit(xTmp,yTmp,order)
                 y_fit=polyLeastFitCal(xTmp,mat)
-                print mat
+                #print mat
                 for j,yy in enumerate(y_fit):
                     fitList.append([yy])
                     residual.append([(yTmp[j] - yy)])
@@ -100,49 +102,57 @@ def polyLeastFitSegment(x,y,order,segmentTime):
     print 'data fitting in %s segment.'%s
     return fitList,residual
 
-def fitComObs(x,y,gpsTimeList,delayList,segmentTime,order,shift):
-    startSec=int(x[0]/1000000000000)
-    endSec=int(x[-1]/1000000000000)
-    lenght=len(x)
-    xTmp = []
-    yTmp = []
+def clockDiffByDistance(timeList1,timeList2,gpsTimeList1,gpsTimeList2,delayList,shift):
+    factor1=clockTimeCalibrate.clockTimeFactor(gpsTimeList1)
+    factor2=clockTimeCalibrate.clockTimeFactor(gpsTimeList2)
+    list1=clockTimeCalibrate.timeCalibrate(timeList1,factor1)
+    list2=clockTimeCalibrate.timeCalibrate(timeList2,factor2)
+    gpsTimeList1=clockTimeCalibrate.timeCalibrate(gpsTimeList1,factor1)
+    gpsTimeList2=clockTimeCalibrate.timeCalibrate(gpsTimeList2,factor2)
+
+    lenght=len(list1)
+    Num=4
     result=[]
-    index=0
-    for sec in range(startSec-1,endSec):
-        time=gpsTimeList[sec][0]
-        while x[index]<time-segmentTime/2:
-            index+=1
-        while x[index]<time+segmentTime/2:
-            xTmp.append(x[index])
-            yTmp.append(y[index])
-            index+=1
-            if index>lenght:
-                break
-        mat = polyLeastFit(xTmp, yTmp, order)
-        delay_fit = polyLeastFitCal([time], mat)
-        result.append([time,delay_fit[0],delayList[sec+shift][2],delay_fit[0]-delayList[sec+shift][2]])
-        print time,delay_fit[0]-delayList[sec+shift][2]
+
+    for index in range(lenght):
+        startNo=int(list1[index][0]/1000000000000)-1
+        delayFun1,delayFun2=gpsOrbit.gpsLagInterFun(gpsTimeList1,gpsTimeList2,delayList,startNo,Num,shift)
+        delay1=delayFun1(list1[index][0])
+        delay2=delayFun2(list2[index][0])
+        delay1=delayFun1(list1[index][0]-delay1)
+        delay2=delayFun2(list2[index][0]-delay2)
+        delay1 = delayFun1(list1[index][0] - delay1)
+        delay2 = delayFun2(list2[index][0] - delay2)
+        coinDelay=list1[index][0]-delay1-(list2[index][0]-delay2)
+        result.append([timeList1[index][0],list1[index][0],coinDelay,delay1,delay2])
+    print 'clock difference calculated by satellite distance'
     return result
 
-def fitComObsTest(date):
-    order = 10
-    segmentTime=1000000000000
+def clockDiffByDistanceTest(date):
     shift=-19
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_00502EM100-250s.txt' % date,
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidenceEM_0530-85-235_filtered.txt' % date,
                        'utf8')
-    gpsFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_GPSTime.txt' % date,
+    gpsFile1=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\send_fixed_GPSTime.txt' % date,
+                       'utf8')
+    gpsFile2 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_GPSTime.txt' % date,
                        'utf8')
     delayFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\GPS_Recv_Precise_disDelay.txt' % date,
                        'utf8')
+    saveFile=timeFile[:-4]+'_diffByDistance.txt'
     timeList = fileToList.fileToList(timeFile)
-    gpsTimeList=fileToList.fileToList(gpsFile)
+    gpsTimeList1=fileToList.fileToList(gpsFile1)
+    gpsTimeList2=fileToList.fileToList(gpsFile2)
     delayList=fileToList.fileToList(delayFile)
-    xa = []
-    ya = []
+    timeList1 = []
+    timeList2 = []
+
     for i in range(len(timeList)):
-        xa.append(timeList[i][1])
-        ya.append(timeList[i][0] - timeList[i][1])
-    result=fitComObs(xa,ya,gpsTimeList,delayList,segmentTime,order,shift)
+        timeList1.append([timeList[i][0]])
+        timeList2.append([timeList[i][1]])
+
+    result=clockDiffByDistance(timeList1,timeList2,gpsTimeList1,gpsTimeList2,delayList,shift)
+    fileToList.listToFile(result,saveFile)
+
 
 
 def polyLeastFitTest(date):
@@ -178,7 +188,7 @@ def polyLeastFitTest(date):
 
 def polyLeastFitSegmentTest(date):
     order =1
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidenceEM_0523-140-190-EM.txt' % date, 'utf8')
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidenceEM_0530-85-250-EM--18.txt' % date, 'utf8')
     #timeFile=unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s_coinDiff_segment_search.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
@@ -197,12 +207,16 @@ def polyLeastFitSegmentTest(date):
     # print len(xa), len(ya)
     # xa,ya =filter.preFilter(timeList,2,100000)
     # print len(xa),len(ya)
-    fitList,residual=polyLeastFitSegment(xa,ya,10,1000)
+    # fitList,residual=polyLeastFitSegment(xa,ya,10,1000)
     # filter.dotFilter(residual, 0, 10000.0, 3)
-    xa,ya,residual=filter.thresholdFilter(xa,ya,residual,0,4000)
-    fitList, residual = polyLeastFitSegment(xa, ya, order, 100)
-    xa, ya, residual = filter.thresholdFilter(xa, ya, residual, 0, 2500)
-    fileToList.listToFile(residual, timeFile[:-4] + '_%s_residual_segment_thresholdFilter0523-1-100.txt' % date)
+    # xa,ya,residual=filter.thresholdFilter(xa,ya,residual,0,4000)
+    # fitList, residual = polyLeastFitSegment(xa, ya, order, 100)
+    # xa, ya, residual = filter.thresholdFilter(xa, ya, residual, 0, 2500)
+    xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,3000,3,order)
+
+    print len(xa),len(timeList)
+    fileToList.listToFile(residual, timeFile[:-4] + '_%s_residual-0530-1-100.txt' % date)
+    fileToList.listToFile(timeList,timeFile[:-4]+'_filtered.txt')
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(xa, residual, color='g', linestyle='-', marker='')

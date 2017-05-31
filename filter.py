@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'levitan'
 import fileToList
+import fitting
 
 
 def freqFilter(timeList, freq, window, threshold):
@@ -22,8 +23,8 @@ def freqFilter(timeList, freq, window, threshold):
     print 'time list filtered , %s data are moved out' % count
     return resultList
 
-def slopeFilter(timeList,threshold):
-    resultList=[]
+# def slopeFilter(timeList,threshold):
+#     resultList=[]
     #for
 
 def dataFilter(timeFile, freq, window, threshold):
@@ -45,21 +46,37 @@ def dotFilter(timeList,listCount,threshold,times):
         if abs(timeList[i][listCount]) > threshold:
             timeList[i][listCount] =threshold/2
 
-def thresholdFilter(x,y,timeList,listCount,threshold):
-    listFiltered=[]
+def thresholdFilter(x, y, residual,timeList, listCount, threshold):
+    #listFiltered=[]
     xa=[]
     ya=[]
-    lenght = len(timeList)
+    filteredList=[]
+    lenght = len(residual)
     count=0
     for i in range(lenght):
-        if abs(timeList[i][listCount])>threshold:
+        if abs(residual[i][listCount])>threshold:
             count+=1
         else:
-            listFiltered.append(timeList[i])
+            #listFiltered.append(residual[i])
             xa.append(x[i])
             ya.append(y[i])
+            filteredList.append(timeList[i])
+
     print '%s data moved !'%count
-    return xa,ya,listFiltered
+    return xa,ya,filteredList
+
+def fitFilter(timeList,threshold,times,order):
+    xa=[]
+    ya=[]
+    filteredList=[]
+    for i in range(len(timeList)):
+        xa.append(timeList[i][1])
+        ya.append(timeList[i][0] - timeList[i][1])
+    fitList, residual = fitting.polyLeastFitSegment(xa, ya, 10, 1000)
+    for j in range(times):
+        xa, ya, filteredList = thresholdFilter(xa, ya, residual,timeList, 0, threshold)
+        fitList, residual = fitting.polyLeastFitSegment(xa, ya, order, 100)
+    return xa,ya,filteredList,fitList,residual
 
 def  preFilter(timeList,listCount,threshold):
     listFiltered=[]
@@ -78,8 +95,8 @@ def  preFilter(timeList,listCount,threshold):
     return xa,listFiltered
 
 def freqFilterTest():
-    file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\recv_fixed_850Time.txt', 'utf8')
-    # file = unicode('G:\\时频传输数据处理\\双站数据处理\\3.2\\DLH\\recv_fixed_850Time.txt', 'utf8')
-    #dataFilter(file, 10000000, 100, 200000)
+    file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\send_fixed_850Time.txt', 'utf8')
+    saveFile=file[:-4]+'_filtered.txt'
     timeList=fileToList.fileToList(file)
-    freqFilter(timeList,10000000,10,100000)
+    result=freqFilter(timeList,10000000,10,200000)
+    fileToList.listToFile(result,saveFile)

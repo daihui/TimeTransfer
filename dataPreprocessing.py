@@ -6,6 +6,8 @@
 
 __author__ = 'levitan'
 
+import fileToList
+
 def getFileNime(s):
     filename=s
     gpsfilename=s[:-4]+'_GPSTime.txt'
@@ -29,3 +31,14 @@ def classifyData(filename, gpsfilename, synfilename):
             light.close()
     finally:print 'data classify successfully !'
 
+def dataSelectBySec(startSec,endSec):
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\send_fixed_850Time.txt' , 'utf8')
+    dataList=fileToList.fileToList(dataFile)
+    saveFile=dataFile[:-4]+'_%s-%s.txt'%(startSec+1,endSec)
+    selectList=[]
+    for item in dataList:
+        sec=int(item[0]/1000000000000)
+        if sec>startSec and sec<endSec+1:
+            selectList.append(item)
+    print 'data selected by secend'
+    fileToList.listToFile(selectList,saveFile)
