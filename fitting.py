@@ -1,4 +1,6 @@
-# coding=utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+__author__ = 'levitan'
 
 import matplotlib.pyplot as plt
 import math
@@ -58,24 +60,28 @@ def polyLeastFitSegment(x,y,order,segmentTime):
     s=0
     fitList=[]
     residual=[]
+    xa=[]
+    ya=[]
     xTmp=[]
     yTmp=[]
     lastTime=x[0]
     lastTimeIndex=0
     for i,time in enumerate(x):
-        if i<lastTimeIndex+segmentTime:
+        if time<lastTime+segmentTime:
             xTmp.append(time)
             yTmp.append(y[i])
             #lastTime=time
             count += 1
         else:
-            if len(xTmp)>2*order:
+            if len(xTmp)>order:
                 mat=polyLeastFit(xTmp,yTmp,order)
                 y_fit=polyLeastFitCal(xTmp,mat)
                 #print mat
                 for j,yy in enumerate(y_fit):
                     fitList.append([yy])
                     residual.append([(yTmp[j] - yy)])
+                    xa.append(xTmp[j])
+                    ya.append(yTmp[j])
                 count=0
                 s+=1
                 del xTmp[:]
@@ -91,16 +97,82 @@ def polyLeastFitSegment(x,y,order,segmentTime):
                 lastTime = time
                 lastTimeIndex = i
                 count += 1
-    if xTmp:
+    if len(xTmp)>order:
         mat = polyLeastFit(xTmp, yTmp, order)
         y_fit = polyLeastFitCal(xTmp, mat)
         for j, yy in enumerate(y_fit):
-            fitList.append([  yy])
+            fitList.append([yy])
             residual.append([(yTmp[j] - yy)])
+            xa.append(xTmp[j])
+            ya.append(yTmp[j])
             count += 1
         s+=1
+    else:
+        print 'no data or few data in this time segment'
+        print len(xTmp)
     print 'data fitting in %s segment.'%s
-    return fitList,residual
+    return xa,ya,fitList,residual
+
+def polyFitSegment(x,y,order,segmentTime):
+    timeUnit=1000000000000.0
+    count=0
+    s=0
+    fitList=[]
+    residual=[]
+    xa = []
+    ya = []
+    xTmp=[]
+    yTmp=[]
+    lastTime=x[0]
+    lastTimeIndex=0
+    for i,time in enumerate(x):
+        if time/timeUnit<lastTime/timeUnit+segmentTime:
+            xTmp.append(time/timeUnit)
+            yTmp.append(y[i]/timeUnit)
+            #lastTime=time
+            count += 1
+        else:
+            if len(xTmp)>2*order:
+                mat=numpy.polyfit(xTmp,yTmp,order)
+                Fx=numpy.poly1d(mat)
+                y_fit=Fx(xTmp)
+                print mat
+                for j,yy in enumerate(y_fit):
+                    fitList.append([yy])
+                    residual.append([(yTmp[j] - yy)])
+                    xa.append(xTmp[j]*timeUnit)
+                    ya.append(yTmp[j]*timeUnit)
+                count=0
+                s+=1
+                del xTmp[:]
+                del yTmp[:]
+                xTmp.append(time/timeUnit)
+                yTmp.append(y[i]/timeUnit)
+                lastTime=time
+                lastTimeIndex=i
+                count += 1
+            else:
+                xTmp.append(time/timeUnit)
+                yTmp.append(y[i]/timeUnit)
+                lastTime = time
+                lastTimeIndex = i
+                count += 1
+    if len(xTmp)>order:
+        mat = numpy.polyfit(xTmp, yTmp, order)
+        Fx = numpy.poly1d(mat)
+        y_fit = Fx(xTmp)
+        for j, yy in enumerate(y_fit):
+            fitList.append([yy])
+            residual.append([(yTmp[j] - yy)])
+            xa.append(xTmp[j]*timeUnit)
+            ya.append(yTmp[j]*timeUnit)
+            count += 1
+        s+=1
+    else:
+        print 'no data or few data in this time segment'
+        print len(xTmp)
+    print 'data fitting in %s segment.'%s
+    return xa,ya,fitList,residual
 
 def clockDiffByDistance(timeList1,timeList2,gpsTimeList1,gpsTimeList2,delayList,shift):
     factor1=clockTimeCalibrate.clockTimeFactor(gpsTimeList1)
@@ -187,7 +259,8 @@ def polyLeastFitTest(date):
     plt.show()
 
 def polyLeastFitSegmentTest(date):
-    order =1
+    order =10
+    timeNormal=100000000000
     timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidenceEM_0530-85-250-EM--18.txt' % date, 'utf8')
     #timeFile=unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s_coinDiff_segment_search.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
@@ -212,14 +285,50 @@ def polyLeastFitSegmentTest(date):
     # xa,ya,residual=filter.thresholdFilter(xa,ya,residual,0,4000)
     # fitList, residual = polyLeastFitSegment(xa, ya, order, 100)
     # xa, ya, residual = filter.thresholdFilter(xa, ya, residual, 0, 2500)
-    xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,3000,3,order)
+    xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,3000,2,order)
 
-    print len(xa),len(timeList)
-    fileToList.listToFile(residual, timeFile[:-4] + '_%s_residual-0530-1-100.txt' % date)
-    fileToList.listToFile(timeList,timeFile[:-4]+'_filtered.txt')
+    print len(xa),len(timeList),len(residual)
+    #residualNormal=filter.normalByTime(timeList,residual,timeNormal)
+    residualSecUnit=filter.timeUnitConvert(residual,1000000000000)
+    fileToList.listToFileLong(residualSecUnit, timeFile[:-4] + '_%s_residual-0531-10-20000-ps.txt' % date)
+    #fileToList.listToFile(timeList,timeFile[:-4]+'_filtered.txt')
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(xa, residual, color='g', linestyle='-', marker='')
     # ax.plot(xa,ya,color='m',linestyle='',marker='.ux')
     ax.legend()
+    plt.show()
+
+def polyFitSegmentTest(date):
+    order =100
+    timeNormal=100000000000
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidenceEM_0530-85-250-EM--18.txt' % date, 'utf8')
+    #timeFile=unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s_coinDiff_segment_search.txt','utf8')
+    timeList = fileToList.fileToList(timeFile)
+    xa = []
+    ya = []
+    x=[]
+
+    for i in range(len(timeList)):
+        xa.append(timeList[i][1])
+        ya.append((timeList[i][0] - timeList[i][1]))
+
+    xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,4000,3,1)
+    xa,ya,fitList, residual = polyFitSegment(xa, ya, 10, 1)
+    xa, ya, filteredList, residual=filter.thresholdFilter(xa,ya,residual,timeList,0,0.000000004)
+    xa,ya,fitList, residual = polyFitSegment(xa, ya, order, 50)
+    xa, ya, filteredList, residual = filter.thresholdFilter(xa, ya, residual, timeList, 0, 0.000000004)
+
+    # print len(xa),len(timeList),len(residual)
+    #residualNormal=filter.normalByTime(timeList,residual,timeNormal)
+    # residualSecUnit=filter.timeUnitConvert(residual,1000000000000)
+    fileToList.listToFileLong(residual, timeFile[:-4] + '_%s_residual-0605-100-50sec-ps.txt' % date)
+    #fileToList.listToFile(timeList,timeFile[:-4]+'_filtered.txt')
+    fig = plt.figure()
+    ax1 = fig.add_subplot(211)
+    ax2= fig.add_subplot(212)
+    ax1.plot(xa, residual, color='g', linestyle='-', marker='')
+    ax2.plot(xa,ya,color='m',linestyle='',marker='.')
+    #ax2.plot(xa, fitList, color='g', linestyle='-', marker='')
+    #ax.legend()
     plt.show()

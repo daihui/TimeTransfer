@@ -51,6 +51,7 @@ def thresholdFilter(x, y, residual,timeList, listCount, threshold):
     xa=[]
     ya=[]
     filteredList=[]
+    residualFiltered=[]
     lenght = len(residual)
     count=0
     for i in range(lenght):
@@ -61,9 +62,10 @@ def thresholdFilter(x, y, residual,timeList, listCount, threshold):
             xa.append(x[i])
             ya.append(y[i])
             filteredList.append(timeList[i])
+            residualFiltered.append(residual[i])
 
     print '%s data moved !'%count
-    return xa,ya,filteredList
+    return xa,ya,filteredList,residualFiltered
 
 def fitFilter(timeList,threshold,times,order):
     xa=[]
@@ -72,10 +74,12 @@ def fitFilter(timeList,threshold,times,order):
     for i in range(len(timeList)):
         xa.append(timeList[i][1])
         ya.append(timeList[i][0] - timeList[i][1])
-    fitList, residual = fitting.polyLeastFitSegment(xa, ya, 10, 1000)
+    xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, 5, 500000000000)
+    xa, ya, filteredList,residual= thresholdFilter(xa, ya, residual, timeList, 0, threshold)
     for j in range(times):
-        xa, ya, filteredList = thresholdFilter(xa, ya, residual,timeList, 0, threshold)
-        fitList, residual = fitting.polyLeastFitSegment(xa, ya, order, 100)
+        xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, order, 30000000000)
+        xa, ya, filteredList,residual = thresholdFilter(xa, ya, residual,timeList, 0, threshold)
+
     return xa,ya,filteredList,fitList,residual
 
 def  preFilter(timeList,listCount,threshold):
@@ -93,6 +97,41 @@ def  preFilter(timeList,listCount,threshold):
             xa.append(timeList[i][1])
     print '%s data moved !'%count
     return xa,listFiltered
+
+def normalByTime(timeList,residualList,time):
+    count=0
+    sum=0
+    lastTime=timeList[0][0]
+    normalList=[]
+    if len(timeList)==len(residualList):
+        print 'len is ok'
+    else:
+        print 'lenght is not equal'
+    for i,item in enumerate(timeList):
+        if item[0]-lastTime<time:
+            count+=1
+            sum+=residualList[i][0]
+        else:
+            normalList.append([sum/count])
+            #print sum,count
+            lastTime=item[0]
+            count=1
+            sum=residualList[i][0]
+    print 'normal list finished!'
+    return normalList
+
+def timeUnitConvert(timeList,timeUnit):
+    result=[]
+    count=0
+    N=len(timeList[0])
+    for item in timeList:
+        result.append([])
+        for i in range(N):
+            result[count]+=[float(item[i])/timeUnit]
+        count+=1
+    return result
+
+
 
 def freqFilterTest():
     file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\send_fixed_850Time.txt', 'utf8')
