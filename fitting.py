@@ -136,7 +136,7 @@ def polyFitSegment(x,y,order,segmentTime):
                 mat=numpy.polyfit(xTmp,yTmp,order)
                 Fx=numpy.poly1d(mat)
                 y_fit=Fx(xTmp)
-                print mat
+                #print mat
                 for j,yy in enumerate(y_fit):
                     fitList.append([yy])
                     residual.append([(yTmp[j] - yy)])
@@ -259,7 +259,7 @@ def polyLeastFitTest(date):
     plt.show()
 
 def polyLeastFitSegmentTest(date):
-    order =10
+    order =1
     timeNormal=100000000000
     timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidenceEM_0530-85-250-EM--18.txt' % date, 'utf8')
     #timeFile=unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s_coinDiff_segment_search.txt','utf8')
@@ -300,10 +300,10 @@ def polyLeastFitSegmentTest(date):
     plt.show()
 
 def polyFitSegmentTest(date):
-    order =100
+    order =50
     timeNormal=100000000000
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidenceEM_0530-85-250-EM--18.txt' % date, 'utf8')
-    #timeFile=unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s_coinDiff_segment_search.txt','utf8')
+    #timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidenceEM_0530-85-250-EM--18.txt' % date, 'utf8')
+    timeFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.6\\10k-300s-sync-1_pars_coin_reduce-10.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
     ya = []
@@ -313,22 +313,22 @@ def polyFitSegmentTest(date):
         xa.append(timeList[i][1])
         ya.append((timeList[i][0] - timeList[i][1]))
 
-    xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,4000,3,1)
-    xa,ya,fitList, residual = polyFitSegment(xa, ya, 10, 1)
-    xa, ya, filteredList, residual=filter.thresholdFilter(xa,ya,residual,timeList,0,0.000000004)
-    xa,ya,fitList, residual = polyFitSegment(xa, ya, order, 50)
-    xa, ya, filteredList, residual = filter.thresholdFilter(xa, ya, residual, timeList, 0, 0.000000004)
+    xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,10000,2,1)
+    # xa,ya,fitList, residual = polyFitSegment(xa, ya, 10, 1)
+    # xa, ya, filteredList, residual=filter.thresholdFilter(xa,ya,residual,timeList,0,0.0000001)
+    xa,ya,fitList, residual = polyFitSegment(xa, ya, order, 400)
+    # xa, ya, filteredList, residual = filter.thresholdFilter(xa, ya, residual, timeList, 0, 0.0000001)
 
     # print len(xa),len(timeList),len(residual)
     #residualNormal=filter.normalByTime(timeList,residual,timeNormal)
     # residualSecUnit=filter.timeUnitConvert(residual,1000000000000)
-    fileToList.listToFileLong(residual, timeFile[:-4] + '_%s_residual-0605-100-50sec-ps.txt' % date)
+    fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-0607-50-400-ps.txt')
     #fileToList.listToFile(timeList,timeFile[:-4]+'_filtered.txt')
     fig = plt.figure()
-    ax1 = fig.add_subplot(211)
-    ax2= fig.add_subplot(212)
+    ax1 = fig.add_subplot(111)
+    #ax2= fig.add_subplot(212)
     ax1.plot(xa, residual, color='g', linestyle='-', marker='')
-    ax2.plot(xa,ya,color='m',linestyle='',marker='.')
+    #ax2.plot(xa,ya,color='m',linestyle='',marker='.')
     #ax2.plot(xa, fitList, color='g', linestyle='-', marker='')
     #ax.legend()
     plt.show()
