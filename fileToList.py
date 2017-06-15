@@ -17,6 +17,12 @@ def fileToList(filename):
     print filename + ' converted to List !'
     return List
 
+def fileLong(filename):
+    List=fileToList(filename)
+    saveFile=filename[:-4]+'_long.txt'
+    listToFile(List,saveFile)
+    print 'file convert to float long file'
+
 def listToFile(List,filename):
     file=open(filename,'w')
     N=len(List)

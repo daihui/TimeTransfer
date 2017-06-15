@@ -74,10 +74,10 @@ def fitFilter(timeList,threshold,times,order):
     for i in range(len(timeList)):
         xa.append(timeList[i][1])
         ya.append(timeList[i][0] - timeList[i][1])
-    xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, 5, 500000000000)
+    xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, 1, 100000000000)
     xa, ya, filteredList,residual= thresholdFilter(xa, ya, residual, timeList, 0, threshold)
     for j in range(times):
-        xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, order, 30000000000)
+        xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, order, 50000000000)
         xa, ya, filteredList,residual = thresholdFilter(xa, ya, residual,timeList, 0, threshold)
 
     return xa,ya,filteredList,fitList,residual
@@ -103,6 +103,7 @@ def normalByTime(timeList,residualList,time):
     sum=0
     lastTime=timeList[0][0]
     normalList=[]
+    xa=[]
     if len(timeList)==len(residualList):
         print 'len is ok'
     else:
@@ -113,12 +114,13 @@ def normalByTime(timeList,residualList,time):
             sum+=residualList[i][0]
         else:
             normalList.append([sum/count])
+            xa.append(lastTime)
             #print sum,count
             lastTime=item[0]
             count=1
             sum=residualList[i][0]
     print 'normal list finished!'
-    return normalList
+    return xa,normalList
 
 def timeUnitConvert(timeList,timeUnit):
     result=[]
@@ -134,8 +136,8 @@ def timeUnitConvert(timeList,timeUnit):
 
 
 def freqFilterTest():
-    file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\send_fixed_850Time.txt', 'utf8')
+    file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14\\6.14Nanshan_channel_0_classified.txt', 'utf8')
     saveFile=file[:-4]+'_filtered.txt'
     timeList=fileToList.fileToList(file)
-    result=freqFilter(timeList,10000000,10,200000)
+    result=freqFilter(timeList,10000000,6,400000)
     fileToList.listToFile(result,saveFile)

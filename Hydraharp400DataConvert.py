@@ -339,7 +339,7 @@ def randomList(timeList,channel,factor):
     return ranList
 
 def two400CoinTest(dataFile1,dataFile2,channel1,channel2,window):
-    saveFile=dataFile1[:-5]+'_coin.txt'
+    saveFile=dataFile1[:-4]+'_coin.txt'
     timeList1=fileToList.fileToList(dataFile1)
     timeList2=fileToList.fileToList(dataFile2)
     coinList=[]
@@ -370,12 +370,12 @@ def two400CoinTest(dataFile1,dataFile2,channel1,channel2,window):
     print 'find coin finished, %s pairs.'%coinCount
 
 if __name__ == '__main__':
-    # dataFile = unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.6\\10k-300s-sync-1.ptu', 'utf8')
+    # dataFile = unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.8\\6.8-200hz-4000s-clock-1.ptu', 'utf8')
     # saveFile=dataFile[:-4]+'_parse.txt'
     # dataList=Hydraharp400DataToList(dataFile,8000)
     # Hydraharp400DataParse(dataList,saveFile,[0])
-    # dataFile1 = unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.6\\10k-300s-sync-1_parse.txt', 'utf8')
-    # dataFile2= unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.6\\10k-300s-sync-2_parse.txt', 'utf8')
+    # dataFile1 = unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.8\\6.8-200hz-4000s-clock-1_parse.txt', 'utf8')
+    # dataFile2= unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.8\\6.8-200hz-4000s-clock-2_parse.txt', 'utf8')
     # two400CoinTest(dataFile1,dataFile2,0,0,20000)
     # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\4.11\\2-1200k-50M-100s-1.ptu','utf8')
     # dataCoincidence(dataFile)
@@ -387,16 +387,17 @@ if __name__ == '__main__':
     # timeList=fileToList.fileToList(dataFile)
     # reduceList=dataReduce(timeList,5)
     # fileToList.listToFileLong(reduceList,dataFile[:-4]+'_reduce5.txt')
-    # dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\Result\\synCoincidenceEM_0530-85-250-EM--18_3.2_residual-0530-1-100.txt','utf8')
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14\\test2.txt','utf8')
     # saveFile=dataFile[:-4]+'_100.txt'
-    # timeList=fileToList.fileToList(dataFile)
+    timeList=fileToList.fileToList(dataFile)
     # ranList=randomList(timeList,0,100)
     # fileToList.listToFileLong(ranList,saveFile)
-    # dataCountHistogram(timeList,50,2500)
-    dataFile = unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.6\\10k-300s-sync-1_pars_coin.txt', 'utf8')
-    saveFile=dataFile[:-4]+'_reduce-10.txt'
-    timeList=fileToList.fileToList(dataFile)
-    reduceList=dataReduce(timeList,10)
-    fileToList.listToFile(reduceList,saveFile)
+    dataCountHistogram(timeList,2,260)
+
+    # dataFile = unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.6\\10k-300s-sync-1_pars_coin.txt', 'utf8')
+    # saveFile=dataFile[:-4]+'_reduce-10.txt'
+    # timeList=fileToList.fileToList(dataFile)
+    # reduceList=dataReduce(timeList,10)
+    # fileToList.listToFile(reduceList,saveFile)
 
 
