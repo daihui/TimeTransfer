@@ -82,12 +82,56 @@ def timeAnalysis(timeList):
     print 'get the diffList.'
     return diffList
 
+def coindenceListMerge(dataList1,dataList2):
+    listMerge=[]
+    index1=0
+    index2=0
+
+def mergeFilter(dataList,timeWindow):
+    length=len(dataList)
+    filteredList=[]
+    filteredList.append(dataList[0])
+    count=0
+    for index in range(1,length):
+        if abs(dataList[index][0]-dataList[index-1][0])>timeWindow:
+            filteredList.append(dataList[index])
+        else:
+            count+=1
+    print 'dataList have been filtered! %s data repeat in %s ps have been moved '%(count,timeWindow)
+    return filteredList
+
+def mergeFilterTest():
+    timeWindow=100000
+    dataFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.27NS\\6.27NS_coindence-2pulse-merge-1900-2080.txt', 'utf8')
+    dataList=fileToList.fileToList(dataFile)
+    filteredList=mergeFilter(dataList,timeWindow)
+    saveFile=dataFile[:-4]+'_filtered.txt'
+    fileToList.listToFile(filteredList,saveFile)
+
+def countBySec(dataList):
+    length=len(dataList)
+    sec=int(dataList[0][0]/1000000000000)
+    count=0
+    for index in range(length):
+        if int(dataList[index][0]/1000000000000)==sec:
+            count+=1
+        else:
+            print '%s\t%s'%(sec,count)
+            count=0
+            sec=int(dataList[index][0]/1000000000000)
+
+def countBySecTest():
+    dataFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14NS\\6.14Nanshan_channel_3_classified.txt', 'utf8')
+    dataList=fileToList.fileToList(dataFile)
+    countBySec(dataList)
 
 if __name__ == '__main__':
-    dataFile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14\\6.14Nanshan_channel_0_classified.txt', 'utf8')
-    dataFile2= unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14\\6.14Nanshan_channel_1_classified.txt', 'utf8')
-    coindenceTest(dataFile1,dataFile2,-4000,3000)
-    # dataFile= unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14\\6.14Nanshan.txt', 'utf8')
+    # dataFile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.27NS\\6.27NS_channel_0_classified.txt', 'utf8')
+    # dataFile2= unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.27NS\\6.27NS_channel_1_classified.txt', 'utf8')
+    # coindenceTest(dataFile1,dataFile2,0,10000)
+    #mergeFilterTest()
+    countBySecTest()
+    # dataFile= unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.30DLH数少\\6.30DLH.txt', 'utf8')
     # dataClassify = classifyData850(dataFile,[0,1,2,3,5])
     # timeList = fileToList.fileToList(dataClassify)
     # diffList = timeAnalysis(timeList)

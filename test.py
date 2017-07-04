@@ -17,11 +17,29 @@ import jdutil
 import calculate
 import gpsOrbit
 import fitting
+import matplotlib.pyplot as plt
 
 def dataPreprocessingTest(s):
     f,g,l=dataPreprocessing.getFileNime(s)
     dataPreprocessing.classifyData(f,g,l)
 
+def test1():
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\5.17\\5.17-850-2路-1_coinDiff_segment_search.txt','utf8')
+    timeList=fileToList.fileToList(dataFile)
+    xa=[]
+    ya=[]
+    timeNormal=250000000000
+    for i in range(len(timeList)):
+        if timeList[i][1]>-700 and timeList[i][1]<600:
+            xa.append([timeList[i][0]])
+            ya.append([timeList[i][1]])
+    xa,ya=filter.normalByTime(xa,ya,timeNormal)
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    ax1.xaxis.grid(True, which='major') #x坐标轴的网格使用主刻度
+    ax1.yaxis.grid(True, which='major') #y坐标轴的网格使用次刻度show()
+    ax1.plot(xa,ya, color='g', linestyle='-', marker='')
+    plt.show()
 
 
 

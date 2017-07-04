@@ -56,6 +56,7 @@ def polyLeastFitCal(x,mat):
     return y
 
 def polyLeastFitSegment(x,y,order,segmentTime):
+    timeUnit=1000000000000.0
     count=0
     s=0
     fitList=[]
@@ -79,7 +80,7 @@ def polyLeastFitSegment(x,y,order,segmentTime):
                 #print mat
                 for j,yy in enumerate(y_fit):
                     fitList.append([yy])
-                    residual.append([(yTmp[j] - yy)])
+                    residual.append([(yTmp[j] - yy)/timeUnit])
                     xa.append(xTmp[j])
                     ya.append(yTmp[j])
                 count=0
@@ -102,7 +103,7 @@ def polyLeastFitSegment(x,y,order,segmentTime):
         y_fit = polyLeastFitCal(xTmp, mat)
         for j, yy in enumerate(y_fit):
             fitList.append([yy])
-            residual.append([(yTmp[j] - yy)])
+            residual.append([(yTmp[j] - yy)/timeUnit])
             xa.append(xTmp[j])
             ya.append(yTmp[j])
             count += 1
@@ -260,7 +261,7 @@ def polyLeastFitTest(date):
 
 def polyLeastFitSegmentTest(date):
     order =50
-    timeNormal=100000000000
+    timeNormal=50000000000
     timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidenceEM_0530-85-250-EM--18.txt' % date, 'utf8')
     #timeFile=unicode('E:\Experiment Data\时频传输数据处理\丽江测试\\4.14\\4.14-lzx-lj-400s_coinDiff_segment_search.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
@@ -303,32 +304,51 @@ def polyFitSegmentTest(date):
     order =1
     timeNormal=500000000000
     #timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidenceEM_0530-85-250-EM--18.txt' % date, 'utf8')
-    timeFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14\\6.14Nanshan_channel_2-3_60-170-singlepulsecoindence.txt','utf8')
+    timeFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.27NS\\6.27NS_coindence-2pulse-merge-1900-2080_filtered.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
     ya = []
-    x=[]
 
     for i in range(len(timeList)):
         xa.append(timeList[i][1])
-        ya.append((timeList[i][0] - timeList[i][1]))
+        # ya.append((timeList[i][0] - timeList[i][1]))
+        ya.append([(timeList[i][2])/1000000000000.0])
 
-    xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,2000,3,1)
+    # xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,2000/1000000000000.0,1,1)
+    # fileToList.listToFile(timeList,timeFile[:-4] + '_filtered.txt')
     # xa,ya,fitList, residual = polyFitSegment(xa, ya, 1, 0.1)
     # xa, ya, filteredList, residual=filter.thresholdFilter(xa,ya,residual,timeList,0,0.000000002)
-    xa,ya,fitList, residual = polyFitSegment(xa, ya, order,300)
+    # xa,ya,fitList, residual = polyFitSegment(xa, ya, order,1000)
     # xa, ya, filteredList, residual = filter.thresholdFilter(xa, ya, residual, timeList, 0, 0.0000001)
 
     # print len(xa),len(timeList),len(residual)
-    xa,residualNormal=filter.normalByTime(timeList,residual,timeNormal)
+
+    # for i,item in enumerate(xa):
+    #     x=item/1000000000000.0
+    #     y=Sine(0.52,20.4378,28.2517,52.091,x)
+    #     yy=Sine(1.9655,10.69678,22.20458,0.41124,x)
+    #     residual[i][0]=residual[i][0]-(y+yy)/1000000000000.0
+
+    # xa,residual=filter.normalByTime(timeList,residual,timeNormal)
+    xa,residual=filter.normalByTime(timeList,ya,timeNormal)
     # residualSecUnit=filter.timeUnitConvert(residual,1000000000000)
-    fileToList.listToFileLong(residualNormal, timeFile[:-4] + '_residual-1-all-0.5-ps.txt')
+
+    fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-0.5s-ps.txt')
+
     #fileToList.listToFile(filteredList,timeFile[:-4]+'_filtered.txt')
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     #ax2= fig.add_subplot(212)
-    ax1.plot(xa,residualNormal, color='g', linestyle='-', marker='')
+    for i,item in enumerate(xa):
+        xa[i]=item/1000000000000.0
+        residual[i][0]=residual[i][0]*1000000000000
+    ax1.plot(xa,residual, color='g', linestyle='-', marker='')
+    ax1.xaxis.grid(True, which='major') #x坐标轴的网格使用主刻度
+    ax1.yaxis.grid(True, which='major') #y坐标轴的网格使用次刻度show()
     #ax2.plot(xa,ya,color='m',linestyle='',marker='.')
     #ax2.plot(xa, fitList, color='g', linestyle='-', marker='')
     #ax.legend()
     plt.show()
+
+def Sine(y0,A,xc,w,x):
+    return y0+A*math.sin(math.pi*(x-xc)/w)

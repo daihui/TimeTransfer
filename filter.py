@@ -57,6 +57,7 @@ def thresholdFilter(x, y, residual,timeList, listCount, threshold):
     for i in range(lenght):
         if abs(residual[i][listCount])>threshold:
             count+=1
+            #print residual[i][listCount],threshold
         else:
             #listFiltered.append(residual[i])
             xa.append(x[i])
@@ -78,7 +79,7 @@ def fitFilter(timeList,threshold,times,order):
     xa, ya, filteredList,residual= thresholdFilter(xa, ya, residual, timeList, 0, threshold)
     for j in range(times):
         xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, order, 50000000000)
-        xa, ya, filteredList,residual = thresholdFilter(xa, ya, residual,timeList, 0, threshold)
+        xa, ya, filteredList,residual = thresholdFilter(xa, ya, residual,filteredList, 0, threshold)
 
     return xa,ya,filteredList,fitList,residual
 
