@@ -86,7 +86,7 @@ def loadFimeTimeFile(fineTimeFile):
     return fileTimeList
 
 def TDCDataParseTest():
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\7.1TDC\\7.1-tdc2-3252-160Mhz-500s-3.dat',encoding='utf-8')
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\7.6TDC\\7.6-tdc2-rb1-2k-500s-3.dat',encoding='utf-8')
     fineTimeFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\FineTimeCali\\tdcB2-52.txt',encoding='utf-8')
     saveFile=dataFile[:-4]+'_fineParse.txt'
     dataList=TDCDataParse(dataFile,fineTimeFile,8,2)

@@ -301,10 +301,10 @@ def polyLeastFitSegmentTest(date):
     plt.show()
 
 def polyFitSegmentTest(date):
-    order =1
-    timeNormal=500000000000
+    order =2
+    timeNormal=1000000000000
     #timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidenceEM_0530-85-250-EM--18.txt' % date, 'utf8')
-    timeFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.27NS\\6.27NS_coindence-2pulse-merge-1900-2080_filtered.txt','utf8')
+    timeFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.27NS\\6.27NS_channel_0-1-1900-2080s_classified_coindence_timeWalkComp.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
     ya = []
@@ -314,7 +314,7 @@ def polyFitSegmentTest(date):
         # ya.append((timeList[i][0] - timeList[i][1]))
         ya.append([(timeList[i][2])/1000000000000.0])
 
-    # xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,2000/1000000000000.0,1,1)
+    # xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,3000/1000000000000.0,1,1)
     # fileToList.listToFile(timeList,timeFile[:-4] + '_filtered.txt')
     # xa,ya,fitList, residual = polyFitSegment(xa, ya, 1, 0.1)
     # xa, ya, filteredList, residual=filter.thresholdFilter(xa,ya,residual,timeList,0,0.000000002)
@@ -333,7 +333,7 @@ def polyFitSegmentTest(date):
     xa,residual=filter.normalByTime(timeList,ya,timeNormal)
     # residualSecUnit=filter.timeUnitConvert(residual,1000000000000)
 
-    fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-0.5s-ps.txt')
+    fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-1s-ps.txt')
 
     #fileToList.listToFile(filteredList,timeFile[:-4]+'_filtered.txt')
     fig = plt.figure()

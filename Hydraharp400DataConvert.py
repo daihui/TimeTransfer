@@ -95,9 +95,10 @@ def dataCoinLight(dataFile, channelDelay, coinWidth):
 def dataCoinLightSegment(dataFile, channelDelay, coinWidth, segmentLength, start, channelList):
     global carryBit
     carryBit = 0
-    saveFile = open(dataFile[:-4] + '_coinDiff_segment.txt', 'w')
+    saveFileName=dataFile[:-4] + '_coinDiff_segment.txt'
+    saveFile = open(saveFileName, 'w')
     saveFile.close()
-    saveFile = open(dataFile[:-4] + '_coinDiff_segment.txt', 'a')
+    saveFile = open(saveFileName, 'a')
     finish = False
     data = open(dataFile, 'rb')
     data.read(start)
@@ -159,6 +160,7 @@ def dataCoinLightSegment(dataFile, channelDelay, coinWidth, segmentLength, start
     saveFile.flush()
     saveFile.close()
     print 'data coincidence finished, %s coincidences' % totCount
+    return saveFileName
 
 def dataCoinSegment(dataFile, channelDelay, coinWidth, segmentLength,searchSteps, start, channelList):
     global carryBit
@@ -294,20 +296,31 @@ def dataCoincidence(dataFile):
     fileToList.listToFile(resultList, dataFile[:-4] + '_diff.txt')
     return resultList
 
-def dataCountHistogram(timeList,bin,range):
+def dataCountHistogram(timeList,channel,bin,range):
     binCount=int(2*range/bin)
     countList=np.zeros([1,binCount])
     index=0
     finish=False
     while not finish:
         for item in timeList:
-            if float(item[0])<float(-range+(index+1)*bin) and float(item[0])>float(-range+index*bin):
+            if float(item[channel])<float(-range+(index+1)*bin) and float(item[channel])>float(-range+index*bin):
                 countList[0][index]+=1
         print float(-range+index*bin),'\t',countList[0][index]
         index+=1
         if index>=binCount:
             finish=True
 
+def coinDataStastistics(coinDataList):
+    lenght=len(coinDataList)
+    startSec=int((coinDataList[0][0]+200000000000)/1000000000000)
+    endSec=int((coinDataList[-1][0]+200000000000)/1000000000000)
+    secCount=endSec-startSec
+    averCount=lenght/secCount
+    coinTime=0
+    for i in range(lenght):
+        coinTime+=coinDataList[i][2]
+    averTime=coinTime/lenght
+    print '%s\t%s\t%s\t%s'%(secCount,averCount,averTime,lenght)
 
 def timeAnalysis(datafile):
     timeList = fileToList.fileToList(dataFile)
@@ -369,6 +382,7 @@ def two400CoinTest(dataFile1,dataFile2,channel1,channel2,window):
     fileToList.listToFile(coinList,saveFile)
     print 'find coin finished, %s pairs.'%coinCount
 
+
 if __name__ == '__main__':
     # dataFile = unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.8\\6.8-200hz-4000s-clock-1.ptu', 'utf8')
     # saveFile=dataFile[:-4]+'_parse.txt'
@@ -377,23 +391,23 @@ if __name__ == '__main__':
     # dataFile1 = unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.8\\6.8-200hz-4000s-clock-1_parse.txt', 'utf8')
     # dataFile2= unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.8\\6.8-200hz-4000s-clock-2_parse.txt', 'utf8')
     # two400CoinTest(dataFile1,dataFile2,0,0,20000)
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\7.1\\15m-MMF-400s-1.ptu','utf8')
-    # dataCoincidence(dataFile)
-    # dataCoinLight(dataFile,0,500)
-    # dataCoinLightSegment(dataFile, 146320, 700, 2000000, 8000, [0, 2])
-    dataCoinLightSegment(dataFile, 4500, 600, 2000000, 8000, [0, 2])
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\7.16\PM13-26033\\7.16-50k-20s-2.ptu','utf8')
+    coinFile=dataCoinLightSegment(dataFile,169380, 3500, 2000000, 8000, [0, 2])
+    coinDataList=fileToList.fileToList(coinFile)
+    coinDataStastistics(coinDataList)
+    # dataCoinLightSegment(dataFile, 159838, 3000, 2000000, 8000, [0, 2])
     # dataCoinSegment(dataFile, 0, 4500, 2000000,10, 8000, [0, 2])
     # dataSecCountSegment(dataFile,2000000,6000,[0,2])
     # timeAnalysis(dataFile)
     # timeList=fileToList.fileToList(dataFile)
     # reduceList=dataReduce(timeList,5)
     # fileToList.listToFileLong(reduceList,dataFile[:-4]+'_reduce5.txt')
-    # dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14\\test2.txt','utf8')
+    # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\7.12-PE\\7.12-MMF-220k-3s-2_coinDiff_segment.txt','utf8')
     # saveFile=dataFile[:-4]+'_100.txt'
     # timeList=fileToList.fileToList(dataFile)
+    # dataCountHistogram(timeList,2,10,1600)
     # ranList=randomList(timeList,0,100)
     # fileToList.listToFileLong(ranList,saveFile)
-    # dataCountHistogram(timeList,2,260)
 
     # dataFile = unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.6\\10k-300s-sync-1_pars_coin.txt', 'utf8')
     # saveFile=dataFile[:-4]+'_reduce-10.txt'

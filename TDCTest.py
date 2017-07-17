@@ -105,12 +105,12 @@ def mergeFilterTest():
     dataFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.27NS\\6.27NS_coindence-2pulse-merge-1900-2080.txt', 'utf8')
     dataList=fileToList.fileToList(dataFile)
     filteredList=mergeFilter(dataList,timeWindow)
-    saveFile=dataFile[:-4]+'_filtered.txt'
+    saveFile=dataFile[:-4]+'_mergeFiltered.txt'
     fileToList.listToFile(filteredList,saveFile)
 
 def countBySec(dataList):
     length=len(dataList)
-    sec=int(dataList[0][0]/1000000000000)
+    sec=1
     count=0
     for index in range(length):
         if int(dataList[index][0]/1000000000000)==sec:
@@ -118,10 +118,10 @@ def countBySec(dataList):
         else:
             print '%s\t%s'%(sec,count)
             count=0
-            sec=int(dataList[index][0]/1000000000000)
+            sec+=1
 
 def countBySecTest():
-    dataFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14NS\\6.14Nanshan_channel_3_classified.txt', 'utf8')
+    dataFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.22DLH\\6.22DLH_channel_1_classified_filtered.txt', 'utf8')
     dataList=fileToList.fileToList(dataFile)
     countBySec(dataList)
 

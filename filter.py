@@ -74,7 +74,7 @@ def fitFilter(timeList,threshold,times,order):
     filteredList=[]
     for i in range(len(timeList)):
         xa.append(timeList[i][1])
-        ya.append(timeList[i][0] - timeList[i][1])
+        ya.append(timeList[i][2])
     xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, 1, 100000000000)
     xa, ya, filteredList,residual= thresholdFilter(xa, ya, residual, timeList, 0, threshold)
     for j in range(times):
@@ -137,8 +137,11 @@ def timeUnitConvert(timeList,timeUnit):
 
 
 def freqFilterTest():
-    file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14\\6.14Nanshan_channel_0_classified.txt', 'utf8')
+    file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.22DLH\\6.22DLH_channel_1_classified.txt', 'utf8')
     saveFile=file[:-4]+'_filtered.txt'
     timeList=fileToList.fileToList(file)
     result=freqFilter(timeList,10000000,6,400000)
     fileToList.listToFile(result,saveFile)
+
+if __name__=='__main__':
+    freqFilterTest()
