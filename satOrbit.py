@@ -74,7 +74,7 @@ def groSatDistance(groundList, satList):
                               + (groundItem[6] - satList[i][3] * 1000) ** 2)
         delay = 1000000000000.0 * (distance2 - distance1) / 299792458
         distanceList.append([distance1, distance2, delay])
-        print distance1
+        print distance1,distance2,groundItem,satList[i]
     print 'distance between ground station 1,2 to satellte are calculated !'
     return distanceList
 
@@ -97,11 +97,11 @@ def groundSecTest():
     goundList = fileToList.fileToList(goundFile)
     startTime = (2017, 3, 2, 17, 12, 15)
     groundSecList = groundStationSec(goundList, startTime, 400, 2)
-    saveFile = goundFile[:-4] + '_Sec.txt'
+    saveFile = goundFile[:-4] + '_Sec-0717.txt'
     fileToList.listToFile(groundSecList, saveFile)
 
 def distanceTest():
-    goundFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\Result\\groundStationJ2000_Sec.txt', 'utf8')
+    goundFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\Result\\groundStationJ2000-0717.txt', 'utf8')
     satFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\Result\\satellite_Sec.txt', 'utf8')
     goundList = fileToList.fileToList(goundFile)
     satList=fileToList.fileToList(satFile)
@@ -134,3 +134,7 @@ def disUncertainTest(X,staCount,i):
     #length=len(goundList)
     #for i in range(length):
     disUncertain(X,goundList[i],satList[i],staCount)
+
+if __name__=='__main__':
+    # distanceTest()
+    groundSecTest()

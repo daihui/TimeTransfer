@@ -5,6 +5,7 @@ __author__ = 'levitan'
 import lagInterpolation
 import matplotlib.pyplot as plt
 import fileToList
+import math
 
 
 def gpsLagInterFun(gpsTimeList1,gpsTimeList2, disDelayList, startNo, Num, shift,sec):  # gps距离list，插值秒数中点，前后各Num秒
@@ -21,7 +22,45 @@ def gpsLagInterFun(gpsTimeList1,gpsTimeList2, disDelayList, startNo, Num, shift,
     gpsfunc1 = lagInterpolation.get_Lxfunc(x1, fx1)
     gpsfunc2 = lagInterpolation.get_Lxfunc(x2, fx2)
     #print gpsfunc1(gpsTimeList1[startNo][0]/sec)
-    return gpsfunc1,gpsfunc2,delayfunc
+    #return gpsfunc1,gpsfunc2,delayfunc
+    return  gpsfunc1,gpsfunc2
+
+##根据地面站位置和卫星位置，以及相对延时，插值计算距离延时
+def delayCal(groundXYZList,satelliteXYZList,detTime,Num):
+    delayList=[]
+    lenght=len(satelliteXYZList)
+    for i in range(Num):
+        distance1=math.sqrt((groundXYZList[i][1] - satelliteXYZList[i][1] ) ** 2 + (groundXYZList[i][2] - satelliteXYZList[i][2]) ** 2 \
+                              + (groundXYZList[i][3] - satelliteXYZList[i][3]) ** 2)
+        distance2 = math.sqrt((groundXYZList[i][4] - satelliteXYZList[i][1]) ** 2 + (groundXYZList[i][5] - satelliteXYZList[i][2]) ** 2 \
+            + (groundXYZList[i][6] - satelliteXYZList[i][3]) ** 2)
+        delay1=1000000000000.0 *distance1/ 299792458
+        delay2 = 1000000000000.0 * distance2 / 299792458
+        delayList.append([delay1,delay2,delay1-delay2])
+        # print distance1,distance2
+    for i in range(Num,lenght-Num):
+        sec=[float(i+j-Num) for j in range(2*Num+1)]
+        satelliteFx=[satelliteXYZList[i+j-Num][1] for j in range(2*Num+1)]
+        satelliteFy = [satelliteXYZList[i + j - Num][2] for j in range(2 * Num + 1)]
+        satelliteFz = [satelliteXYZList[i + j - Num][3] for j in range(2 * Num + 1)]
+        satelliteFuncX=lagInterpolation.get_Lxfunc(sec,satelliteFx)
+        satelliteFuncY=lagInterpolation.get_Lxfunc(sec,satelliteFy)
+        satelliteFuncZ = lagInterpolation.get_Lxfunc(sec, satelliteFz)
+        satelliteX=satelliteFuncX(i+detTime)
+        satelliteY=satelliteFuncY(i+detTime)
+        satelliteZ=satelliteFuncZ(i+detTime)
+        distance1 = math.sqrt(
+            (groundXYZList[i][1] - satelliteX) ** 2 + (groundXYZList[i][2] - satelliteY) ** 2 \
+            + (groundXYZList[i][3] - satelliteZ) ** 2)
+        distance2 = math.sqrt(
+            (groundXYZList[i][4] - satelliteX) ** 2 + (groundXYZList[i][5] - satelliteY) ** 2 \
+            + (groundXYZList[i][6] - satelliteZ) ** 2)
+        delay1 = 1000000000000.0 * distance1 / 299792458
+        delay2 = 1000000000000.0 * distance2 / 299792458
+        delayList.append([delay1, delay2, delay1 - delay2])
+        # print distance1,distance2
+    return delayList
+
 
 def gpsLagInter(gpsTimeList1,gpsTimeList2,gpsDelList,interNum):
     N=len(gpsDelList)
@@ -75,6 +114,14 @@ def gpsLagInterFunTest():
     plt.plot(tmp_x, tmp_y, linestyle='--', color='r')
     plt.show()
 
+def delayCalTest():
+    groundXYZList = fileToList.fileToList(
+        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\groundStationJ2000_Sec.txt' , 'utf8'))
+    satelliteXYZList = fileToList.fileToList(
+        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\satelliteJ2000_Sec.txt' , 'utf8'))
+    delayCal(groundXYZList,satelliteXYZList,2,5)
+
 
 if __name__ == '__main__':
-    gpsLagInterFunTest()
+    #gpsLagInterFunTest()
+    delayCalTest()

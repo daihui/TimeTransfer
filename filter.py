@@ -102,7 +102,7 @@ def  preFilter(timeList,listCount,threshold):
 def normalByTime(timeList,residualList,time):
     count=0
     sum=0
-    lastTime=timeList[0][0]
+    lastTime=timeList[0]
     normalList=[]
     xa=[]
     if len(timeList)==len(residualList):
@@ -110,14 +110,14 @@ def normalByTime(timeList,residualList,time):
     else:
         print 'lenght is not equal'
     for i,item in enumerate(timeList):
-        if item[0]-lastTime<time:
+        if item-lastTime<time:
             count+=1
             sum+=residualList[i][0]
         else:
             normalList.append([sum/count])
             xa.append(lastTime)
             #print sum,count
-            lastTime=item[0]
+            lastTime=item
             count=1
             sum=residualList[i][0]
     print 'normal list finished!'

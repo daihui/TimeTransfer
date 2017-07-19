@@ -55,8 +55,8 @@ def gpsDisDelayEasyMode(gpsDisFile1, gpsDisFile2):
     else:
         item = len(gpsDisList2)
     for i in range(item):
-        t1 = 1000000000000.0 * gpsDisList1[i][0] / 299792.458
-        t2 = 1000000000000.0 * gpsDisList2[i][0] / 299792.458
+        t1 = 1000000000000.0 * gpsDisList1[i][0] / 299792458
+        t2 = 1000000000000.0 * gpsDisList2[i][0] / 299792458
         gpsDelList.append([t1, t2, t1 - t2])
         delayFile.write(str(t1) + '\t' + str(t2) +'\t'+ str(t1 - t2) + '\n')
     print 'GPS distance delay have finished !'
@@ -127,8 +127,8 @@ def timeCorrectByGpsTest(startSec, endSec, shift):
 
 
 def gpsDisDelayEasyModeTest(date):
-    gpsdisfile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\GPS_Send_Precise.txt'%date, 'utf8')
-    gpsdisfile2 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\GPS_Recv_Precise.txt'%date, 'utf8')
+    gpsdisfile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\GPS_Send_Precise_紫台.txt'%date, 'utf8')
+    gpsdisfile2 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\GPS_Recv_Precise_紫台.txt'%date, 'utf8')
     gpsDisDelayEasyMode(gpsdisfile1, gpsdisfile2)
 
 
@@ -137,3 +137,6 @@ def delayOrbitFitTest():
     timeList = fileToList.fileToList(timeFile)
     tau = 1000000000000
     delayOrbitFit(timeList, tau)
+
+if __name__=='__main__':
+    gpsDisDelayEasyModeTest('3.2')
