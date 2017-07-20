@@ -9,7 +9,7 @@ import fitting
 import gpsOrbit
 import filter
 import matplotlib.pyplot as plt
-import statistics
+#import statistics
 
 
 # 合符函数，寻找两list的时间符合。

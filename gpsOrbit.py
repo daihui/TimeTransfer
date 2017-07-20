@@ -25,7 +25,7 @@ def gpsLagInterFun(gpsTimeList1,gpsTimeList2, disDelayList, startNo, Num, shift,
     #return gpsfunc1,gpsfunc2,delayfunc
     return  gpsfunc1,gpsfunc2
 
-##根据地面站位置和卫星位置，以及相对延时，插值计算距离延时
+##根据地面站置位和卫星位置，以及相对延时，插值计算距离延时
 def delayCal(groundXYZList,satelliteXYZList,detTime,Num):
     delayList=[]
     lenght=len(satelliteXYZList)
@@ -46,17 +46,24 @@ def delayCal(groundXYZList,satelliteXYZList,detTime,Num):
         satelliteFuncX=lagInterpolation.get_Lxfunc(sec,satelliteFx)
         satelliteFuncY=lagInterpolation.get_Lxfunc(sec,satelliteFy)
         satelliteFuncZ = lagInterpolation.get_Lxfunc(sec, satelliteFz)
-        satelliteX=satelliteFuncX(i+detTime)
-        satelliteY=satelliteFuncY(i+detTime)
-        satelliteZ=satelliteFuncZ(i+detTime)
-        distance1 = math.sqrt(
-            (groundXYZList[i][1] - satelliteX) ** 2 + (groundXYZList[i][2] - satelliteY) ** 2 \
-            + (groundXYZList[i][3] - satelliteZ) ** 2)
-        distance2 = math.sqrt(
-            (groundXYZList[i][4] - satelliteX) ** 2 + (groundXYZList[i][5] - satelliteY) ** 2 \
-            + (groundXYZList[i][6] - satelliteZ) ** 2)
-        delay1 = 1000000000000.0 * distance1 / 299792458
-        delay2 = 1000000000000.0 * distance2 / 299792458
+        delay1=0.0
+        delay2=0.0
+        for i in range(3):
+            satelliteX1=satelliteFuncX(i+detTime-delay1)
+            satelliteY1=satelliteFuncY(i+detTime-delay1)
+            satelliteZ1=satelliteFuncZ(i+detTime-delay1)
+            satelliteX2=satelliteFuncX(i+detTime-delay2)
+            satelliteY2=satelliteFuncY(i+detTime-delay2)
+            satelliteZ2=satelliteFuncZ(i+detTime-delay2)
+            distance1 = math.sqrt(
+            (groundXYZList[i][1] - satelliteX1) ** 2 + (groundXYZList[i][2] - satelliteY1) ** 2 \
+            + (groundXYZList[i][3] - satelliteZ1) ** 2)
+            distance2 = math.sqrt(
+            (groundXYZList[i][4] - satelliteX2) ** 2 + (groundXYZList[i][5] - satelliteY2) ** 2 \
+            + (groundXYZList[i][6] - satelliteZ2) ** 2)
+            delay1 = 1000000000000.0 * distance1 / 299792458
+            delay2 = 1000000000000.0 * distance2 / 299792458
+            print delay1,delay2
         delayList.append([delay1, delay2, delay1 - delay2])
         # print distance1,distance2
     return delayList

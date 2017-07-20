@@ -121,7 +121,7 @@ def countBySec(dataList):
             sec+=1
 
 def countBySecTest():
-    dataFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.22DLH\\6.22DLH_channel_1_classified_filtered.txt', 'utf8')
+    dataFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.22DLH\\6.22DLH_channel_0-1-130-360s_classified_coindence.txt', 'utf8')
     dataList=fileToList.fileToList(dataFile)
     countBySec(dataList)
 
