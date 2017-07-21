@@ -333,7 +333,7 @@ def polyFitSegmentTest(date):
     # xa,residual=filter.normalByTime(timeList,ya,timeNormal)
     # residualSecUnit=filter.timeUnitConvert(residual,1000000000000)
 
-    # fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-1s-ps.txt')
+    fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-1s-ps.txt')
 
     #fileToList.listToFile(filteredList,timeFile[:-4]+'_filtered.txt')
     fig = plt.figure()

@@ -20,7 +20,7 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
     timeCount1 = 0
     timeCount2 = 0
     coinCount = 0
-    Num = 4
+    Num = 5
     sec = 1
     timeFactor1 = clockTimeCalibrate.clockTimeFactor(gpsTimeList1)
     timeFactor2 = clockTimeCalibrate.clockTimeFactor(gpsTimeList2)
@@ -62,13 +62,9 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
                 coincidenceList.append(
                     [timeList1[timeCount1][0], timeList2[timeCount2][0], detTime, det, delay1, delay2])
                 detList.append(det)
-                # if coinCount > 1:
-                #     det1 = (coincidenceList[coinCount - 1][0] - coincidenceList[coinCount - 2][0]) % 10000000
-                #     det2 = (coincidenceList[coinCount - 1][1] - coincidenceList[coinCount - 2][1]) % 10000000
-                #     print 'det 1: ' + str(det1) + ' det 2: ' + str(det2)
                 timeCount1 += 1
                 timeCount2 += 1
-            if List2[timeCount2][0] - timeBase2 > 1000000000000:
+            if List2[timeCount2][0] > gpsTimeList2[i+1][0]:
                 inSec = False
     fileToList.listToFile(coincidenceList, coinfile)
     print 'STDEV:\t %s'%(statistics.pstdev(detList))
@@ -348,9 +344,6 @@ def timeCoinTest(startSec, endSec, gpsShift, date,detTime):
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\send_fixed_GPSTime.txt' % date, 'utf8'))
     gpsTimeList2 = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_GPSTime.txt' % date, 'utf8'))
-    # for i in range(-gpsShift,gpsShift):
-    #     coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidence_0530-%s-%s-%s-Coin.txt' % (date, startSec, endSec,i),
-    #     'utf8')
     for i in range(1):
         List2Delay = gpsOrbit.delayCalWGS84(groundXYZList,0,1, satelliteXYZList, detTime+(i-0)*0.0005, 5)
         coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidence-%s-%s-%s-%s-Coin-紫台.txt' % (
