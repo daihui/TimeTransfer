@@ -44,8 +44,8 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
         while inSec:
             delay1 = delayFun1(List1[timeCount1][0])
             delay2 = delayFun2(List2[timeCount2][0])
-            delay1 = delayFun1(List1[timeCount1][0] - delay1)
-            delay2 = delayFun2(List2[timeCount2][0] - delay2)
+            # delay1 = delayFun1(List1[timeCount1][0] - delay1)
+            # delay2 = delayFun2(List2[timeCount2][0] - delay2)
             # delay1 = delayFun1(List1[timeCount1][0] - delay1)
             # delay2 = delayFun2(List2[timeCount2][0] - delay2)
             time2 = List2[timeCount2][0] - timeBase2 - delay2
@@ -339,7 +339,7 @@ def timeCoinTest(startSec, endSec, gpsShift, date,detTime):
     #     unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\dat2txt\\send_fixed_850Time_151-154.txt', 'utf8'))
     # List2 = fileToList.fileToList(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\dat2txt\\recv_fixed_850Time_151-154.txt', 'utf8'))
     groundXYZList= fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\groundStationJ2000_Sec.txt' % date, 'utf8'))
+        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\groundStationWGS84.txt' % date, 'utf8'))
     satelliteXYZList = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\satelliteJ2000_Sec.txt' % date, 'utf8'))
     # List2Delay = fileToList.fileToList( unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\GPS_Recv_Precise_紫台_disDelay.txt' % date, 'utf8'))
@@ -351,10 +351,10 @@ def timeCoinTest(startSec, endSec, gpsShift, date,detTime):
     # for i in range(-gpsShift,gpsShift):
     #     coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidence_0530-%s-%s-%s-Coin.txt' % (date, startSec, endSec,i),
     #     'utf8')
-    for i in range(11):
-        List2Delay = gpsOrbit.delayCal(groundXYZList, satelliteXYZList, detTime+(i-5)*0.0005, 5)
+    for i in range(1):
+        List2Delay = gpsOrbit.delayCalWGS84(groundXYZList,0,1, satelliteXYZList, detTime+(i-0)*0.0005, 5)
         coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidence-%s-%s-%s-%s-Coin-紫台.txt' % (
-            date, startSec, endSec, gpsShift, detTime+(i-5)*0.0005), 'utf8')
+            date, startSec, endSec, gpsShift, detTime+(i-0)*0.0005), 'utf8')
         timeCoincidence(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startSec, endSec, gpsShift, coinfile)
 
 
