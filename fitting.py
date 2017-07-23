@@ -301,9 +301,9 @@ def polyLeastFitSegmentTest(date):
     plt.show()
 
 def polyFitSegmentTest(date):
-    order =1
-    timeNormal=1000000000000
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidence-85-250--18-1.9855-Coin-紫台.txt' % date, 'utf8')
+    order =10
+    timeNormal=100000000000
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\synCoincidence-85-250--18-0.0-Coin-紫台WGS84.txt' % date, 'utf8')
     # timeFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14NS\\6.14Nanshan_channel_0-1_60-170_193-220_coindence_timeWalkLinearComp.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
@@ -318,7 +318,7 @@ def polyFitSegmentTest(date):
     # fileToList.listToFile(timeList,timeFile[:-4] + '_filtered.txt')
     # xa,ya,fitList, residual = polyFitSegment(xa, ya, 1, 0.1)
     # xa, ya, filteredList, residual=filter.thresholdFilter(xa,ya,residual,timeList,0,0.000000002)
-    # xa,ya,fitList, residual = polyFitSegment(xa, ya, order,1000)
+    xa,ya,fitList, residual = polyFitSegment(xa, ya, order,1000)
     # xa, ya, filteredList, residual = filter.thresholdFilter(xa, ya, residual, timeList, 0, 0.0000001)
 
     # print len(xa),len(timeList),len(residual)
@@ -329,11 +329,11 @@ def polyFitSegmentTest(date):
     #     yy=Sine(1.9655,10.69678,22.20458,0.41124,x)
     #     residual[i][0]=residual[i][0]-(y+yy)/1000000000000.0
 
-    # xa,residual=filter.normalByTime(timeList,residual,timeNormal)
+    xa,residual=filter.normalByTime(timeList,residual,timeNormal)
     # xa,residual=filter.normalByTime(timeList,ya,timeNormal)
     # residualSecUnit=filter.timeUnitConvert(residual,1000000000000)
 
-    fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-1s-ps.txt')
+    fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-2-0.1s-ps.txt')
 
     #fileToList.listToFile(filteredList,timeFile[:-4]+'_filtered.txt')
     fig = plt.figure()
@@ -341,11 +341,12 @@ def polyFitSegmentTest(date):
     #ax2= fig.add_subplot(212)
     for i,item in enumerate(xa):
         xa[i]=item/1000000000000.0
-        ya[i]=timeList[i][3]
-        # residual[i][0]=residual[i][0]*1000000000000
+        # ya[i]=[timeList[i][3]]
+        residual[i][0]=residual[i][0]*1000000000000
         # print '%s\t%s'%(xa[i],residual[i][0])
-    # ax1.plot(xa,residual, color='g', linestyle='-', marker='')
-    ax1.plot(xa, ya, color='g', linestyle='-', marker='')
+    ax1.plot(xa,residual, color='g', linestyle='-', marker='')
+    # xa, ya = filter.normalByTime(timeList, ya, timeNormal)
+    # ax1.plot(xa, ya, color='g', linestyle='-', marker='')
     ax1.xaxis.grid(True, which='major') #x坐标轴的网格使用主刻度
     ax1.yaxis.grid(True, which='major') #y坐标轴的网格使用次刻度show()
     #ax2.plot(xa,ya,color='m',linestyle='',marker='.')

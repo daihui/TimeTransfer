@@ -9,7 +9,7 @@ import fitting
 import gpsOrbit
 import filter
 import matplotlib.pyplot as plt
-#import statistics
+import statistics
 
 
 # 合符函数，寻找两list的时间符合。
@@ -337,17 +337,17 @@ def timeCoinTest(startSec, endSec, gpsShift, date,detTime):
     groundXYZList= fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\groundStationWGS84.txt' % date, 'utf8'))
     satelliteXYZList = fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\satelliteJ2000_Sec.txt' % date, 'utf8'))
+        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\satelliteWGS84_Sec.txt' % date, 'utf8'))
     # List2Delay = fileToList.fileToList( unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\GPS_Recv_Precise_紫台_disDelay.txt' % date, 'utf8'))
 
     gpsTimeList1 = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\send_fixed_GPSTime.txt' % date, 'utf8'))
     gpsTimeList2 = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_GPSTime.txt' % date, 'utf8'))
-    for i in range(1):
-        List2Delay = gpsOrbit.delayCalWGS84(groundXYZList,0,1, satelliteXYZList, detTime+(i-0)*0.0005, 5)
-        coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidence-%s-%s-%s-%s-Coin-紫台.txt' % (
-            date, startSec, endSec, gpsShift, detTime+(i-0)*0.0005), 'utf8')
+    for i in range(11):
+        List2Delay = gpsOrbit.delayCalWGS84(groundXYZList,0,1, satelliteXYZList, detTime+(i-5)*0.0002, 5)
+        coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidence-%s-%s-%s-%s-Coin-紫台WGS84.txt' % (
+            date, startSec, endSec, gpsShift, detTime+(i-5)*0.0002), 'utf8')
         timeCoincidence(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startSec, endSec, gpsShift, coinfile)
 
 

@@ -73,7 +73,7 @@ if __name__ == '__main__':
     # timeDataCoincidence.timeCoinFinalEfficent(180, 200, -19, '3.2',1)
     # timeDataCoincidence.timeCoinEasyModeTest(85, 250, -18, '3.2')
 
-    # timeDataCoincidence.timeCoinTest(85, 250, -18, '3.2',1.9855)
+    # timeDataCoincidence.timeCoinTest(85, 250, -18, '3.2',0)
     # timeDataCoincidence.coincidenceDelayTest(85, 200, -18, '3.2')
     # fitting.fitComObsTest('3.2')
     # for sec in range(10):

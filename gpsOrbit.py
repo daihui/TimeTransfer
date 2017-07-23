@@ -113,7 +113,7 @@ def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Nu
                     + (groundXYZList[ground2][3] - satelliteZ2) ** 2)
             delay1 = distance1 / 299792458
             delay2 = distance2 / 299792458
-            print delay1, delay2
+            #print delay1, delay2
         delayList.append([1000000000000.0 * delay1, 1000000000000.0 * delay2, 1000000000000.0 * (delay1 - delay2)])
         # print distance1,distance2
     return delayList
@@ -188,7 +188,7 @@ def delayCalWGS84Test():
     groundXYZList = fileToList.fileToList(
             unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\groundStationWGS84.txt', 'utf8'))
     satelliteXYZList = fileToList.fileToList(
-            unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\satelliteJ2000_Sec.txt', 'utf8'))
+            unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\satelliteWGS84_Sec.txt', 'utf8'))
     delayCalWGS84(groundXYZList, 0, 1, satelliteXYZList, 0, 5)
 
 

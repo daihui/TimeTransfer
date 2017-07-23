@@ -74,7 +74,7 @@ def fitFilter(timeList,threshold,times,order):
     filteredList=[]
     for i in range(len(timeList)):
         xa.append(timeList[i][1])
-        ya.append(timeList[i][2])
+        ya.append(timeList[i][3])
     xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, 1, 100000000000)
     xa, ya, filteredList,residual= thresholdFilter(xa, ya, residual, timeList, 0, threshold)
     for j in range(times):
