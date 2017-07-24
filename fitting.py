@@ -303,7 +303,7 @@ def polyLeastFitSegmentTest(date):
 def polyFitSegmentTest(date):
     order =10
     timeNormal=100000000000
-    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\synCoincidence-85-250--18-0.0-Coin-紫台WGS84.txt' % date, 'utf8')
+    timeFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\Result\\synCoincidence-85-250--18-0.0-Coin-紫台WGS84-atm.txt' % date, 'utf8')
     # timeFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.14NS\\6.14Nanshan_channel_0-1_60-170_193-220_coindence_timeWalkLinearComp.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
@@ -333,7 +333,7 @@ def polyFitSegmentTest(date):
     # xa,residual=filter.normalByTime(timeList,ya,timeNormal)
     # residualSecUnit=filter.timeUnitConvert(residual,1000000000000)
 
-    fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-2-0.1s-ps.txt')
+    # fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-2-0.1s-ps.txt')
 
     #fileToList.listToFile(filteredList,timeFile[:-4]+'_filtered.txt')
     fig = plt.figure()

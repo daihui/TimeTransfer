@@ -69,11 +69,11 @@ if __name__ == '__main__':
     # gpsOrbit.gpsLagInterTest()
     # fitting.polyLeastFitTest('3.2')
     # fitting.polyLeastFitSegmentTest('3.2')
-    # fitting.polyFitSegmentTest('3.2')
+    fitting.polyFitSegmentTest('3.2')
     # timeDataCoincidence.timeCoinFinalEfficent(180, 200, -19, '3.2',1)
     # timeDataCoincidence.timeCoinEasyModeTest(85, 250, -18, '3.2')
 
-    timeDataCoincidence.timeCoinTest(85, 250, -18, '3.2',0)
+    # timeDataCoincidence.timeCoinTest(85, 250, -18, '3.2',-0.0012)
     # timeDataCoincidence.coincidenceDelayTest(85, 200, -18, '3.2')
     # fitting.fitComObsTest('3.2')
     # for sec in range(10):
