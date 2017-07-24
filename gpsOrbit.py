@@ -6,7 +6,7 @@ import lagInterpolation
 import matplotlib.pyplot as plt
 import fileToList
 import math
-
+import atmosphericDelayCorrect
 
 ## 以时间为变量，距离延时列表为目标值，输入需求插值函数的时间点，采用前后各Num秒的数据来计算返回插值函数
 def gpsLagInterFun(gpsTimeList1, gpsTimeList2, disDelayList, startNo, Num, shift, sec):
@@ -74,7 +74,7 @@ def delayCalJ2000(groundXYZList, satelliteXYZList, detTime, Num):
 
 
 ##根据地面站置位WGS84和卫星位置WGS84坐标，插值计算距离延时
-def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Num):
+def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Num,atmosphereList):
     delayList = []
     lenght = len(satelliteXYZList)
     for i in range(Num):
@@ -86,7 +86,7 @@ def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Nu
                               + (groundXYZList[ground2][3] - satelliteXYZList[i][3]) ** 2)
         delay1 = 1000000000000.0 * distance1 / 299792458
         delay2 = 1000000000000.0 * distance2 / 299792458
-        delayList.append([delay1, delay2, delay1 - delay2])
+        delayList.append([delay1, delay2,0.0,0.0, delay1 - delay2])
         # print distance1,distance2
     for i in range(Num, lenght - Num):
         sec = [float(i + j - Num) for j in range(2 * Num + 1)]
@@ -114,8 +114,33 @@ def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Nu
             delay1 = distance1 / 299792458
             delay2 = distance2 / 299792458
             #print delay1, delay2
-        delayList.append([1000000000000.0 * delay1, 1000000000000.0 * delay2, 1000000000000.0 * (delay1 - delay2)])
-        # print distance1,distance2
+        tmpX1=(satelliteX1+groundXYZList[ground1][2]*satelliteY1/groundXYZList[ground1][1]+groundXYZList[ground1][3]*satelliteZ1/groundXYZList[ground1][1])/(
+            1.0+(groundXYZList[ground1][2]/groundXYZList[ground1][1])**2+(groundXYZList[ground1][3]/groundXYZList[ground1][1])**2
+        )
+        tmpY1=(groundXYZList[ground1][2]/groundXYZList[ground1][1])*tmpX1
+        tmpZ1=(groundXYZList[ground1][3]/groundXYZList[ground1][1])*tmpX1
+        tmpDis1=math.sqrt((tmpX1 - satelliteX1) ** 2 + (tmpY1 - satelliteY1) ** 2 + (tmpZ1 - satelliteZ1) ** 2)
+        theta1=math.asin(tmpDis1/distance1)
+        elevationAngle1=(math.pi/2-theta1)*180/math.pi
+        atmDelay1=atmosphericDelayCorrect.MPAtmDelayModelCal(atmosphereList[ground1][1],atmosphereList[ground1][2],
+                                                             atmosphereList[ground1][3],atmosphereList[ground1][4],atmosphereList[ground1][5],atmosphereList[ground1][6],elevationAngle1)
+        tmpX2=(satelliteX2+groundXYZList[ground2][2]*satelliteY2/groundXYZList[ground2][1]+groundXYZList[ground2][3]*satelliteZ2/groundXYZList[ground2][1])/(
+            1.0+(groundXYZList[ground2][2]/groundXYZList[ground2][1])**2+(groundXYZList[ground2][3]/groundXYZList[ground2][1])**2
+        )
+        tmpY2=(groundXYZList[ground2][2]/groundXYZList[ground2][1])*tmpX2
+        tmpZ2=(groundXYZList[ground2][3]/groundXYZList[ground2][1])*tmpX2
+        tmpDis2=math.sqrt((tmpX2 - satelliteX2) ** 2 + (tmpY2 - satelliteY2) ** 2 + (tmpZ2 - satelliteZ2) ** 2)
+        theta2=math.asin(tmpDis2/distance2)
+        elevationAngle2=(math.pi/2-theta2)*180/math.pi
+        atmDelay2=atmosphericDelayCorrect.MPAtmDelayModelCal(atmosphereList[ground2][1],atmosphereList[ground2][2],atmosphereList[ground2][3],
+                                                             atmosphereList[ground2][4],atmosphereList[ground2][5],atmosphereList[ground2][6],elevationAngle2)
+        atmDelay1=1000000000000.0 * atmDelay1/ 299792458
+        atmDelay2=1000000000000.0 * atmDelay2/ 299792458
+        disDelay1=1000000000000.0 * delay1
+        disDelay2=1000000000000.0 * delay2
+        totDelay=disDelay1+atmDelay1-disDelay2-atmDelay2
+        delayList.append([disDelay1+atmDelay1, disDelay2+atmDelay2,atmDelay1,atmDelay2,totDelay])
+        #print atmDelay1,atmDelay2,atmDelay1-atmDelay2,disDelay1-disDelay2
     return delayList
 
 
@@ -189,7 +214,9 @@ def delayCalWGS84Test():
             unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\groundStationWGS84.txt', 'utf8'))
     satelliteXYZList = fileToList.fileToList(
             unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\satelliteWGS84_Sec.txt', 'utf8'))
-    delayCalWGS84(groundXYZList, 0, 1, satelliteXYZList, 0, 5)
+    atmosphereList=fileToList.fileToList(
+            unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\3.2天气参数.txt', 'utf8'))
+    delayCalWGS84(groundXYZList, 0, 1, satelliteXYZList, 0, 5,atmosphereList)
 
 
 if __name__ == '__main__':

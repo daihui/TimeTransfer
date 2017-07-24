@@ -9,7 +9,7 @@ import fitting
 import gpsOrbit
 import filter
 import matplotlib.pyplot as plt
-import statistics
+#import statistics
 
 
 # 合符函数，寻找两list的时间符合。
@@ -67,7 +67,7 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
             if List2[timeCount2][0] > gpsTimeList2[i+1][0]:
                 inSec = False
     fileToList.listToFile(coincidenceList, coinfile)
-    print 'STDEV:\t %s'%(statistics.pstdev(detList))
+    #print 'STDEV:\t %s'%(statistics.pstdev(detList))
     print 'time coincidence finished ! there are ' + str(coinCount) + ' pairs.'
     return coincidenceList
 
@@ -339,15 +339,16 @@ def timeCoinTest(startSec, endSec, gpsShift, date,detTime):
     satelliteXYZList = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\satelliteWGS84_Sec.txt' % date, 'utf8'))
     # List2Delay = fileToList.fileToList( unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\GPS_Recv_Precise_紫台_disDelay.txt' % date, 'utf8'))
-
+    atmosphereList=fileToList.fileToList(
+            unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\3.2天气参数.txt', 'utf8'))
     gpsTimeList1 = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\send_fixed_GPSTime.txt' % date, 'utf8'))
     gpsTimeList2 = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_GPSTime.txt' % date, 'utf8'))
-    for i in range(11):
-        List2Delay = gpsOrbit.delayCalWGS84(groundXYZList,0,1, satelliteXYZList, detTime+(i-5)*0.0002, 5)
-        coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidence-%s-%s-%s-%s-Coin-紫台WGS84.txt' % (
-            date, startSec, endSec, gpsShift, detTime+(i-5)*0.0002), 'utf8')
+    for i in range(1):
+        List2Delay = gpsOrbit.delayCalWGS84(groundXYZList,0,1, satelliteXYZList, detTime+(i-0)*0.0002, 5,atmosphereList)
+        coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidence-%s-%s-%s-%s-Coin-紫台WGS84-atm.txt' % (
+            date, startSec, endSec, gpsShift, detTime+(i-0)*0.0002), 'utf8')
         timeCoincidence(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startSec, endSec, gpsShift, coinfile)
 
 
