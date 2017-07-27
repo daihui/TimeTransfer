@@ -345,10 +345,10 @@ def timeCoinTest(startSec, endSec, gpsShift, date,detTime):
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\send_fixed_GPSTime.txt' % date, 'utf8'))
     gpsTimeList2 = fileToList.fileToList(
         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_GPSTime.txt' % date, 'utf8'))
-    for i in range(7):
-        List2Delay = gpsOrbit.delayCalWGS84(groundXYZList,0,1, satelliteXYZList, detTime+(i-3)*0.0002, 5,atmosphereList)
+    for i in range(1):
+        List2Delay = gpsOrbit.delayCalWGS84(groundXYZList,0,1, satelliteXYZList, detTime+(i-0)*0.0002, 5,atmosphereList)
         coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidence-%s-%s-%s-%s-Coin-紫台WGS84-atm.txt' % (
-            date, startSec, endSec, gpsShift, detTime+(i-3)*0.0002), 'utf8')
+            date, startSec, endSec, gpsShift, detTime+(i-0)*0.0002), 'utf8')
         timeCoincidence(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startSec, endSec, gpsShift, coinfile)
 
 
