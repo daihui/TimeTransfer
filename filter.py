@@ -4,7 +4,7 @@ __author__ = 'levitan'
 import fileToList
 import fitting
 
-
+#根据已知脉冲频率进行频率滤波
 def freqFilter(timeList, freq, window, threshold):
     N = len(timeList)
     resultList=[]
@@ -27,6 +27,7 @@ def freqFilter(timeList, freq, window, threshold):
 #     resultList=[]
     #for
 
+#给出脉冲数据文件，进行频率滤波
 def dataFilter(timeFile, freq, window, threshold):
     timeList = fileToList.fileToList(timeFile)
     filtered = freqFilter(timeList, freq, window, threshold)
@@ -74,7 +75,7 @@ def fitFilter(timeList,threshold,times,order):
     filteredList=[]
     for i in range(len(timeList)):
         xa.append(timeList[i][1])
-        ya.append(timeList[i][3])
+        ya.append(timeList[i][2])
     xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, 1, 100000000000)
     xa, ya, filteredList,residual= thresholdFilter(xa, ya, residual, timeList, 0, threshold)
     for j in range(times):
@@ -99,6 +100,7 @@ def  preFilter(timeList,listCount,threshold):
     print '%s data moved !'%count
     return xa,listFiltered
 
+#将residualList根据单位时间内多个点平滑成一个点
 def normalByTime(timeList,residualList,time):
     count=0
     sum=0
@@ -123,6 +125,7 @@ def normalByTime(timeList,residualList,time):
     print 'normal list finished!'
     return xa,normalList
 
+#时间单位转换
 def timeUnitConvert(timeList,timeUnit):
     result=[]
     count=0
@@ -134,14 +137,36 @@ def timeUnitConvert(timeList,timeUnit):
         count+=1
     return result
 
+def reflectNoiseFilter(timeList,thresold,channel):
+    length=len(timeList)
+    nowTime=timeList[0][channel]
+    index=0
+    for i in range(1,length):
+        if timeList[i][channel]-nowTime>thresold:
+            index+=1
+            timeList[index]=timeList[i]
+            nowTime=timeList[index][channel]
+    del timeList[index+1:]
+    print '%s reflect pulses moved out'%(length-index)
+    return timeList
 
+def reflectNoiseFilterTest():
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170825\\20170826030559_fineParse_1.txt',encoding='utf-8')
+    saveFile=dataFile[:-4]+'_reflectFiltered.txt'
+    dataList=fileToList.fileToList(dataFile)
+    dataList=reflectNoiseFilter(dataList,1000000,1)
+    fileToList.listToFile(dataList,saveFile)
 
 def freqFilterTest():
-    file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.22DLH\\6.22DLH_channel_1_classified.txt', 'utf8')
+    file = unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170825\\20170826030559_fineParse_1_reflectFiltered.txt', 'utf8')
     saveFile=file[:-4]+'_filtered.txt'
     timeList=fileToList.fileToList(file)
-    result=freqFilter(timeList,10000000,6,400000)
+    length=len(timeList)
+    for i in range(length):
+        timeList[i]=[timeList[i][1]]
+    result=freqFilter(timeList,88500000,7,10000000)
     fileToList.listToFile(result,saveFile)
 
 if __name__=='__main__':
     freqFilterTest()
+    # reflectNoiseFilterTest()

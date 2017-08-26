@@ -45,7 +45,7 @@ def MPZenithDelayModel(wavelength,latitude,height,baroPressure,es):
     #dnh1=0.000001*(5.316*fnh-3.759*fh)*es/((1-0.00266*math.cos(2*latitude)-0.00028*height))
     #print Ngaxs,dnh,dnh1
     delay=dh+dnh
-    #print 'the zenith delay is %s m, and dry part is %s m, moist part is %s m'%(delay,dh,dnh)
+    # print 'the zenith delay is %s m, and dry part is %s m, moist part is %s m'%(delay,dh,dnh)
     return delay
 
 #俯仰角的Map函数
@@ -76,5 +76,5 @@ def MPAtmDelayModelCal(wavelength,latitude,height,baroPressure,t,RH,elevationAng
     return delay
 
 if __name__=='__main__':
-    MPAtmDelayModelCal(0.85,26.69393,3233,68560,2.5,55,80)
-    MPAtmDelayModelCal(0.85,37.37901,3153,69330,-8,50,80)
+    MPAtmDelayModelCal(0.85,37.37901,3153,69610,-10,50,20)
+    MPAtmDelayModelCal(0.85,37.37901,3153,69610,-15,50,20)

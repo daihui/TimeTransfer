@@ -6,6 +6,7 @@ __author__ = 'levitan'
 
 
 import fileToList
+import filter
 
 def TDCDataConvert(bufferData):
     global coarseTime
@@ -72,6 +73,7 @@ def TDCDataParse(dataFile,fineTimeFile,start,channelNo):
         else:
             channel,time=TDCDataConvert(bufferData)
             if channel==channelNo:
+            # if True:
                 dataList.append([channel,time])
                 count += 1
             bufferData = fileData.read(8).encode('hex')
@@ -86,10 +88,13 @@ def loadFimeTimeFile(fineTimeFile):
     return fileTimeList
 
 def TDCDataParseTest():
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\7.6TDC\\7.6-tdc2-rb1-2k-500s-3.dat',encoding='utf-8')
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170825\\20170826030559.dat',encoding='utf-8')
+    # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\7.6TDC\\7.6-tdc14-rb1-2k-500s-2.dat',encoding='utf-8')
+
     fineTimeFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\FineTimeCali\\tdcB2-52.txt',encoding='utf-8')
-    saveFile=dataFile[:-4]+'_fineParse.txt'
-    dataList=TDCDataParse(dataFile,fineTimeFile,8,2)
+    saveFile=dataFile[:-4]+'_fineParse_1.txt'
+    dataList=TDCDataParse(dataFile,fineTimeFile,8,1)
+
     fileToList.listToFile(dataList,saveFile)
 
 if __name__=='__main__':

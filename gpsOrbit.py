@@ -140,7 +140,8 @@ def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Nu
         disDelay2=1000000000000.0 * delay2
         totDelay=disDelay1+atmDelay1-disDelay2-atmDelay2
         delayList.append([disDelay1+atmDelay1, disDelay2+atmDelay2,atmDelay1,atmDelay2,totDelay])
-        #print atmDelay1,atmDelay2,atmDelay1-atmDelay2,disDelay1-disDelay2
+        # print elevationAngle1,299792458*atmDelay1/1000000000000.0,atmDelay1,elevationAngle2,299792458*atmDelay2/1000000000000.0,atmDelay2
+        print distance1,distance2
     return delayList
 
 
