@@ -74,7 +74,7 @@ def TDCDataParse(dataFile,fineTimeFile,start,channelNo):
             channel,time=TDCDataConvert(bufferData)
             if channel==channelNo:
             # if True:
-                dataList.append([channel,time])
+                dataList.append([time])
                 count += 1
             bufferData = fileData.read(8).encode('hex')
             #print bufferData
@@ -88,7 +88,7 @@ def loadFimeTimeFile(fineTimeFile):
     return fileTimeList
 
 def TDCDataParseTest():
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170825\\20170826030559.dat',encoding='utf-8')
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232.dat',encoding='utf-8')
     # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\7.6TDC\\7.6-tdc14-rb1-2k-500s-2.dat',encoding='utf-8')
 
     fineTimeFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\FineTimeCali\\tdcB2-52.txt',encoding='utf-8')

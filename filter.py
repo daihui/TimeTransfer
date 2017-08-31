@@ -151,22 +151,22 @@ def reflectNoiseFilter(timeList,thresold,channel):
     return timeList
 
 def reflectNoiseFilterTest():
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170825\\20170826030559_fineParse_1.txt',encoding='utf-8')
+    dataFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232_fineParse_532_filtered.txt',encoding='utf-8')
     saveFile=dataFile[:-4]+'_reflectFiltered.txt'
     dataList=fileToList.fileToList(dataFile)
-    dataList=reflectNoiseFilter(dataList,1000000,1)
+    dataList=reflectNoiseFilter(dataList,2000000,0)
     fileToList.listToFile(dataList,saveFile)
 
 def freqFilterTest():
-    file = unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170825\\20170826030559_fineParse_1_reflectFiltered.txt', 'utf8')
+    file = unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232_fineParse_532.txt', 'utf8')
     saveFile=file[:-4]+'_filtered.txt'
     timeList=fileToList.fileToList(file)
     length=len(timeList)
     for i in range(length):
-        timeList[i]=[timeList[i][1]]
-    result=freqFilter(timeList,88500000,7,10000000)
+        timeList[i]=[timeList[i][0]]
+    result=freqFilter(timeList,91000000,6,8000000)
     fileToList.listToFile(result,saveFile)
 
 if __name__=='__main__':
-    freqFilterTest()
-    # reflectNoiseFilterTest()
+    # freqFilterTest()
+    reflectNoiseFilterTest()
