@@ -78,3 +78,6 @@ def MPAtmDelayModelCal(wavelength,latitude,height,baroPressure,t,RH,elevationAng
 if __name__=='__main__':
     MPAtmDelayModelCal(0.85,37.37901,3153,69610,-10,50,20)
     MPAtmDelayModelCal(0.85,37.37901,3153,69610,-15,50,20)
+    MPAtmDelayModelCal(0.532,32.33901,5045,45270,10,50,10)
+    MPAtmDelayModelCal(1.064,32.33901,5045,45270,10,50,10)
+    MPAtmDelayModelCal(1.064,32.33901,5045,45270,10,50,10.1)
