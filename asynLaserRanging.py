@@ -19,6 +19,11 @@ def timeCalibrate(groPulseList,satPulseList,groGPSList,satGPSList):
     print 'time calibrated!'
     return groPulseList,satPulseList,groGPSList,satGPSList
 
+def timeGPSFactor(groGPSList,satGPSList,window):
+    groGPSFactorList=clockTimeCalibrate.clockTimeFactorSecGro(groGPSList)
+    satGPSFactorList=clockTimeCalibrate.clockTimeFactorSecSat(satGPSList,window)
+    return groGPSFactorList,satGPSFactorList
+
 #寻找地面发射脉冲，星上接收到的脉冲的符合对
 def groPulseCoincidence(groPulseList,satPulseList,groGPSList,satGPSList,gpsDisList,groSatShift,startSec,endSec):
     indexGro=0
@@ -30,6 +35,7 @@ def groPulseCoincidence(groPulseList,satPulseList,groGPSList,satGPSList,gpsDisLi
     windows=1500000
     offset=0
     #satShiftTime=groSatShift*1000000000000.0
+    groGPSFactorList,satGPSFactorList=timeGPSFactor(groGPSList,satGPSList,50000)
     if startSec-groSatShift-1<0:
         print 'start sec should be later than ',groSatShift+1
     timeBaseG = groGPSList[startSec-1][0]
@@ -44,11 +50,11 @@ def groPulseCoincidence(groPulseList,satPulseList,groGPSList,satGPSList,gpsDisLi
         y=[gpsDisList[j][0] for j in range(i-Num,i+Num+1)]
         distanceFun=lagInterpolation.get_Lxfunc(x,y)
         while inSec:
-            groPulseTime=groPulseList[indexGro][0]
-            satPulseTime=satPulseList[indexSat][0]
+            groPulseTime=i*1000000000000.0+(groPulseList[indexGro][0]-timeBaseG)/(groGPSFactorList[i-1]/1000000000000.0)
+            satPulseTime=i*1000000000000.0+(satPulseList[indexSat][0]-timeBaseS)/(satGPSFactorList[i-1-groSatShift]/1000000000000.0)
             delay=distanceFun(groPulseTime)*1000*1000000000000.0/ 299792458
             delay=distanceFun(groPulseTime+delay)*1000*1000000000000.0/ 299792458
-            detTime=(groPulseTime+delay-timeBaseG)-(satPulseTime-timeBaseS)
+            detTime=groPulseTime+delay-satPulseTime
             #print detTime,delay,groPulseTime,satPulseTime
             if abs(detTime-offset)>tolerate:
                 if detTime>0:
@@ -57,7 +63,7 @@ def groPulseCoincidence(groPulseList,satPulseList,groGPSList,satGPSList,gpsDisLi
                     indexGro+=1
             else:
                 coinCount+=1
-                coinList.append([groPulseTime,satPulseTime,detTime])
+                coinList.append([groPulseList[indexGro][0],satPulseList[indexSat][0],groPulseTime,satPulseTime,detTime])
                 tolerate=abs(detTime-offset)+windows
                 offset=detTime
                 indexGro+=1
@@ -80,7 +86,7 @@ def satPulseCoincidence(groPulseList,satPulseList,groGPSList,satGPSList,gpsDisLi
     tolerate = 20000000
     windows=1500000
     offset=0
-    #satShiftTime=groSatShift*1000000000000.0
+    groGPSFactorList,satGPSFactorList=timeGPSFactor(groGPSList,satGPSList,50000)
     if startSec-groSatShift-1<0:
         print 'start sec should be later than ',groSatShift+1
     timeBaseG = groGPSList[startSec-1][0]
@@ -91,16 +97,15 @@ def satPulseCoincidence(groPulseList,satPulseList,groGPSList,satGPSList,gpsDisLi
             indexSat += 1
     for i in range(startSec, endSec - 1):
         inSec = True
-        x= [float(j) for j in range(i-Num-groSatShift,i+Num+1-groSatShift)]
+        x= [float(j) for j in range(i-Num,i+Num+1)]
         y=[gpsDisList[j][0] for j in range(i-Num,i+Num+1)]
         distanceFun=lagInterpolation.get_Lxfunc(x,y)
-        #print x,y,distanceFun(i)
         while inSec:
-            groPulseTime=groPulseList[indexGro][0]
-            satPulseTime=satPulseList[indexSat][0]
+            groPulseTime=i*1000000000000.0+(groPulseList[indexGro][0]-timeBaseG)/(groGPSFactorList[i-1]/1000000000000.0)
+            satPulseTime=i*1000000000000.0+(satPulseList[indexSat][0]-timeBaseS)/(satGPSFactorList[i-1-groSatShift]/1000000000000.0)
             delay=distanceFun(satPulseTime/1000000000000.0)*1000*1000000000000.0/299792458
-            #delay=distanceFun((satPulseTime+delay)/1000000000000.0)*1000*1000000000000.0/299792458
-            detTime=(satPulseTime+delay-timeBaseS)-(groPulseTime-timeBaseG)
+            delay=distanceFun((satPulseTime+delay)/1000000000000.0)*1000*1000000000000.0/299792458
+            detTime=satPulseTime+delay-groPulseTime
             # print detTime,delay,groPulseTime,satPulseTime
             if abs(detTime-offset)>tolerate:
                 if detTime>0:
@@ -109,7 +114,7 @@ def satPulseCoincidence(groPulseList,satPulseList,groGPSList,satGPSList,gpsDisLi
                     indexSat+=1
             else:
                 coinCount+=1
-                coinList.append([satPulseTime,groPulseTime,detTime])
+                coinList.append([satPulseList[indexSat][0],groPulseList[indexGro][0],satPulseTime,groPulseTime,detTime])
                 tolerate=abs(detTime-offset)+windows
                 offset=detTime
                 indexGro+=1
@@ -132,29 +137,26 @@ def groSatPulseMatch(groList,satList,groSatShift,threshold):
     indexSat=0
     matchList=[]
     matchCount=0
-    # preTimeG=groList[0][0]-(groSatShift*1000000000000+groList[0][1])
-    # preTimeS=satList[0][0]+groSatShift*1000000000000-satList[0][1]
     while indexGro<lengthGro:
-        detTime=groList[indexGro][0]-(satList[indexSat][0]+groSatShift*1000000000000.0)
+        # detTime=groList[indexGro][0]-(satList[indexSat][0]+groSatShift*1000000000000.0)
+        detTime=groList[indexGro][2]-satList[indexSat][2]
         if abs(detTime)>threshold:
             if detTime>0:
                 indexSat+=1
             else:
                 indexGro+=1
         else:
-            # tempG=groList[indexGro][0]-(groSatShift*1000000000000+groList[indexGro][1])
-            # tempS=satList[indexSat][0]+groSatShift*1000000000000-satList[indexSat][1]
-            # if abs(tempG-preTimeG)<nosieThd and abs(tempS-preTimeS)<nosieThd:
             matchCount+=1
-            matchList.append([groList[indexGro][0],groList[indexGro][1],satList[indexSat][0],satList[indexSat][1]])
-                # preTimeG=tempG
-                # preTimeS=tempS
+            # matchList.append([groList[indexGro][0],groList[indexGro][1],satList[indexSat][0],satList[indexSat][1]])
+            matchList.append([groList[indexGro][0],groList[indexGro][1],satList[indexSat][0],satList[indexSat][1],
+                              groList[indexGro][2],groList[indexGro][3],satList[indexSat][2],satList[indexSat][3]])
+
             indexSat+=1
             indexGro+=1
         if indexSat>lengthSat-1:
             break
     print '%s matched! '%matchCount
-    matchList=fitfilter(matchList,80,1,0.5,groSatShift)
+    matchList=fitfilter(matchList,50,1,1,groSatShift)
     return matchList
 
 #根据星地互打脉冲时间结果计算距离，输出时间、距离，计算模型参考：提高深空异步激光测距精度方法研究
@@ -165,12 +167,15 @@ def asynLaserRanging(matchList,groSatShift):
     iterNum=3
     c=299792458.0
     smoothNum=8
-    newList=[]
     for i in range(length):
-        t=(matchList[i][1]+matchList[i][2])/(2*1000000000000.0)+groSatShift
-        R=(matchList[i][1]+matchList[i][3]-matchList[i][0]-matchList[i][2])*c/(2*1000000000000.0)
-        tau=(matchList[i][3]-matchList[i][0]-(matchList[i][1]-matchList[i][2]))
-        T=matchList[i][3]-matchList[i][0]
+        # t=(matchList[i][1]+matchList[i][2])/(2*1000000000000.0)+groSatShift
+        # R=(matchList[i][1]+matchList[i][3]-matchList[i][0]-matchList[i][2])*c/(2*1000000000000.0)
+        # tau=(matchList[i][3]-matchList[i][0]-(matchList[i][1]-matchList[i][2]))
+        # T=matchList[i][3]-matchList[i][0]
+        t=(matchList[i][4]+matchList[i][7])/(2*1000000000000.0)
+        R=(matchList[i][5]+matchList[i][7]-matchList[i][4]-matchList[i][6])*c/(2*1000000000000.0)
+        tau=(matchList[i][7]-matchList[i][4]-(matchList[i][5]-matchList[i][6]))
+        T=matchList[i][7]-matchList[i][4]
         rangingList.append([t,R,tau,T,R])
     #TODO  数点合成一个点，平滑滤波，但是需注意数据不能缺失大段，否则会引入误差，待改善
     rangingList=fitSmooth(rangingList,50,1)
@@ -193,8 +198,8 @@ def asynLaserRanging(matchList,groSatShift):
             else:
                 detR=(rangingList[i][1]-rangingList[i-1][1])/(rangingList[i][0]-rangingList[i-1][0])
             Tau=rangingList[i][2]/(2+detR/(c-detR))/1000000000000.0
-            tempR.append(rangingList[i][4]-detR*(rangingList[i][3]/1000000000000.0-Tau)/2.0)
-            #print j,detR
+            tempR.append(rangingList[i][4]+detR*(rangingList[i][3]/1000000000000.0-Tau)/2.0)
+            # print j,detR
         for i in range(length):
             rangingList[i][1]=tempR[i]
         del tempR[:]
@@ -249,7 +254,7 @@ def fitfilter(matchList,segment,order,groSatShift,windows):
         del t[:]
         del R[:]
         #newList.append(rangingList[i*segment+int(segment/2)])
-    # reamin=length-int(length/segment)*segment
+    reamin=length-int(length/segment)*segment
     # if reamin>0:
     #     for index in range(int(length/segment)*segment,length):
     #         t.append((matchList[index][1]+matchList[index][2])/(2*1000000000000.0)+groSatShift)
@@ -263,7 +268,7 @@ def fitfilter(matchList,segment,order,groSatShift,windows):
     #         else:
     #             count+=1
         #newList.append(rangingList[int(length/segment)*segment+int(reamin/2)])
-    print 'fit filtered! %s points moved out!'%count
+    print 'fit filtered! %s points moved out!'%(count+reamin)
     return filterList
 
 def reduceSec(rangingList):
@@ -307,13 +312,14 @@ def groPulseCoincidenceTest():
     groGPSFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232_fineParse_GPS.txt',encoding='utf-8')
     satGPSFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\0829AliSatellite_channel_5_GPS.txt',encoding='utf-8')
     gpsDisFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\GPS_Dis.txt',encoding='utf-8')
-    saveFile=groFile[:-4]+'_%s-%s_coincidence.txt'%(startSec,endSec)
-    groList=fileToList.fileToList(groFile)
-    satList=fileToList.fileToList(satFile)
+    saveFile=groFile[:-4]+'_%s-%s_coincidence_new.txt'%(startSec,endSec)
+    groPulseList=fileToList.fileToList(groFile)
+    satPulseList=fileToList.fileToList(satFile)
     groGPSList=fileToList.fileToList(groGPSFile)
     satGPSList=fileToList.fileToList(satGPSFile)
     gpsDisList=fileToList.fileToList(gpsDisFile)
-    groPulseList,satPulseList,groGPSList,satGPSList=timeCalibrate(groList,satList,groGPSList,satGPSList)
+
+    # groPulseList,satPulseList,groGPSList,satGPSList=timeCalibrate(groList,satList,groGPSList,satGPSList)
     coinList=groPulseCoincidence(groPulseList,satPulseList,groGPSList,satGPSList,gpsDisList,groSatShift,startSec,endSec)
     fileToList.listToFile(coinList,saveFile)
 
@@ -326,20 +332,19 @@ def satPulseCoincidenceTest():
     groGPSFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232_fineParse_GPS.txt',encoding='utf-8')
     satGPSFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\0829AliSatellite_channel_5_GPS.txt',encoding='utf-8')
     gpsDisFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\GPS_Dis.txt',encoding='utf-8')
-    saveFile=groFile[:-4]+'_%s-%s_coincidence.txt'%(startSec,endSec)
-    groList=fileToList.fileToList(groFile)
-    satList=fileToList.fileToList(satFile)
+    saveFile=groFile[:-4]+'_%s-%s_coincidence_new.txt'%(startSec,endSec)
+    groPulseList=fileToList.fileToList(groFile)
+    satPulseList=fileToList.fileToList(satFile)
     groGPSList=fileToList.fileToList(groGPSFile)
     satGPSList=fileToList.fileToList(satGPSFile)
     gpsDisList=fileToList.fileToList(gpsDisFile)
-    groPulseList,satPulseList,groGPSList,satGPSList=timeCalibrate(groList,satList,groGPSList,satGPSList)
+    # groPulseList,satPulseList,groGPSList,satGPSList=timeCalibrate(groList,satList,groGPSList,satGPSList)
     coinList=satPulseCoincidence(groPulseList,satPulseList,groGPSList,satGPSList,gpsDisList,groSatShift,startSec,endSec)
-    # coinList=satPulseCoincidence(groList,satList,groGPSList,satGPSList,gpsDisList,groSatShift,startSec,endSec)
     fileToList.listToFile(coinList,saveFile)
 
 def groSatPulseMatchTest():
-    groCoinFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232_fineParse_1064_245-500_coincidence.txt',encoding='utf-8')
-    satCoinFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232_fineParse_532_filtered_reflectFiltered_245-500_coincidence.txt',encoding='utf-8')
+    groCoinFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232_fineParse_1064_245-500_coincidence_new.txt',encoding='utf-8')
+    satCoinFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232_fineParse_532_filtered_reflectFiltered_245-500_coincidence_new.txt',encoding='utf-8')
     groList=fileToList.fileToList(groCoinFile)
     satList=fileToList.fileToList(satCoinFile)
     saveFile=groCoinFile[:-4]+'_match.txt'
@@ -347,7 +352,7 @@ def groSatPulseMatchTest():
     fileToList.listToFile(matchList,saveFile)
 
 def asynLaserRangingTest():
-    matchFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232_fineParse_1064_245-500_coincidence_match.txt',encoding='utf-8')
+    matchFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232_fineParse_1064_245-500_coincidence_new_match.txt',encoding='utf-8')
     atmFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\俯仰角.txt',encoding='utf-8')
     saveFile=matchFile[:-4]+'_ranging.txt'
     saveRedFile=matchFile[:-4]+'_rangingSec.txt'
@@ -355,7 +360,7 @@ def asynLaserRangingTest():
     atmList=fileToList.fileToList(atmFile)
     rangingList=asynLaserRanging(matchList,240)
     reduceList=reduceSec(rangingList)
-    atmCorrect(reduceList,atmList)
+    # atmCorrect(reduceList,atmList)
     fileToList.listToFileLong(rangingList,saveFile)
     fileToList.listToFileLong(reduceList,saveRedFile)
 
