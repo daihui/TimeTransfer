@@ -15,11 +15,11 @@ def gpsLagInterFun(gpsTimeList1, gpsTimeList2, disDelayList, startNo, Num, shift
     x1 = [float(gpsTimeList1[i + startNo - Num][0] / sec) for i in range(2 * Num + 1)]
     fx1 = [float(disDelayList[i + startNo - Num + shift][0]) for i in range(2 * Num + 1)]
     x2 = [float(gpsTimeList2[i + startNo - Num][0] / sec) for i in range(2 * Num + 1)]
-    fx2 = [float(disDelayList[i + startNo - Num + shift][1]) for i in range(2 * Num + 1)]
+    fx2 = [float(disDelayList[i + startNo - Num+shift][1]) for i in range(2 * Num + 1)]
     # print x1,fx1
-    delayX = [float(i + 1) for i in range(startNo - Num, startNo + Num + 1)]
-    delayY = [float(disDelayList[i + startNo - Num + shift][2]) for i in range(2 * Num + 1)]
-    delayfunc = lagInterpolation.get_Lxfunc(delayX, delayY)
+    # delayX = [float(i + 1) for i in range(startNo - Num, startNo + Num + 1)]
+    # delayY = [float(disDelayList[i + startNo - Num + shift][2]) for i in range(2 * Num + 1)]
+    # delayfunc = lagInterpolation.get_Lxfunc(delayX, delayY)
     gpsfunc1 = lagInterpolation.get_Lxfunc(x1, fx1)
     gpsfunc2 = lagInterpolation.get_Lxfunc(x2, fx2)
     # print gpsfunc1(gpsTimeList1[startNo][0]/sec)
@@ -141,7 +141,7 @@ def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Nu
         totDelay=disDelay1+atmDelay1-disDelay2-atmDelay2
         delayList.append([disDelay1+atmDelay1, disDelay2+atmDelay2,atmDelay1,atmDelay2,totDelay])
         # print elevationAngle1,299792458*atmDelay1/1000000000000.0,atmDelay1,elevationAngle2,299792458*atmDelay2/1000000000000.0,atmDelay2
-        print distance1,distance2
+        # print distance1,distance2,delayList[-1]
     return delayList
 
 

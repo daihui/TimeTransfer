@@ -74,7 +74,7 @@ def fitFilter(timeList,threshold,times,order):
     ya=[]
     filteredList=[]
     for i in range(len(timeList)):
-        xa.append(timeList[i][1])
+        xa.append(timeList[i][0])
         ya.append(timeList[i][2])
     xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, 1, 100000000000)
     xa, ya, filteredList,residual= thresholdFilter(xa, ya, residual, timeList, 0, threshold)
@@ -151,21 +151,21 @@ def reflectNoiseFilter(timeList,thresold,channel):
     return timeList
 
 def reflectNoiseFilterTest():
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.10\LJ\\send_fixed_channel_4_850_filtered.txt',encoding='utf-8')
+    dataFile=unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170920032416_fineParse_2_532_filtered.txt',encoding='utf-8')
     saveFile=dataFile[:-4]+'_reflectFiltered.txt'
     dataList=fileToList.fileToList(dataFile)
     dataList=reflectNoiseFilter(dataList,2000000,0)
     fileToList.listToFile(dataList,saveFile)
 
 def freqFilterTest():
-    file = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.10\LJ\\send_fixed_channel_4_850.txt', 'utf8')
+    file = unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170920032416_fineParse_2_532.txt', 'utf8')
     saveFile=file[:-4]+'_filtered.txt'
     timeList=fileToList.fileToList(file)
     length=len(timeList)
     for i in range(length):
         timeList[i]=[timeList[i][0]]
-    # result=freqFilter(timeList,91000000,6,8000000)
-    result=freqFilter(timeList,10000000,6,200000)
+    result=freqFilter(timeList,90000000,6,5000000)
+    # result=freqFilter(timeList,10000000,6,200000)
     fileToList.listToFile(result,saveFile)
 
 if __name__=='__main__':

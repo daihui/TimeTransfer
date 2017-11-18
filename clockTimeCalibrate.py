@@ -19,7 +19,7 @@ def clockTimeFactor(timeList):
 
 def clockTimeFactorSecSat(timeList,window):
     N=len(timeList)
-    print N
+    #print N
     sec=[float(i+1) for i in range(N)]
     time=[]
     filteredSec=[]
@@ -40,46 +40,52 @@ def clockTimeFactorSecSat(timeList,window):
     # for i in range(N):
     #     newGPS+=factorList[i]
     #     print timeList[i][0]-newGPS
-    print factorList
+    # print factorList
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    ax1.scatter(sec,time, color='g', marker='o')
+    ax1.scatter(filteredSec,filteredTime, color='b',  marker='*')
+    ax1.scatter(sec,factorList, color='r',  marker='+')
+    plt.show()
     return factorList
-    # fig = plt.figure()
-    # ax1 = fig.add_subplot(111)
-    # ax1.scatter(sec,time, color='g', marker='o')
-    # ax1.scatter(filteredSec,filteredTime, color='b',  marker='*')
-    # ax1.scatter(sec,factorList, color='r',  marker='+')
-    # plt.show()
 
-def clockTimeFactorSecGro(timeList):
+def clockTimeFactorSecGro(timeList,Num):
+    #err=50000
     N=len(timeList)
-    print N
-    sec=[float(i+1) for i in range(N)]
+    if N<2*Num:
+        print 'Num %s is too big'%Num
+    if Num<=1:
+        print 'Num should bigger than 1'
     time=[]
-    filteredSec=[]
-    filteredTime=[]
+    timeT=[]
     time.append(timeList[0][0])
+    timeT.append(timeList[0][0])
+    sumTime=0
     for i in range(1,N):
         time.append(timeList[i][0]-timeList[i-1][0])
-    mat = fitting.polyLeastFit(sec,time,2)
-
-    for i in range(N):
-        det=time[i]-fitting.polyLeastFitCal([sec[i]],mat)[0]
-        if det>0:
-            filteredSec.append(sec[i])
-            filteredTime.append(time[i])
-    matFilter=fitting.polyLeastFit(filteredSec,filteredTime,2)
-    factorList=fitting.polyLeastFitCal(sec,matFilter)
-    # newGPS=0
-    # for i in range(N):
-    #     newGPS+=factorList[i]
-    #     print timeList[i][0]-newGPS
-    print factorList
-    return factorList
-    # fig = plt.figure()
-    # ax1 = fig.add_subplot(111)
-    # ax1.scatter(sec,time, color='g', marker='o')
-    # ax1.scatter(filteredSec,filteredTime, color='b',  marker='*')
-    # ax1.scatter(sec,factorList, color='r',  marker='+')
-    # plt.show()
+        timeT.append(timeList[i][0]-timeList[i-1][0])
+    for err in range(55000,10000,-10000):
+        for i in range(N-Num):
+            for j in range(1,Num):
+                sumTime+=time[i+j]
+            averTime=sumTime/(Num-1)
+            if abs(time[i]-averTime)>err:
+                time[i]=averTime
+            sumTime=0
+        for i in range(N-Num,N):
+            for j in range(1,Num):
+                sumTime+=time[i-j]
+            averTime=sumTime/(Num-1)
+            if abs(time[i]-averTime)>err:
+                time[i]=averTime
+            sumTime=0
+    sec = [float(i + 1) for i in range(N)]
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    ax1.scatter(sec, timeT, color='g', marker='o')
+    ax1.scatter(sec, time, color='r', marker='+')
+    plt.show()
+    return time
 
 def timeCalibrate(timeList,factor):
     timeListCal=[]
@@ -89,9 +95,10 @@ def timeCalibrate(timeList,factor):
     return timeListCal
 
 if __name__=='__main__':
-    GPSFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232_fineParse_GPS.txt',encoding='utf-8')
+    GPSFile=unicode('C:\Users\Levit\Experiment Data\阿里数据\\170829\\0829AliSatellite_channel_5_GPS.txt',encoding='utf-8')
     timeList=fileToList.fileToList(GPSFile)
-    factor=clockTimeFactorSecGro(timeList,50000)
-    # for item in timeList:
-    #     print item[0]/factor/1000000000000.0
+    # factor=clockTimeFactorSecGro(timeList,5)
+    factor=clockTimeFactorSecSat(timeList,40000)
+    for item in enumerate(factor):
+        print item[0],item[1]
 

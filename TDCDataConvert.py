@@ -14,9 +14,10 @@ def TDCDataConvert(bufferData):
     global carry
     global lastTime
     global fineTimeList
+    global fineTimeLen
 
     channel=int(bufferData[12:14],16)&0x0F
-    fineTime=int(bufferData[6:8],16)&0x10<<4 | int(bufferData[14:16],16)
+    fineTime=(int(bufferData[6:8],16)&0x10)<<4 | int(bufferData[14:16],16)
     #print fineTime
     coarseTime[channel]=int(bufferData[8:10],16) | int(bufferData[10:12],16)<<8 | \
                         int(bufferData[4:6],16)<<16 | (int(bufferData[6:8],16)&0x0F)<<24
@@ -31,7 +32,7 @@ def TDCDataConvert(bufferData):
     # else:
     #     exactTime=int(6250.0/273*fineTime)
 
-    if fineTime<len(fineTimeList[0]):
+    if fineTime<fineTimeLen:
         exactTime=fineTimeList[0][fineTime]
     else:
         exactTime=6250.0
@@ -55,11 +56,13 @@ def TDCDataParse(dataFile,fineTimeFile,start,channelNo):
     global carry
     global lastTime
     global fineTimeList
+    global fineTimeLen
     coarseTime=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     lastCoarseTime=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     carry=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     lastTime=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     fineTimeList=loadFimeTimeFile(fineTimeFile)
+    fineTimeLen=len(fineTimeList[0])
 
     fileData = open(dataFile, 'rb')
     fileData.read(start)
@@ -88,12 +91,12 @@ def loadFimeTimeFile(fineTimeFile):
     return fileTimeList
 
 def TDCDataParseTest():
-    dataFile=unicode('E:\Experiment Data\时频传输数据处理\阿里测试\\170829\\20170830031232.dat',encoding='utf-8')
+    dataFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171116\\20171116220338-tdc13-4-10-4000s.dat',encoding='utf-8')
     # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\7.6TDC\\7.6-tdc14-rb1-2k-500s-2.dat',encoding='utf-8')
 
-    fineTimeFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\FineTimeCali\\tdcB2-52.txt',encoding='utf-8')
-    saveFile=dataFile[:-4]+'_fineParse_1.txt'
-    dataList=TDCDataParse(dataFile,fineTimeFile,8,1)
+    fineTimeFile=unicode('C:\Users\Levit\Experiment Data\FineTimeCali\\tdc13\\tdc13_channel_4_43.txt',encoding='utf-8')
+    saveFile=dataFile[:-4]+'_fineParse_4.txt'
+    dataList=TDCDataParse(dataFile,fineTimeFile,8,3)
 
     fileToList.listToFile(dataList,saveFile)
 

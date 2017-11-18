@@ -121,7 +121,7 @@ def countBySec(dataList):
             sec=int(dataList[index][0]/1000000000000)
 
 def countBySecTest():
-    dataFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.10\LJ\\send_fixed_channel_4_850_filtered_reflectFiltered.txt', 'utf8')
+    dataFile = unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170920032416_fineParse_2_532_filtered_reflectFiltered.txt', 'utf8')
     dataList=fileToList.fileToList(dataFile)
     countBySec(dataList)
 
@@ -131,8 +131,8 @@ if __name__ == '__main__':
     # coindenceTest(dataFile1,dataFile2,0,10000)
     #mergeFilterTest()
     countBySecTest()
-    # dataFile= unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.10\LJ\\send_fixed.txt', 'utf8')
-    # dataClassify = classifyData850(dataFile,[0,1,2,3,4,5])
+    # dataFile= unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170919AliSat.txt', 'utf8')
+    # dataClassify = classifyData850(dataFile,[5,10,27])
     # timeList = fileToList.fileToList(dataClassify)
     # diffList = timeAnalysis(timeList)
     # fileToList.listToFile(diffList, dataClassify[:-4] + '_diff.txt')

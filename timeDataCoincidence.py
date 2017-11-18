@@ -9,7 +9,7 @@ import fitting
 import gpsOrbit
 import filter
 import matplotlib.pyplot as plt
-import statistics
+# import statistics
 
 
 # 合符函数，寻找两list的时间符合。
@@ -21,7 +21,7 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
     timeCount2 = 0
     coinCount = 0
     Num = 5
-    sec = 1
+    sec = 1000000000000.0
     timeFactor1 = clockTimeCalibrate.clockTimeFactor(gpsTimeList1)
     timeFactor2 = clockTimeCalibrate.clockTimeFactor(gpsTimeList2)
     List1 = clockTimeCalibrate.timeCalibrate(timeList1, timeFactor1)
@@ -31,10 +31,11 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
     # List1 = filter.freqFilter(List1, 10000000, 10, 200000)
     # List2 = filter.freqFilter(List2, 10000000, 10, 200000)
     # delayFun1, delayFun2 = gpsOrbit.gpsLagInterFun(gpsTimeList1, gpsTimeList2, List2Delay, int((startSec+endSec)/2), Num, shift)
-    for i in range(startSec, endSec - 1):
+    for i in range(startSec, endSec ):
         inSec = True
-        timeBase1 = gpsTimeList1[i][0]
-        timeBase2 = gpsTimeList2[i][0]
+        timeBase1 = gpsTimeList1[i-1][0]
+        # timeBase2 = gpsTimeList2[i][0]
+        timeBase2 = gpsTimeList2[i-1][0]
         while List2[timeCount2][0] - timeBase2 < 0:
             timeCount2 += 1
         while List1[timeCount1][0] - timeBase1 < 0:
@@ -42,8 +43,9 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
         startNo = i
         delayFun1, delayFun2 = gpsOrbit.gpsLagInterFun(gpsTimeList1, gpsTimeList2, List2Delay, startNo, Num, shift, sec)
         while inSec:
-            delay1 = delayFun1(List1[timeCount1][0])
-            delay2 = delayFun2(List2[timeCount2][0])
+            delay1 = delayFun1(List1[timeCount1][0]/sec)
+            delay2 = delayFun2(List2[timeCount2][0]/sec)
+            # print List1[timeCount1][0]/sec,delay1,List2[timeCount2][0]/sec,delay2
             # delay1 = delayFun1(List1[timeCount1][0] - delay1)
             # delay2 = delayFun2(List2[timeCount2][0] - delay2)
             # delay1 = delayFun1(List1[timeCount1][0] - delay1)
@@ -52,6 +54,7 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
             time1 = List1[timeCount1][0] - timeBase1 - delay1
             detTime = time1 - time2
             det = (List1[timeCount1][0] - delay1) - (List2[timeCount2][0] - delay2)
+            # print List1[timeCount1][0],delay1,List2[timeCount2][0],delay2,detTime,timeBase1,timeBase2
             if abs(detTime) > tolerate:
                 if detTime > 0:
                     timeCount2 += 1
@@ -64,10 +67,10 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
                 detList.append(det)
                 timeCount1 += 1
                 timeCount2 += 1
-            if List2[timeCount2][0] > gpsTimeList2[i+1][0]:
+            if List2[timeCount2][0] > gpsTimeList2[i][0]:
                 inSec = False
     fileToList.listToFile(coincidenceList, coinfile)
-    print 'STDEV:\t %s'%(statistics.pstdev(detList))
+    # print 'STDEV:\t %s'%(statistics.pstdev(detList))
     print 'time coincidence finished ! there are ' + str(coinCount) + ' pairs.'
     return coincidenceList
 
@@ -328,28 +331,28 @@ def timeCoincidenceFinal(List1, List2, gpsTimeList1, gpsTimeList2, List2Delay, s
 
 def timeCoinTest(startSec, endSec, gpsShift, date,detTime):
     List1 = fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\send_fixed_850Time_filtered.txt', 'utf8'))
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\LJ\\send_fixed_channel_4_850_filtered_reflectFiltered.txt', 'utf8'))
     List2 = fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\recv_fixed_850Time_filtered.txt', 'utf8'))
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\DLH\\recv_fixed_channel_7_classified_filtered_reflectFiltered.txt', 'utf8'))
     # List1 = fileToList.fileToList(
     #     unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\dat2txt\\send_fixed_850Time_151-154.txt', 'utf8'))
     # List2 = fileToList.fileToList(unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\dat2txt\\recv_fixed_850Time_151-154.txt', 'utf8'))
     groundXYZList= fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\groundStationWGS84.txt' % date, 'utf8'))
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\\groundStationWGS84.txt' , 'utf8'))
     satelliteXYZList = fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\satelliteWGS84_Sec.txt' % date, 'utf8'))
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\\satelliteWGS84_Sec.txt' , 'utf8'))
     # List2Delay = fileToList.fileToList( unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\GPS_Recv_Precise_紫台_disDelay.txt' % date, 'utf8'))
     atmosphereList=fileToList.fileToList(
-            unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\3.2天气参数.txt', 'utf8'))
+            unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\\天气参数.txt', 'utf8'))
     gpsTimeList1 = fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\send_fixed_GPSTime.txt' % date, 'utf8'))
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\LJ\\send_fixed_channel_5_GPS.txt' , 'utf8'))
     gpsTimeList2 = fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\recv_fixed_GPSTime.txt' % date, 'utf8'))
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\DLH\\recv_fixed_channel_5_GPS.txt' , 'utf8'))
     for i in range(1):
-        List2Delay = gpsOrbit.delayCalWGS84(groundXYZList,0,1, satelliteXYZList, detTime+(i-0)*0.0002, 5,atmosphereList)
-        coinfile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\result\\synCoincidence-%s-%s-%s-%s-Coin-紫台WGS84-atm.txt' % (
-            date, startSec, endSec, gpsShift, detTime+(i-0)*0.0002), 'utf8')
-        timeCoincidence(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startSec, endSec, gpsShift, coinfile)
+        List2Delay = gpsOrbit.delayCalWGS84(groundXYZList,0,1, satelliteXYZList, 0, 5,atmosphereList)
+        coinfile = unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\\result\\synCoincidence-%s-%s-%s-%s-Coin-紫台WGS84-atm.txt' % (
+            date, startSec, endSec, gpsShift+i, 0), 'utf8')
+        timeCoincidence(List1, List2, List2Delay, gpsTimeList1, gpsTimeList2, startSec, endSec, gpsShift+i, coinfile)
 
 
 def timeCoinEasyModeTest(startSec, endSec, gpsShift, date):
@@ -453,3 +456,7 @@ def coincidenceDelayTest(startSec, endSec, gpsShift, date):
         list1.append([item[0]])
         list2.append([item[1]])
     coincidenceDelay(list1, list2, List2Delay, gpsTimeList1, gpsTimeList2, startSec, endSec, gpsShift, 990)
+
+
+if __name__=='__main__':
+    timeCoinTest(61, 200, 1, '3.10', 0)
