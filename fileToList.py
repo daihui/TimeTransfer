@@ -12,7 +12,6 @@ def fileToList(filename):
         for i in range(N):
             List[count]+=[float(line.split()[i])]
         count+=1
-        #print List
     file.close()
     print filename + ' converted to List !'
     return List
@@ -22,6 +21,18 @@ def fileLong(filename):
     saveFile=filename[:-4]+'_long.txt'
     listToFile(List,saveFile)
     print 'file convert to float long file'
+
+def listToFileFloat(List,filename):
+    file=open(filename,'w')
+    N=len(List)
+    for i in xrange(N):
+        J=len(List[i])
+        for j in range(J):
+            file.write('%s\t'%List[i][j])
+        file.write('\n')
+    file.flush()
+    file.close()
+    print 'List save to file !'
 
 def listToFile(List,filename):
     file=open(filename,'w')
@@ -46,3 +57,4 @@ def listToFileLong(List,filename):
     file.flush()
     file.close()
     print 'List save to file !'
+
