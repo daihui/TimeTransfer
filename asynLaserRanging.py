@@ -216,46 +216,47 @@ def asynLaserRanging(matchList,groSatShift):
     c=299792458.0
     smoothNum=8
     for i in range(length):
-        # t=(matchList[i][1]+matchList[i][2])/(2*1000000000000.0)+groSatShift
-        # R=(matchList[i][1]+matchList[i][3]-matchList[i][0]-matchList[i][2])*c/(2*1000000000000.0)
-        # tau=(matchList[i][3]-matchList[i][0]-(matchList[i][1]-matchList[i][2]))
-        # T=matchList[i][3]-matchList[i][0]
-        t=(matchList[i][4]+matchList[i][7])/(2*1000000000000.0)
+        t=(matchList[i][1]+matchList[i][2])/(2*1000000000000.0)+groSatShift
+        R=(matchList[i][1]+matchList[i][3]-matchList[i][0]-matchList[i][2])*c/(2*1000000000000.0)
+        tau=(matchList[i][3]-matchList[i][0]-(matchList[i][1]-matchList[i][2]))
+        T=matchList[i][3]-matchList[i][0]
+        clk=(matchList[i][1]-matchList[i][0]-(matchList[i][3]-matchList[i][2]))/2+groSatShift*1000000000000
+        # t=(matchList[i][4]+matchList[i][7])/(2*1000000000000.0)
         # t = (matchList[i][4] + (matchList[i][5]-matchList[i][6])/2.0) / 1000000000000.0
-        R=(matchList[i][5]+matchList[i][7]-matchList[i][4]-matchList[i][6])*c/(2*1000000000000.0)
-        tau=(matchList[i][7]-matchList[i][4]-(matchList[i][5]-matchList[i][6]))
-        T=matchList[i][7]-matchList[i][4]
-        rangingList.append([t,R,tau,T,R])
+        # R=(matchList[i][5]+matchList[i][7]-matchList[i][4]-matchList[i][6])*c/(2*1000000000000.0)
+        # tau=(matchList[i][7]-matchList[i][4]-(matchList[i][5]-matchList[i][6]))
+        # T=matchList[i][7]-matchList[i][4]
+        rangingList.append([t,R,tau,T,R,clk])
         #print (matchList[i][4]+matchList[i][7])-(matchList[i][5]+matchList[i][6])
     #TODO  数点合成一个点，平滑滤波，但是需注意数据不能缺失大段，否则会引入误差，待改善
-    rangingList=fitSmooth(rangingList,50,1)
-    length=len(rangingList)
-    tx=[]
-    ry=[]
-    for j in range(iterNum):
-        for i in range(length):
-            #TODO 平滑速度
-            if i<=smoothNum:
-                detR=(rangingList[i][1]-rangingList[i+1][1])/(rangingList[i+1][0]-rangingList[i][0])
-            elif i<length-smoothNum :
-                for index in range(i-smoothNum,i+smoothNum):
-                    tx.append(rangingList[index][0])
-                    ry.append(rangingList[index][1])
-                mat=fitting.polyLeastFit(tx,ry,1)
-                detR=(fitting.polyLeastFitCal([rangingList[i-1][0]],mat)[0]-fitting.polyLeastFitCal([rangingList[i+1][0]],mat)[0])/(rangingList[i+1][0]-rangingList[i-1][0])
-                del tx[:]
-                del ry[:]
-            else:
-                detR=(rangingList[i-1][1]-rangingList[i][1])/(rangingList[i][0]-rangingList[i-1][0])
-            Tau=rangingList[i][2]/(2+detR/(c-detR))/1000000000000.0
-            tempR.append(rangingList[i][4]-detR*(rangingList[i][3]/1000000000000.0-Tau)/2.0)
-            # if j==iterNum-1:
-            #     rangingList[i][0]=rangingList[i][0]+Tau
-            print '%s\t%s\t%s'%(j,rangingList[i][0],detR)
-        for i in range(length):
-            rangingList[i][1]=tempR[i]
-        del tempR[:]
-    print 'iterate %s times, asyn laser ranging is finished!'%iterNum
+    rangingList=fitSmooth(rangingList,50,4)
+    # length=len(rangingList)
+    # tx=[]
+    # ry=[]
+    # for j in range(iterNum):
+    #     for i in range(length):
+    #         #TODO 平滑速度
+    #         if i<=smoothNum:
+    #             detR=(rangingList[i][1]-rangingList[i+1][1])/(rangingList[i+1][0]-rangingList[i][0])
+    #         elif i<length-smoothNum :
+    #             for index in range(i-smoothNum,i+smoothNum):
+    #                 tx.append(rangingList[index][0])
+    #                 ry.append(rangingList[index][1])
+    #             mat=fitting.polyLeastFit(tx,ry,1)
+    #             detR=(fitting.polyLeastFitCal([rangingList[i-1][0]],mat)[0]-fitting.polyLeastFitCal([rangingList[i+1][0]],mat)[0])/(rangingList[i+1][0]-rangingList[i-1][0])
+    #             del tx[:]
+    #             del ry[:]
+    #         else:
+    #             detR=(rangingList[i-1][1]-rangingList[i][1])/(rangingList[i][0]-rangingList[i-1][0])
+    #         Tau=rangingList[i][2]/(2+detR/(c-detR))/1000000000000.0
+    #         tempR.append(rangingList[i][4]-detR*(rangingList[i][3]/1000000000000.0-Tau)/2.0)
+    #         # if j==iterNum-1:
+    #         #     rangingList[i][0]=rangingList[i][0]+Tau
+    #         print '%s\t%s\t%s'%(j,rangingList[i][0],detR)
+    #     for i in range(length):
+    #         rangingList[i][1]=tempR[i]
+    #     del tempR[:]
+    # print 'iterate %s times, asyn laser ranging is finished!'%iterNum
     return rangingList
 
 def fitSmooth(rangingList,segment,order):
@@ -309,12 +310,13 @@ def fitfilter(matchList,segment,order,groSatShift,windows):
     print 'fit filtered! %s points moved out!'%(count+reamin)
     return filterList
 
-def reduceSec(rangingList,fitNum,timeShift,channel):
+def reduceSec(rangingList,fitNum,timeShift,channelR,channelC):
     startSec=int(rangingList[0][0])+1
     endSec=int(rangingList[-1][0])
     reduceList=[]
     t=[]
     r=[]
+    c=[]
     # fitNum=5
     index=0
     for sec in range(startSec,endSec+1):
@@ -322,11 +324,14 @@ def reduceSec(rangingList,fitNum,timeShift,channel):
             index+=1
         for i in range(index-fitNum,index+fitNum):
             t.append(rangingList[i][0]+timeShift)
-            r.append(rangingList[i][channel])
-        mat=fitting.polyLeastFit(t,r,1)
-        reduceList.append([sec,fitting.polyLeastFitCal([float(sec)],mat)[0]])
+            r.append(rangingList[i][channelR])
+            c.append(rangingList[i][channelC])
+        matR=fitting.polyLeastFit(t,r,1)
+        matC = fitting.polyLeastFit(t, c, 1)
+        reduceList.append([sec,fitting.polyLeastFitCal([float(sec)],matR)[0],fitting.polyLeastFitCal([float(sec)],matC)[0]])
         del t[:]
         del r[:]
+        del c[:]
     return reduceList
 
 def atmCorrect(rangingList,atmList):
@@ -415,17 +420,17 @@ def nearMatchTest():
     fileToList.listToFileLong(reduceKList, saveFile[:-4] + '_KSec.txt')
 
 def asynLaserRangingTest():
-    matchFile=unicode('C:\Users\Levit\Experiment Data\阿里数据\\170913\\20170914022751_fineParse_1_1064_110-245_coincidence_new_match.txt',encoding='utf-8')
-    atmFile=unicode('C:\Users\Levit\Experiment Data\阿里数据\\170913\\俯仰角.txt',encoding='utf-8')
+    matchFile=unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170920032416_fineParse_1_1064_10-220_coincidence_new_match.txt',encoding='utf-8')
+    atmFile=unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\俯仰角.txt',encoding='utf-8')
     saveFile=matchFile[:-4]+'_ranging_NoIte.txt'
 
     matchList=fileToList.fileToList(matchFile)
     atmList=fileToList.fileToList(atmFile)
     rangingList=asynLaserRanging(matchList,5)
-    for timeshift in range(-30,20,5):
+    for timeshift in range(0,1,5):
         timeshift=0.001*timeshift
         saveRedFile = matchFile[:-4] + '_rangingSec_NoIte-%s.txt'%timeshift
-        reduceList=reduceSec(rangingList,5,timeshift,1)
+        reduceList=reduceSec(rangingList,5,timeshift,4,5)
         atmCorrect(reduceList,atmList)
         fileToList.listToFile(reduceList, saveRedFile)
     fileToList.listToFile(rangingList,saveFile)

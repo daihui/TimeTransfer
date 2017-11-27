@@ -39,9 +39,12 @@ def TDCDataConvert(bufferData):
         print fineTime
 
     time = -exactTime+(coarseTime[channel]+(carry[channel]<<28))*6250
+    # print coarseTime[channel],-exactTime,fineTime
     if channel>=0 & channel<8:
         if time<lastTime[channel]:
-            print 'error in parse data channel %s time%s is small than %s'%(channel,time,lastTime[channel])
+            print 'error in parse data channel %s time %s is small than %s'%(channel,time,lastTime[channel])
+            lastTime[channel] = time
+            return channel, time
         else:
             #print time-lastTime[channel]
             lastTime[channel]=time
@@ -91,13 +94,12 @@ def loadFimeTimeFile(fineTimeFile):
     return fileTimeList
 
 def TDCDataParseTest():
-    dataFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171116\\20171116220338-tdc13-4-10-4000s.dat',encoding='utf-8')
-    # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\7.6TDC\\7.6-tdc14-rb1-2k-500s-2.dat',encoding='utf-8')
+    # dataFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171125\\20171125164702-tdc2-2-4-2k-2.dat',encoding='utf-8')
+    dataFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171126\\20171126212424-tdc13-4k-light-1.dat',encoding='utf-8')
 
     fineTimeFile=unicode('C:\Users\Levit\Experiment Data\FineTimeCali\\tdc13\\tdc13_channel_4_43.txt',encoding='utf-8')
-    saveFile=dataFile[:-4]+'_fineParse_4.txt'
+    saveFile=dataFile[:-4]+'_channel_4.txt'
     dataList=TDCDataParse(dataFile,fineTimeFile,8,3)
-
     fileToList.listToFile(dataList,saveFile)
 
 if __name__=='__main__':

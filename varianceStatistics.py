@@ -82,14 +82,18 @@ def ADEVTest():
     fileToList.listToFileFloat(adev,saveFile)
 
 def MDEVTest():
-    dataFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171114200130-tdc2-13-2k-500s-3_residual-1-0.01s-ps.txt','utf8')
+    dataFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171121\\20171121230538-tdc2-13-2k-500s-dating-1_residual-2-0.01s-ps.txt','utf8')
     dataList=fileToList.fileToList(dataFile)
     saveFile = dataFile[:-4] + '_MDEV.txt'
     mdev=MDEV(dataList,0.01)
     fileToList.listToFileFloat(mdev, saveFile)
 
 def TDEVTest():
-    dataFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171114200130-tdc2-13-2k-500s-3_residual-1-0.01s-ps.txt','utf8')
+    # dataFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171125\\20171125162259-tdc2-2-4-2k-2_residual-1-0.01s-ps.txt','utf8')
+    dataFile = unicode(
+        'C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171126\\20171126212413-tdc2-4k-light-1_channel_4_coindence_residual-2-0.01s-ps.txt',
+        'utf8')
+
     dataList=fileToList.fileToList(dataFile)
     saveFile = dataFile[:-4] + '_TDEV.txt'
     tdev=TDEV(dataList,0.01)
