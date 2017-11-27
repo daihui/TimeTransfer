@@ -68,12 +68,11 @@ def coincidence850(list1,list2,channelDelay, coinWidth):
     print 'coincidence finished! %s pairs'%count
     return resultList
 
-def coindenceTest(dataFile1,dataFile2,channelDelay,coinWidth):
-    list1=fileToList.fileToList(dataFile1)
-    list2=fileToList.fileToList(dataFile2)
-    saveFile=dataFile1[:-4]+'_coindence.txt'
-    resultList=coincidence850(list1,list2,channelDelay,coinWidth)
+def coindenceTest(dataList1,dataList2,channelDelay,coinWidth,saveFile):
+    resultList=coincidence850(dataList1,dataList2,channelDelay,coinWidth)
+    averSecCount=countBySec(resultList)
     fileToList.listToFile(resultList,saveFile)
+    return resultList,averSecCount
 
 def timeAnalysis(timeList):
     diffList = []
@@ -112,25 +111,35 @@ def countBySec(dataList):
     length=len(dataList)
     sec=int(dataList[0][0]/1000000000000)
     count=0
+    sumSec=0
+    sumCount=0
     for index in range(length):
         if int(dataList[index][0]/1000000000000)==sec:
             count+=1
         else:
             print '%s\t%s'%(sec,count)
+            sumSec+=1
+            sumCount+=count
             count=0
             sec=int(dataList[index][0]/1000000000000)
+    return sumCount/sumSec
 
 def countBySecTest():
-    dataFile = unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170920032416_fineParse_2_532_filtered_reflectFiltered.txt', 'utf8')
+    dataFile = unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171125\\20171125221852-tdc2-5k-light-1_channel_4_coindence.txt', 'utf8')
     dataList=fileToList.fileToList(dataFile)
-    countBySec(dataList)
+    averSecCount=countBySec(dataList)
+    print 'average second count: %s'%averSecCount
+    # return averSecCount
 
 if __name__ == '__main__':
-    # dataFile1 = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.27NS\\6.27NS_channel_0_classified.txt', 'utf8')
-    # dataFile2= unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.27NS\\6.27NS_channel_1_classified.txt', 'utf8')
-    # coindenceTest(dataFile1,dataFile2,0,10000)
+    dataFile1 = unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171126\\20171126212413-tdc2-4k-light-1_channel_4.txt', 'utf8')
+    dataFile2= unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171126\\20171126212424-tdc13-4k-light-1_channel_4.txt', 'utf8')
+    saveFile = dataFile1[:-4] + '_coindence.txt'
+    datalist1 = fileToList.fileToList(dataFile1)
+    datalist2 = fileToList.fileToList(dataFile2)
+    coindenceTest(dataList1,dataList2,0,60000,saveFile)
     #mergeFilterTest()
-    countBySecTest()
+    # countBySecTest()
     # dataFile= unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170919AliSat.txt', 'utf8')
     # dataClassify = classifyData850(dataFile,[5,10,27])
     # timeList = fileToList.fileToList(dataClassify)
