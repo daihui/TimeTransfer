@@ -132,12 +132,12 @@ def countBySecTest():
     # return averSecCount
 
 if __name__ == '__main__':
-    dataFile1 = unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171126\\20171126212413-tdc2-4k-light-1_channel_4.txt', 'utf8')
-    dataFile2= unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171126\\20171126212424-tdc13-4k-light-1_channel_4.txt', 'utf8')
+    dataFile1 = unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171216\零基线实验\\20171217005308-tdc2-0baseline-1_channel_5_filterN.txt', 'utf8')
+    dataFile2 = unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171216\零基线实验\\20171217005308-tdc13-0baseline-1_channel_5_filterN.txt', 'utf8')
     saveFile = dataFile1[:-4] + '_coindence.txt'
     datalist1 = fileToList.fileToList(dataFile1)
     datalist2 = fileToList.fileToList(dataFile2)
-    coindenceTest(dataList1,dataList2,0,60000,saveFile)
+    coindenceTest(datalist1,datalist2,0,2000000,saveFile)
     #mergeFilterTest()
     # countBySecTest()
     # dataFile= unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170919AliSat.txt', 'utf8')

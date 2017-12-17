@@ -7,6 +7,7 @@ __author__ = 'levitan'
 
 import fileToList
 import filter
+import TDCTest
 
 def TDCDataConvert(bufferData):
     global coarseTime
@@ -36,7 +37,7 @@ def TDCDataConvert(bufferData):
         exactTime=fineTimeList[0][fineTime]
     else:
         exactTime=6250.0
-        print fineTime
+        # print fineTime
 
     time = -exactTime+(coarseTime[channel]+(carry[channel]<<28))*6250
     # print coarseTime[channel],-exactTime,fineTime
@@ -95,11 +96,13 @@ def loadFimeTimeFile(fineTimeFile):
 
 def TDCDataParseTest():
     # dataFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171125\\20171125164702-tdc2-2-4-2k-2.dat',encoding='utf-8')
-    dataFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171126\\20171126212424-tdc13-4k-light-1.dat',encoding='utf-8')
-
-    fineTimeFile=unicode('C:\Users\Levit\Experiment Data\FineTimeCali\\tdc13\\tdc13_channel_4_43.txt',encoding='utf-8')
-    saveFile=dataFile[:-4]+'_channel_4.txt'
-    dataList=TDCDataParse(dataFile,fineTimeFile,8,3)
+    dataFile=unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171216\零基线实验\\20171217022617-tdc13-0baseline-2.dat',encoding='utf-8')
+    channel=5
+    tdc=13
+    fineTimeFile=unicode('C:\Users\Levit\Experiment Data\FineTimeCali\\tdc%s\\1216_tdc%s_5C_channel_%s_4%s.txt',encoding='utf-8')%(tdc,tdc,channel,channel-1)
+    saveFile=dataFile[:-4]+'_channel_%s.txt'%channel
+    dataList=TDCDataParse(dataFile,fineTimeFile,8,channel-1)
+    TDCTest.countBySec(dataList)
     fileToList.listToFile(dataList,saveFile)
 
 if __name__=='__main__':

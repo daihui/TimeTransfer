@@ -119,14 +119,20 @@ def twoLightTDCDataProcess(channel1,channel2,delay,window,dataFile1,dataFile2,fi
     saveFile1 = dataFile1[:-4] + '_channel_%s.txt'%channel1
     dataList1 = TDCDataConvert.TDCDataParse(dataFile1, fineTimeFile1, 8, channel1-1)
     fileToList.listToFile(dataList1, saveFile1)
+    dataList1_filter=filter.freqFilter(dataList1,10000200,6,300000)
+    dataList1_filterN=filter.reflectNoiseFilter(dataList1_filter,1000000,0)
+    fileToList.listToFile(dataList1_filterN, saveFile1[:-4]+'_filterN.txt')
     saveFile2 = dataFile2[:-4] + '_channel_%s.txt' % channel2
     dataList2 = TDCDataConvert.TDCDataParse(dataFile2, fineTimeFile2, 8, channel2 - 1)
     fileToList.listToFile(dataList2, saveFile2)
-    saveCoinFile = dataFile1[:-4] + '_coindence.txt'
-    coindenceList,averSecCount=TDCTest.coindenceTest(dataList1, dataList2, delay, window, saveCoinFile)
+    dataList2_filter = filter.freqFilter(dataList2, 10000200, 6, 300000)
+    dataList2_filterN = filter.reflectNoiseFilter(dataList2_filter, 1000000, 0)
+    fileToList.listToFile(dataList2_filterN, saveFile2[:-4] + '_filterN.txt')
+    saveCoinFile = dataFile1[:-4] + '_filterN_coindence.txt'
+    coindenceList,averSecCount=TDCTest.coindenceTest(dataList1_filterN, dataList2_filterN, delay, window, saveCoinFile)
     tdevName=tdevName+' %s'%averSecCount
-    del dataList1
-    del dataList2
+    del dataList1,dataList1_filter,dataList1_filterN
+    del dataList2,dataList2_filter,dataList2_filterN
     num=len(coindenceList)
     xa = []
     xb = []
@@ -134,7 +140,7 @@ def twoLightTDCDataProcess(channel1,channel2,delay,window,dataFile1,dataFile2,fi
     for i in range(num):
         xa.append(coindenceList[i][0])
         ya.append(coindenceList[i][2])
-    xa, ya, coindenceList, fitList, residual = filter.fitFilter(coindenceList, 4000 / 1000000000000.0, 1, 1)
+    xa, ya, coindenceList, fitList, residual = filter.fitFilter(coindenceList, 3000 / 1000000000000.0, 1, 1)
     xa, ya, fitList, residual = fitting.polyFitSegment(xa, ya, order, 10000)
     for i in range(len(xa)):
         xb.append([xa[i]])
@@ -180,29 +186,29 @@ def twoLocalTDCDataProcessTest():
     fineTimeFile2 = unicode('C:\Users\Levit\Experiment Data\FineTimeCali\\tdc13\\tdc13_channel_4_43.txt',
                             encoding='utf-8')
     order=2
-    tau=10000000000.0
+    tau=100000000000.0
     twoLocalTDCDataProcess(dataFile1,dataFile2,fineTimeFile1,fineTimeFile2,order,tau)
 
 def twoLightTDCDataProcessTest():
-    channel1 = 4
-    channel2 = 4
-    delay = 0
-    window = 100000
+    channel1 = 5
+    channel2 = 5
+    delay =-144000
+    window = 500000
     order = 2
     tau = 10000000000.0
-    tdevName='11.26 light'
+    tdevName='12.16 electronic'
     tdevComp='11.25 Electronic TDEV'
     dataFile1 = unicode(
-        'C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171126\\20171126214640-tdc2-2k-light-3.dat',
+        'C:\Users\Levit\Experiment Data\德令哈测试\\20171216\零基线实验\\20171217005308-tdc2-0baseline-1.dat',
         encoding='utf-8')
     dataFile2 = unicode(
-        'C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171126\\20171126214652-tdc13-2k-light-3.dat',
+        'C:\Users\Levit\Experiment Data\德令哈测试\\20171216\零基线实验\\20171217005308-tdc13-0baseline-1.dat',
         encoding='utf-8')
     fineTimeFile1 = unicode(
-        'C:\Users\Levit\Experiment Data\FineTimeCali\\tdc2\\tdc2_channel_%s_4%s.txt' % (channel1, channel1 - 1),
+        'C:\Users\Levit\Experiment Data\FineTimeCali\\tdc2\\1216_tdc2_5C_channel_%s_4%s.txt' % (channel1, channel1 - 1),
         encoding='utf-8')
     fineTimeFile2 = unicode(
-        'C:\Users\Levit\Experiment Data\FineTimeCali\\tdc13\\tdc13_channel_%s_4%s.txt' % (channel2, channel2 - 1),
+        'C:\Users\Levit\Experiment Data\FineTimeCali\\tdc13\\1216_tdc13_5C_channel_%s_4%s.txt' % (channel2, channel2 - 1),
         encoding='utf-8')
     tdevCompFile = unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171125\\20171125183452-tdc2-2k-500s-3_channel4-4_residual-2-0.010s-ps_TDEV.txt','utf8')
     twoLightTDCDataProcess(channel1,channel2,delay,window,dataFile1,dataFile2,fineTimeFile1,fineTimeFile2,order,tau,tdevName,tdevComp,tdevCompFile)

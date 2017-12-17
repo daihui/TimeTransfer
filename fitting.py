@@ -302,8 +302,8 @@ def polyLeastFitSegmentTest(date):
 
 def polyFitSegmentTest(date):
     order =2
-    timeNormal=10000000000
-    timeFile = unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171126\\20171126212413-tdc2-4k-light-1_channel_4_coindence.txt' , 'utf8')
+    timeNormal=1000000000000
+    timeFile = unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171213\\20171214003506-tdc2-2k-5-1_coindence.txt' , 'utf8')
     # timeFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171125\\20171125162259-tdc2-2-4-2k-2.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
@@ -333,7 +333,7 @@ def polyFitSegmentTest(date):
     # xa,residual=filter.normalByTime(timeList,fitList,timeNormal)
     # residualSecUnit=filter.timeUnitConvert(residual,1000000000000)
 
-    fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-2-0.01s-ps.txt')
+    fileToList.listToFileLong(residual, timeFile[:-4] + '_residual-2-1s-ps.txt')
 
     #fileToList.listToFile(filteredList,timeFile[:-4]+'_filtered.txt')
     fig = plt.figure()
