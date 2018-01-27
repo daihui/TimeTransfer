@@ -78,9 +78,18 @@ def timeWalkLinearCompensation(countFile,coinFile):
     fileToList.listToFile(coinList,saveFile)
     print 'time walk linear compensation finished!'
 
+def timeWalkLinearCorrectionTest():
+    a = 3.55226
+    b = -0.00355
+    countFile = unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171218\零基线实验\\1218DLHCount.txt', encoding='utf-8')
+    countList = fileToList.fileToList(countFile)
+    timeWalkLinearCorrection(a, b, countList)
+
+def timeWalkLinearCompensationTest():
+    countFile=unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171218\零基线实验\\1218DLHCountAll.txt',encoding='utf-8')
+    coinFile=unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171218\零基线实验\\20171219014131-tdc2-0baseline-1_filterN_coindence_filtered-160-460.txt',encoding='utf-8')
+    timeWalkLinearCompensation(countFile,coinFile)
 
 if __name__=='__main__':
-    countFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.22DLH\\6.22DLHCount.txt',encoding='utf-8')
-    coinFile=unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\6.22DLH\\6.22DLH_channel_0-1-130-360s_classified_coindence.txt',encoding='utf-8')
-    #timeWalkPECompensation(countFile,coinFile)
-    timeWalkLinearCompensation(countFile,coinFile)
+    timeWalkLinearCompensationTest()
+    # timeWalkLinearCorrectionTest()

@@ -64,9 +64,9 @@ def twoLocalTDCDataProcess(dataFile1,dataFile2,fineTimeFile1,fineTimeFile2,order
     channel1=int(fineTimeFile1[-8])
     channel2=int(fineTimeFile2[-8])
     saveFile1 = dataFile1[:-4] + '_channel%s.txt'%channel1
-    dataList1 = TDCDataConvert.TDCDataParse(dataFile1, fineTimeFile1, 8, channel1-1)
+    dataList1 = TDCDataConvert.TDCDataParse(dataFile1, fineTimeFile1, 8, str(40+channel1-1))
     saveFile2 = dataFile2[:-4] + '_channel%s.txt' % channel2
-    dataList2 = TDCDataConvert.TDCDataParse(dataFile2, fineTimeFile2, 8, channel2 - 1)
+    dataList2 = TDCDataConvert.TDCDataParse(dataFile2, fineTimeFile2, 8, str(40+channel2-1))
     fileToList.listToFile(dataList1, saveFile1)
     fileToList.listToFile(dataList2, saveFile2)
     num1=len(dataList1)
@@ -117,18 +117,22 @@ def twoLocalTDCDataProcess(dataFile1,dataFile2,fineTimeFile1,fineTimeFile2,order
 def twoLightTDCDataProcess(channel1,channel2,delay,window,dataFile1,dataFile2,fineTimeFile1,fineTimeFile2,order,tau,tdevName,tdevComp,tdevCompFile):
 
     saveFile1 = dataFile1[:-4] + '_channel_%s.txt'%channel1
-    dataList1 = TDCDataConvert.TDCDataParse(dataFile1, fineTimeFile1, 8, channel1-1)
+    dataList1 = TDCDataConvert.TDCDataParse(dataFile1, fineTimeFile1, 8, str(40+channel1-1))
     fileToList.listToFile(dataList1, saveFile1)
     dataList1_filter=filter.freqFilter(dataList1,10000200,6,300000)
     dataList1_filterN=filter.reflectNoiseFilter(dataList1_filter,1000000,0)
     fileToList.listToFile(dataList1_filterN, saveFile1[:-4]+'_filterN.txt')
     saveFile2 = dataFile2[:-4] + '_channel_%s.txt' % channel2
-    dataList2 = TDCDataConvert.TDCDataParse(dataFile2, fineTimeFile2, 8, channel2 - 1)
+    dataList2 = TDCDataConvert.TDCDataParse(dataFile2, fineTimeFile2, 8, str(40+channel2 - 1))
     fileToList.listToFile(dataList2, saveFile2)
     dataList2_filter = filter.freqFilter(dataList2, 10000200, 6, 300000)
     dataList2_filterN = filter.reflectNoiseFilter(dataList2_filter, 1000000, 0)
+    TDCTest.countBySec(dataList2)
+    TDCTest.countBySec(dataList1)
+    TDCTest.countBySec(dataList2_filterN)
+    TDCTest.countBySec(dataList1_filterN)
     fileToList.listToFile(dataList2_filterN, saveFile2[:-4] + '_filterN.txt')
-    saveCoinFile = dataFile1[:-4] + '_filterN_coindence.txt'
+    saveCoinFile = dataFile1[:-4] + '_%s_filterN_coindence.txt'%channel1
     coindenceList,averSecCount=TDCTest.coindenceTest(dataList1_filterN, dataList2_filterN, delay, window, saveCoinFile)
     tdevName=tdevName+' %s'%averSecCount
     del dataList1,dataList1_filter,dataList1_filterN
@@ -140,8 +144,9 @@ def twoLightTDCDataProcess(channel1,channel2,delay,window,dataFile1,dataFile2,fi
     for i in range(num):
         xa.append(coindenceList[i][0])
         ya.append(coindenceList[i][2])
-    xa, ya, coindenceList, fitList, residual = filter.fitFilter(coindenceList, 3000 / 1000000000000.0, 1, 1)
+    xa, ya, coindenceList, fitList, residual = filter.fitFilter(coindenceList, 2000 / 1000000000000.0, 2, 1)
     xa, ya, fitList, residual = fitting.polyFitSegment(xa, ya, order, 10000)
+    fileToList.listToFile(coindenceList,saveCoinFile[:-4]+'_filtered.txt')
     for i in range(len(xa)):
         xb.append([xa[i]])
     xOneSec, residualOneSec = filter.normalByTime(xb, residual, 1000000000000)
@@ -185,24 +190,25 @@ def twoLocalTDCDataProcessTest():
         encoding='utf-8')
     fineTimeFile2 = unicode('C:\Users\Levit\Experiment Data\FineTimeCali\\tdc13\\tdc13_channel_4_43.txt',
                             encoding='utf-8')
-    order=2
+    order=20
     tau=100000000000.0
     twoLocalTDCDataProcess(dataFile1,dataFile2,fineTimeFile1,fineTimeFile2,order,tau)
 
 def twoLightTDCDataProcessTest():
     channel1 = 5
     channel2 = 5
-    delay =-144000
+    # delay =-999999849928
+    delay=0
     window = 500000
     order = 2
-    tau = 10000000000.0
-    tdevName='12.16 electronic'
+    tau = 100000000000.0
+    tdevName='1.2 elec 2kHz'
     tdevComp='11.25 Electronic TDEV'
     dataFile1 = unicode(
-        'C:\Users\Levit\Experiment Data\德令哈测试\\20171216\零基线实验\\20171217005308-tdc2-0baseline-1.dat',
+        'C:\Users\Levit\Experiment Data\德令哈测试\\20180102\\20180102190703-tdc2-2k-5-1.dat',
         encoding='utf-8')
     dataFile2 = unicode(
-        'C:\Users\Levit\Experiment Data\德令哈测试\\20171216\零基线实验\\20171217005308-tdc13-0baseline-1.dat',
+        'C:\Users\Levit\Experiment Data\德令哈测试\\20180102\\20180102190704-tdc13-2k-5-1.dat',
         encoding='utf-8')
     fineTimeFile1 = unicode(
         'C:\Users\Levit\Experiment Data\FineTimeCali\\tdc2\\1216_tdc2_5C_channel_%s_4%s.txt' % (channel1, channel1 - 1),
@@ -213,6 +219,58 @@ def twoLightTDCDataProcessTest():
     tdevCompFile = unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171125\\20171125183452-tdc2-2k-500s-3_channel4-4_residual-2-0.010s-ps_TDEV.txt','utf8')
     twoLightTDCDataProcess(channel1,channel2,delay,window,dataFile1,dataFile2,fineTimeFile1,fineTimeFile2,order,tau,tdevName,tdevComp,tdevCompFile)
 
+def fitting_segment(startTime,endTime,coindenceFile):
+    coindenceList=fileToList.fileToList(coindenceFile)
+    second=1000000000000.0
+    tau=100000000000
+    order=2
+    num = len(coindenceList)
+    xa = []
+    xb = []
+    ya = []
+    for i in range(num):
+        if coindenceList[i][0]/second>=startTime and coindenceList[i][0]/second<endTime:
+            xa.append(coindenceList[i][0])
+            ya.append(coindenceList[i][2])
+    # xa, ya, coindenceList, fitList, residual = filter.fitFilter(coindenceList, 2000 / 1000000000000.0, 2, 1)
+    xa, ya, fitList, residual = fitting.polyFitSegment(xa, ya, order, 10000)
+    for i in range(len(xa)):
+        xb.append([xa[i]])
+    xOneSec, residualOneSec = filter.normalByTime(xb, residual, second)
+    del xa[:]
+    del fitList[:]
+    del coindenceList[:]
+    fileToList.listToFileLong(residualOneSec, coindenceFile[:-4] + '_%s-%s-1s-ps.txt' % (startTime, endTime))
+    xTau, residualTau = filter.normalByTime(xb, residual, tau)
+    residualFile = coindenceFile[:-4] + '_%s-%s-%.3fs-ps.txt' % (startTime, endTime, tau / 1000000000000.0)
+    fileToList.listToFileLong(residualTau, residualFile)
+
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    for i, item in enumerate(xOneSec):
+        xOneSec[i] = item / 1000000000000.0
+        residualOneSec[i][0] = residualOneSec[i][0] * 1000000000000
+    ax1.plot(xOneSec, residualOneSec, color='g', linestyle='-', marker='*')
+    ax1.xaxis.grid(True, which='major')  # x坐标轴的网格使用主刻度
+    ax1.yaxis.grid(True, which='major')  # y坐标轴的网格使用次刻度show()
+    plt.show()
+
+    tdevFile = residualFile[:-4] + '_TDEV.txt'
+    tdev = varianceStatistics.TDEV(residualTau, tau / 1000000000000.0)
+    fileToList.listToFileFloat(tdev, tdevFile)
+    print 'TDEV calculation finished!'
+    tdevName='TDEV %s-%s second'%(startTime,endTime)
+    fig = plt.figure()
+    dataPlot.logPlotAx(tdev, fig, 'r', '--', 's', tdevName)
+    plt.show()
+
+def fitting_segment_test():
+    startTime=160
+    endTime=300
+    coindenceFile=unicode(
+        'C:\Users\Levit\Experiment Data\德令哈测试\\20171216\零基线实验\\20171217022617-tdc2-0baseline-2_filterN_coindence_filtered.txt',
+        encoding='utf-8')
+    fitting_segment(startTime,endTime,coindenceFile)
 
 if __name__ == '__main__':
     # groundDataFile1=unicode('G:\时频传输数据处理\双站数据处理\\12.12\\send_fixed.txt','utf8')
@@ -221,5 +279,6 @@ if __name__ == '__main__':
     # GPSDistance2=unicode('G:\时频传输数据处理\双站数据处理\\12.12\\GPS_recv.txt','utf8')
     # coinfile=unicode('G:\时频传输数据处理\双站数据处理\\12.12\Result\\synCoincidenceEM.txt','utf8')
     # calculateGPS(groundDataFile1,groundDataFile2,GPSDistance1,GPSDistance2,coinfile)
-    # twoLocalTDCDataProcessTest()
-    twoLightTDCDataProcessTest()
+    twoLocalTDCDataProcessTest()
+    # twoLightTDCDataProcessTest()
+    # fitting_segment_test()

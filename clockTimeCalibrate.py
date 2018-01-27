@@ -5,16 +5,32 @@ __author__ = 'levitan'
 import fileToList
 import fitting
 import matplotlib.pyplot as plt
+import numpy
 
 def clockTimeFactor(timeList):
     N=len(timeList)
     print N
-    sec=[float(i+1) for i in range(N)]
+    # sec=[float(i+1) for i in range(N)]
     time=[timeList[i][0] for i in range(N)]
-    mat = fitting.polyLeastFit(sec,time,1)
-    detTime=fitting.polyLeastFitCal([N],mat)[0]-fitting.polyLeastFitCal([1],mat)[0]
+    detTime=time[N-1]-time[0]
     factor=detTime/((N-1)*1000000000000.0000)
     print 'time factor is '+str(factor)
+    return factor
+
+def clockTimeFactorFit(timeList):
+    N=len(timeList)
+    print N
+    sec=[float(i+1) for i in range(N)]
+    time=[timeList[i][0] for i in range(N)]
+    matN=numpy.polyfit(sec,time,1)
+    # fx=numpy.poly1d(matN)
+    # residualTime=fx(sec)-time
+    # fig = plt.figure()
+    # ax1 = fig.add_subplot(111)
+    # ax1.scatter(sec, residualTime, color='g', marker='o')
+    # plt.show()
+    factor=matN[0]/1000000000000
+    print factor,matN[1]/1000000000000
     return factor
 
 def clockTimeFactorSecSat(timeList,window):
@@ -94,11 +110,29 @@ def timeCalibrate(timeList,factor):
     print 'time calibrate finished !'
     return timeListCal
 
-if __name__=='__main__':
-    GPSFile=unicode('C:\Users\Levit\Experiment Data\阿里数据\\170829\\0829AliSatellite_channel_5_GPS.txt',encoding='utf-8')
-    timeList=fileToList.fileToList(GPSFile)
-    # factor=clockTimeFactorSecGro(timeList,5)
-    factor=clockTimeFactorSecSat(timeList,40000)
-    for item in enumerate(factor):
-        print item[0],item[1]
+def clockTimeFactorTest():
+    GPSFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\共视数据\\20180110012854-tdc13_channel_1.txt',
+                      encoding='utf-8')
+    timeList = fileToList.fileToList(GPSFile)
+    clockTimeFactor(timeList)
 
+def clockTimeFactorFitTest():
+    GPSFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\共视数据\\20180110012854-tdc13_channel_1.txt',
+                      encoding='utf-8')
+    timeList = fileToList.fileToList(GPSFile)
+    clockTimeFactorFit(timeList)
+
+def clockTimeFactorSecSatTest():
+    # GPSFile=unicode('C:\Users\Levit\Experiment Data\阿里数据\\170829\\0829AliSatellite_channel_5_GPS.txt',encoding='utf-8')
+    GPSFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\共视数据\\20180110012854-tdc13_channel_1.txt',
+                      encoding='utf-8')
+    timeList = fileToList.fileToList(GPSFile)
+    # factor=clockTimeFactorSecGro(timeList,5)
+    factor = clockTimeFactorSecSat(timeList, 40000)
+    for item in enumerate(factor):
+        print item[0], item[1]
+
+if __name__=='__main__':
+    clockTimeFactorFitTest()
+    # clockTimeFactorSecSatTest()
+    clockTimeFactorTest()

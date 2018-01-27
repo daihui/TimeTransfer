@@ -3,6 +3,7 @@
 __author__ = 'levitan'
 import fileToList
 import fitting
+import numpy
 
 #根据已知脉冲频率进行频率滤波
 def freqFilter(timeList, freq, window, threshold):
@@ -76,10 +77,26 @@ def fitFilter(timeList,threshold,times,order):
     for i in range(len(timeList)):
         xa.append(timeList[i][0])
         ya.append(timeList[i][2])
-    xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, 1, 100000000000)
-    xa, ya, filteredList,residual= thresholdFilter(xa, ya, residual, timeList, 0, threshold)
+        # ya.append((timeList[i][0] - timeList[i][1]))
+    xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, 2, 10000000000000)
+    xa, ya, filteredList,residual= thresholdFilter(xa, ya, residual, timeList, 0, 4*threshold)
     for j in range(times):
-        xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, order, 50000000000)
+        xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, order, 5000000000000)
+        xa, ya, filteredList,residual = thresholdFilter(xa, ya, residual,filteredList, 0, threshold)
+
+    return xa,ya,filteredList,fitList,residual
+
+def fitFineFilter(timeList,threshold,times,order):
+    xa=[]
+    ya=[]
+    filteredList=[]
+    for i in range(len(timeList)):
+        xa.append(timeList[i][0])
+        ya.append(timeList[i][0]-timeList[i][1])
+    xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, 1, 200000000000)
+    xa, ya, filteredList,residual= thresholdFilter(xa, ya, residual, timeList, 0, 4*threshold)
+    for j in range(times):
+        xa,ya,fitList, residual = fitting.polyLeastFitSegment(xa, ya, order, 10000000000)
         xa, ya, filteredList,residual = thresholdFilter(xa, ya, residual,filteredList, 0, threshold)
 
     return xa,ya,filteredList,fitList,residual
@@ -101,10 +118,12 @@ def  preFilter(timeList,listCount,threshold):
     return xa,listFiltered
 
 #将residualList根据单位时间内多个点平滑成一个点
+#TODO 时间需要确认
 def normalByTime(timeList,residualList,time):
     count=0
     sum=0
     lastTime=timeList[0][0]
+    sumTime=0
     normalList=[]
     xa=[]
     if len(timeList)==len(residualList):
@@ -112,18 +131,67 @@ def normalByTime(timeList,residualList,time):
     else:
         print 'lenght is not equal'
     for i,item in enumerate(timeList):
-        if item[0]-lastTime<time:
+        detTime=item[0]-lastTime
+        if detTime<time:
             count+=1
             sum+=residualList[i][0]
+            sumTime+=detTime
         else:
             normalList.append([sum/count])
-            xa.append(lastTime)
+            xa.append((lastTime+sumTime/count))
             #print sum,count
             lastTime=item[0]
             count=1
             sum=residualList[i][0]
+            sumTime=0
     print 'normal list finished!'
     return xa,normalList
+
+def normalBySec(timeList,time,order,offset):
+    timeSec=1000000000000.0
+    startSec=int(timeList[0][0]/time)
+    endSec=int(timeList[-1][0]/time)
+    length=len(timeList)
+    index=0
+    xa1=[]
+    xa2 = []
+    ya=[]
+    orbit1=[]
+    orbit2 = []
+    fitSecList=[]
+    for sec in range(startSec,endSec+1):
+        while index<length and timeList[index][0]<(sec+0.5)*time:
+            xa1.append(timeList[index][0]/timeSec)
+            xa2.append(timeList[index][1] / timeSec)
+            ya.append(timeList[index][0]-timeList[index][1])
+            orbit1.append(timeList[index][4])
+            orbit2.append(timeList[index][5])
+            index+=1
+        if len(xa1)>200:
+            mat = numpy.polyfit(xa1, ya, order)
+            mat1 = numpy.polyfit(xa1, orbit1, order)
+            mat2 = numpy.polyfit(xa2, orbit2, order)
+            mat3=numpy.polyfit(xa1, xa2, order)
+            Fx = numpy.poly1d(mat)
+            Fx1 = numpy.poly1d(mat1)
+            Fx2 = numpy.poly1d(mat2)
+            Fx3=numpy.poly1d(mat3)
+            t=Fx(sec/(timeSec/time))
+            t1 = Fx1(sec / (timeSec / time)+offset)
+            sec2=Fx3(sec)
+            t2=Fx2(sec2+offset)
+            fitSecList.append([sec,sec2,t1,t2,t-t1+t2])
+            # print sec,sec2,sec-sec2,t,t1,t2,t-t1+t2
+            del xa1[:]
+            del xa2[:]
+            del ya[:]
+            del orbit1[:]
+            del orbit2[:]
+        # else:
+        #     fitSecList.append([sec, 0,0,0])
+        #     print fitSecList[-1][0], fitSecList[-1][1],fitSecList[-1][2],fitSecList[-1][3]
+            # print 'len(xa) is < order !!!'
+    return fitSecList
 
 #时间单位转换
 def timeUnitConvert(timeList,timeUnit):
@@ -146,28 +214,38 @@ def reflectNoiseFilter(timeList,thresold,channel):
             index+=1
             timeList[index]=timeList[i]
             nowTime=timeList[index][channel]
+        else:
+            print timeList[i][channel]-nowTime
     del timeList[index+1:]
     print '%s reflect pulses moved out'%(length-index)
     return timeList
 
 def reflectNoiseFilterTest():
-    dataFile=unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170920032416_fineParse_2_532_filtered.txt',encoding='utf-8')
+    dataFile=unicode('C:\Users\Levit\Experiment Data\双站数据\\20180121\共视数据\\20180122014608-tdc13_channel_6.txt',encoding='utf-8')
     saveFile=dataFile[:-4]+'_reflectFiltered.txt'
     dataList=fileToList.fileToList(dataFile)
-    dataList=reflectNoiseFilter(dataList,2000000,0)
+    dataList=reflectNoiseFilter(dataList,1000000,0)
     fileToList.listToFile(dataList,saveFile)
 
 def freqFilterTest():
-    file = unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170920032416_fineParse_2_532.txt', 'utf8')
+    file = unicode('C:\Users\Levit\Experiment Data\丽江测试\\20180104\\20180105014530_channel_6.txt', 'utf8')
     saveFile=file[:-4]+'_filtered.txt'
     timeList=fileToList.fileToList(file)
     length=len(timeList)
     for i in range(length):
         timeList[i]=[timeList[i][0]]
-    result=freqFilter(timeList,90000000,6,5000000)
+    result=freqFilter(timeList,10000200,6,300000)
     # result=freqFilter(timeList,10000000,6,200000)
     fileToList.listToFile(result,saveFile)
+
+def fitFineFilterTest():
+    file = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180121\\result\\synCoincidence-120-220--16-1-Coarse_Coin_factor.txt', 'utf8')
+    saveFile = file[:-4] + '_fitFilter.txt'
+    timeList = fileToList.fileToList(file)
+    xa, ya, timeList, fitList, residual=fitFineFilter(timeList,2500/1000000000000.0,5,2)
+    fileToList.listToFile(timeList,saveFile)
 
 if __name__=='__main__':
     # freqFilterTest()
     reflectNoiseFilterTest()
+    # fitFineFilterTest()

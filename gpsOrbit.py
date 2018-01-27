@@ -12,9 +12,11 @@ import atmosphericDelayCorrect
 def gpsLagInterFun(gpsTimeList1, gpsTimeList2, disDelayList, startNo, Num, shift, sec):
     if startNo < Num:
         print 'startNo should bigger than Num'
-    x1 = [float(gpsTimeList1[i + startNo - Num][0] / sec) for i in range(2 * Num + 1)]
+    # x1 = [float(gpsTimeList1[i + startNo - Num][0] / sec) for i in range(2 * Num + 1)]
+    x1 = [float(i  + startNo - Num) for i in range(2 * Num + 1)]
     fx1 = [float(disDelayList[i + startNo - Num + shift][0]) for i in range(2 * Num + 1)]
-    x2 = [float(gpsTimeList2[i + startNo - Num][0] / sec) for i in range(2 * Num + 1)]
+    # x2 = [float(gpsTimeList2[i + startNo - Num][0] / sec) for i in range(2 * Num + 1)]
+    x2 = [float(i  + startNo - Num) for i in range(2 * Num + 1)]
     fx2 = [float(disDelayList[i + startNo - Num+shift][1]) for i in range(2 * Num + 1)]
     # print x1,fx1
     # delayX = [float(i + 1) for i in range(startNo - Num, startNo + Num + 1)]
@@ -77,6 +79,7 @@ def delayCalJ2000(groundXYZList, satelliteXYZList, detTime, Num):
 def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Num,atmosphereList):
     delayList = []
     lenght = len(satelliteXYZList)
+    print lenght
     for i in range(Num):
         distance1 = math.sqrt((groundXYZList[ground1][1] - satelliteXYZList[i][1]) ** 2 + (
         groundXYZList[ground1][2] - satelliteXYZList[i][2]) ** 2 \
@@ -113,7 +116,7 @@ def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Nu
                     + (groundXYZList[ground2][3] - satelliteZ2) ** 2)
             delay1 = distance1 / 299792458
             delay2 = distance2 / 299792458
-            #print delay1, delay2
+            # print ii,delay1, delay2,delay1-delay2
         tmpX1=(satelliteX1+groundXYZList[ground1][2]*satelliteY1/groundXYZList[ground1][1]+groundXYZList[ground1][3]*satelliteZ1/groundXYZList[ground1][1])/(
             1.0+(groundXYZList[ground1][2]/groundXYZList[ground1][1])**2+(groundXYZList[ground1][3]/groundXYZList[ground1][1])**2
         )
@@ -140,10 +143,21 @@ def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Nu
         disDelay2=1000000000000.0 * delay2
         totDelay=disDelay1+atmDelay1-disDelay2-atmDelay2
         delayList.append([disDelay1+atmDelay1, disDelay2+atmDelay2,atmDelay1,atmDelay2,totDelay])
-        # print elevationAngle1,299792458*atmDelay1/1000000000000.0,atmDelay1,elevationAngle2,299792458*atmDelay2/1000000000000.0,atmDelay2
-        # print distance1,distance2,delayList[-1]
+        print i, disDelay1, disDelay2,atmDelay1,atmDelay2,totDelay
+
     return delayList
 
+def delayCoarseCal(delayList1,delayList2):
+    delayList = []
+    if len(delayList1)>len(delayList2) :
+        length=len(delayList2)
+    else:
+        length=len(delayList1)
+    for i in range(length):
+        delay1=delayList1[i][0]*1000*1000000000000.0 / 299792458
+        delay2 = delayList2[i][0] * 1000 * 1000000000000.0 / 299792458
+        delayList.append([delay1,delay2,0,0,delay1-delay2])
+    return delayList
 
 def gpsLagInter(gpsTimeList1, gpsTimeList2, gpsDelList, interNum):
     N = len(gpsDelList)
@@ -175,30 +189,44 @@ def gpsLagInterTest():
 
 
 def gpsLagInterFunTest():
-    gpsTimeList1 = fileToList.fileToList(
-            unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\send_fixed_GPSTime.txt', 'utf8'))
-    gpsTimeList2 = fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\recv_fixed_GPSTime.txt', 'utf8'))
-    gpsDisList = fileToList.fileToList(
-        unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\GPS_Recv_Precise_disDelay.txt', 'utf8'))
-    startNo = 7
+    groundXYZList = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\groundStationWGS84.txt', 'utf8'))
+    satelliteXYZList = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\satelliteWGS84_Sec.txt', 'utf8'))
+    atmosphereList = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\天气参数.txt', 'utf8'))
+    delayList=delayCalWGS84(groundXYZList, 0, 1, satelliteXYZList, 0, 5, atmosphereList)
+
+    # gpsTimeList1 = fileToList.fileToList(
+    #         unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\send_fixed_GPSTime.txt', 'utf8'))
+    # gpsTimeList2 = fileToList.fileToList(
+    #     unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\recv_fixed_GPSTime.txt', 'utf8'))
+
+    startNo = 50
+    shift=0
+    Sec=1000000000000
     Num = 5
     tmp_x = []
     tmp_y = []
+    tmp_y2=[]
     x = []
     y = []
-    for sec in range(100):
-        Lx1, Lx2 = gpsLagInterFun(gpsTimeList1, gpsTimeList2, gpsDisList, startNo + sec, Num, 0)  # 获得插值函数
-        tmp_x += [float(startNo + sec + i / 10.0) * 1000000000000 for i in range(10)]  # 测试用例
-        tmp_y += [Lx1(float(startNo + sec + i / 10.0) * 1000000000000) for i in range(10)]  # 根据插值函数获得测试用例的纵坐标
-        x += [gpsTimeList1[startNo + sec][0]]
-        y += [gpsDisList[startNo + sec][0]]
+    y2=[]
+    for sec in range(300):
+        Lx1, Lx2 = gpsLagInterFun(delayList, delayList, delayList, startNo + sec, Num, shift,Sec)  # 获得插值函数
+        tmp_x += [float(startNo + sec + i / 10.0)  for i in range(10)]  # 测试用例
+        tmp_y += [Lx1(float(startNo + sec + i / 10.0) ) for i in range(10)]  # 根据插值函数获得测试用例的纵坐标
+        tmp_y2 += [Lx2(float(startNo + sec + i / 10.0) ) for i in range(10)]
+        x += [startNo + sec]
+        y += [delayList[startNo + sec][0]]
+        y2+=[delayList[startNo + sec][1]]
+
     ''' 画图 '''
     plt.figure("play")
     ax1 = plt.subplot(111)
     plt.sca(ax1)
-    plt.plot(x, y, linestyle=' ', marker='o', color='b')
-    plt.plot(tmp_x, tmp_y, linestyle='--', color='r')
+    plt.plot(x, y2, linestyle=' ', marker='o', color='b')
+    plt.plot(tmp_x, tmp_y2, linestyle=' ',marker='*', color='r')
     plt.show()
 
 
@@ -212,14 +240,14 @@ def delayCalJ2000Test():
 
 def delayCalWGS84Test():
     groundXYZList = fileToList.fileToList(
-            unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\groundStationWGS84.txt', 'utf8'))
+            unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\groundStationWGS84.txt', 'utf8'))
     satelliteXYZList = fileToList.fileToList(
-            unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\satelliteWGS84_Sec.txt', 'utf8'))
+            unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\satelliteWGS84_Sec.txt', 'utf8'))
     atmosphereList=fileToList.fileToList(
-            unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\\3.2天气参数.txt', 'utf8'))
+            unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\天气参数.txt', 'utf8'))
     delayCalWGS84(groundXYZList, 0, 1, satelliteXYZList, 0, 5,atmosphereList)
 
 
 if __name__ == '__main__':
-    # gpsLagInterFunTest()
-    delayCalWGS84Test()
+    gpsLagInterFunTest()
+    # delayCalWGS84Test()

@@ -89,14 +89,14 @@ def MDEVTest():
     fileToList.listToFileFloat(mdev, saveFile)
 
 def TDEVTest():
-    # dataFile=unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\两TDC测试\\20171125\\20171125162259-tdc2-2-4-2k-2_residual-1-0.01s-ps.txt','utf8')
+    # dataFile=unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171226\零基线实验\\20171227015305-tdc2_5_filterN_coindence_filtered_250-350s_residual-1-0.1s-ps.txt','utf8')
     dataFile = unicode(
-        'C:\Users\Levit\Experiment Data\德令哈测试\\20171213\\20171214003506-tdc2-2k-5-1_coindence_residual-2-0.01s-ps.txt',
+        'C:\Users\Levit\Experiment Data\双站数据\\20180110\\result\\synCoincidence-90-190--18-0-Coin-紫台WGS84-atm-factor_filtered_residual-2-0.1s-ps.txt',
         'utf8')
 
     dataList=fileToList.fileToList(dataFile)
     saveFile = dataFile[:-4] + '_TDEV.txt'
-    tdev=TDEV(dataList,0.01)
+    tdev=TDEV(dataList,0.1)
     fileToList.listToFileFloat(tdev, saveFile)
 
 if __name__=='__main__':

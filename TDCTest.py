@@ -113,33 +113,37 @@ def countBySec(dataList):
     count=0
     sumSec=0
     sumCount=0
+    countList=[]
     for index in range(length):
         if int(dataList[index][0]/1000000000000)==sec:
             count+=1
         else:
             print '%s\t%s'%(sec,count)
+            countList.append([sec,count])
             sumSec+=1
             sumCount+=count
             count=0
-            sec=int(dataList[index][0]/1000000000000)
-    return sumCount/sumSec
+            # sec=int(dataList[index][0]/1000000000000)
+            sec+=1
+    return countList
 
 def countBySecTest():
-    dataFile = unicode('C:\Users\Levit\Experiment Data\Rakon晶振测试数据\本地光路测试\\20171125\\20171125221852-tdc2-5k-light-1_channel_4_coindence.txt', 'utf8')
+    dataFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180121\\result\\synCoincidence-50-250--16-1-Coarse_Coin_factor.txt', 'utf8')
     dataList=fileToList.fileToList(dataFile)
-    averSecCount=countBySec(dataList)
-    print 'average second count: %s'%averSecCount
+    countList=countBySec(dataList)
+
     # return averSecCount
 
 if __name__ == '__main__':
-    dataFile1 = unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171216\零基线实验\\20171217005308-tdc2-0baseline-1_channel_5_filterN.txt', 'utf8')
-    dataFile2 = unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171216\零基线实验\\20171217005308-tdc13-0baseline-1_channel_5_filterN.txt', 'utf8')
-    saveFile = dataFile1[:-4] + '_coindence.txt'
-    datalist1 = fileToList.fileToList(dataFile1)
-    datalist2 = fileToList.fileToList(dataFile2)
-    coindenceTest(datalist1,datalist2,0,2000000,saveFile)
+    # dataFile1 = unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171230\\20171230163026-elec_channel_5.txt', 'utf8')
+    # dataFile2 = unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171230\\20171230163026-elec_channel_6.txt', 'utf8')
+    # saveFile = dataFile1[:-4] + '_coindence.txt'
+    # datalist1 = fileToList.fileToList(dataFile1)
+    # datalist2 = fileToList.fileToList(dataFile2)
+    # coindenceTest(datalist1,datalist2,-999999849928,200000,saveFile)
+    # coindenceTest(datalist1, datalist2, 0, 20000, saveFile)
     #mergeFilterTest()
-    # countBySecTest()
+    countBySecTest()
     # dataFile= unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170919AliSat.txt', 'utf8')
     # dataClassify = classifyData850(dataFile,[5,10,27])
     # timeList = fileToList.fileToList(dataClassify)
