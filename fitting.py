@@ -232,8 +232,8 @@ def clockDiffByDistanceTest(date):
 
 def polyFitTest():
 
-    order = 5
-    timeFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180125\\result\\synCoincidence-60-160--12-0-Coarse_Coin_factor.txt', 'utf8')
+    order = 65
+    timeFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\GPSJ2000.txt', 'utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
     ya = []
@@ -242,35 +242,38 @@ def polyFitTest():
     timeNormal = 100000000000
 
     for i in range(len(timeList)):
-        xa.append(timeList[i][0] )
-        ya.append((timeList[i][0] - timeList[i][1]))
-    xa, ya, timeList, fitList, residual = filter.fitFilter(timeList, 3000 / 1000000000000.0, 1, 2)
-    for i in range(len(timeList)):
-        ya[i]=(timeList[i][0] - timeList[i][1])
+        xa.append(timeList[i][0]-timeList[0][0] )
+        # ya.append((timeList[i][0] - timeList[i][1]))
+        # xa.append(i)
+        ya.append((timeList[i][5]*1000))
+    # xa, ya, timeList, fitList, residual = filter.fitFilter(timeList, 3000 / 1000000000000.0, 1, 2)
+    # for i in range(len(timeList)):
+    #     ya[i]=(timeList[i][0] - timeList[i][1])
     startSec=int(xa[0]/ 1000000000000)
     endSec=int(xa[-1]/ 1000000000000)
-    print startSec,endSec
-    for i in range(startSec,endSec+1):
-        sec.append(i* 1000000000000)
+    # print startSec,endSec
+    # for i in range(startSec,endSec+1):
+    #     sec.append(i* 1000000000000)
 
     mat = numpy.polyfit(xa, ya, order)
     Fx = numpy.poly1d(mat)
     y_fit = Fx(xa)
-    y_sec=Fx(sec)
+    # y_sec=Fx(sec)
 
-    for i in range(len(sec)):
-        print sec[i]/ 1000000000000,y_sec[i]
+    # for i in range(len(sec)):
+    #     print sec[i]/ 1000000000000,y_sec[i]
 
     for i in range(len(y_fit)):
         residual.append([y_fit[i]-ya[i]])
     # filter.dotFilter(y,0,10000,3)
-    fileToList.listToFile(residual,timeFile[:-4]+'_%s_fit_residual.txt'%order)
+    # fileToList.listToFile(residual,timeFile[:-4]+'_%s_fit_residual.txt'%order)
     print numpy.std(residual,ddof=1)
-    xa, residual = filter.normalByTime(timeList, residual, timeNormal)
+    # xa, residual = filter.normalByTime(timeList, residual, timeNormal)
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.plot(xa, residual, color='g', linestyle='-', marker='')
+    ax.plot(xa, residual, color='g', linestyle='-', marker='*')
     # ax.plot(sec,y_sec,color='m',linestyle='',marker='.')
+    # ax.plot(xa, ya, color='m', linestyle='', marker='.')
     ax.legend()
     plt.show()
 
@@ -318,14 +321,14 @@ def polyLeastFitSegmentTest(date):
 def polyFitSegmentTest(date):
     order =2
     timeNormal=100000000000
-    timeFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180110\\result\\synCoincidence-90-190--18-0-Coin-紫台WGS84-atm-factor_filtered.txt' , 'utf8')
+    timeFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180121\\result\\satellite_move--29--32-15-Coin.txt' , 'utf8')
     # timeFile=unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\\result\\synCoincidence-61-200-1-0-Coin-紫台WGS84-atm-new.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
     ya = []
 
     for i in range(len(timeList)):
-        xa.append(timeList[i][0])
+        xa.append(timeList[i][0]-timeList[i][4])
         ya.append((timeList[i][0] - timeList[i][1]))
         # ya.append([(timeList[i][2])/1000000000000.0])
     #

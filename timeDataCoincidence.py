@@ -10,6 +10,7 @@ import gpsOrbit
 import filter
 import matplotlib.pyplot as plt
 import TDCTest
+import numpy
 # import statistics
 
 
@@ -23,14 +24,14 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
     coinCount = 0
     Num = 5
     sec = 1000000000000.0
-    timeFactor1 = clockTimeCalibrate.clockTimeFactorFit(gpsTimeList1)
-    timeFactor2 = clockTimeCalibrate.clockTimeFactorFit(gpsTimeList2)
-    List1 = clockTimeCalibrate.timeCalibrate(timeList1, timeFactor1)
-    List2 = clockTimeCalibrate.timeCalibrate(timeList2, timeFactor2)
-    gpsTimeList1 = clockTimeCalibrate.timeCalibrate(gpsTimeList1, timeFactor1)
-    gpsTimeList2 = clockTimeCalibrate.timeCalibrate(gpsTimeList2, timeFactor2)
-    # List1=timeList1
-    # List2=timeList2
+    # timeFactor1,offset1 = clockTimeCalibrate.clockTimeFactorFit(gpsTimeList1)
+    # timeFactor2,offset2 = clockTimeCalibrate.clockTimeFactorFit(gpsTimeList2)
+    # List1 = clockTimeCalibrate.timeCalibrate(timeList1, timeFactor1,offset1)
+    # List2 = clockTimeCalibrate.timeCalibrate(timeList2, timeFactor2,offset2)
+    # gpsTimeList1 = clockTimeCalibrate.timeCalibrate(gpsTimeList1, timeFactor1,offset1)
+    # gpsTimeList2 = clockTimeCalibrate.timeCalibrate(gpsTimeList2, timeFactor2,offset2)
+    List1=timeList1
+    List2=timeList2
     for i in range(startSec, endSec ):
         inSec = True
         timeBase1 = gpsTimeList1[i-1][0]
@@ -42,7 +43,7 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
             timeCount1 += 1
         startNo = i
         delayFun1, delayFun2 = gpsOrbit.gpsLagInterFun(gpsTimeList1, gpsTimeList2, List2Delay, startNo, Num, shift, sec)
-        print i,delayFun1(i),delayFun2(i)
+        # print i,delayFun1(i),delayFun2(i)
         while inSec:
             delay1 = delayFun1(List1[timeCount1][0]/sec)
             delay2 = delayFun2(List2[timeCount2][0]/sec)
@@ -73,9 +74,10 @@ def timeCoincidence(timeList1, timeList2, List2Delay, gpsTimeList1, gpsTimeList2
             if List2[timeCount2][0] > gpsTimeList2[i][0]:
                 inSec = False
     fileToList.listToFile(coincidenceList, coinfile)
-    # print 'STDEV:\t %s'%(statistics.pstdev(detList))
-    print 'time coincidence finished ! there are ' + str(coinCount) + ' pairs.'
-    return coincidenceList
+    # print numpy.std(detList, ddof=1)
+    std=numpy.std(detList, ddof=1)
+    # print 'time coincidence finished ! there are ' + str(coinCount) + ' pairs.'
+    return coincidenceList, std
 
 
 # 每秒寻找第一个符合，然后后面依次按与前面符合对的时间差来找符合
@@ -346,7 +348,7 @@ def timeCoinTest(startSec, endSec, gpsShift, date,tdcShift,dataLJ,dataDLH):
     groundXYZList= fileToList.fileToList(
         unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\\groundStationWGS84.txt' , 'utf8'))
     satelliteXYZList = fileToList.fileToList(
-        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\\satelliteWGS84_Sec.txt'%date , 'utf8'))
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\\satelliteWGS84_Sec_FTP.txt'%date , 'utf8'))
     # List2Delay = fileToList.fileToList( unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\%s\\GPS_Recv_Precise_紫台_disDelay.txt' % date, 'utf8'))
     atmosphereList=fileToList.fileToList(
             unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\\天气参数.txt'%date, 'utf8'))
@@ -555,11 +557,11 @@ if __name__=='__main__':
     # timeCoinCoarseTest(50, 120, -14, '20180106', 0)
     # timeCoinCoarseTest(137, 240, -21, '20180109', 1,dataLJ,dataDLH)
     # timeCoinCoarseTest(90, 190, -17, '20180110', 0, dataLJ, dataDLH)
-    # timeCoinTest(137, 240, -21, date, 1, dataLJ, dataDLH)
+    timeCoinTest(137, 240, -22, '20180109', 1, '20180110012855', '20180110012854')
     # timeCoinTest(165, 265, -11, date, 0, dataLJ, dataDLH)
     # timeCoinTest(85, 250, -18, date, 0, dataLJ, dataDLH)
     # timeCoinCoarseTest(120, 130, -16, '20180121', 1, '20180122014609', '20180122014608')
     # timeCoinTest(50, 100, -17, '20180121', 1, '20180122014609', '20180122014608')
     # timeCoinTest(90, 190, -18, '20180110', 0, '20180111010707', '20180111010706')
-    timeCoinCoarseTest(60, 160, -12, '20180125', 0, '20180126015157', '20180126015156')
+    # timeCoinCoarseTest(60, 160, -12, '20180125', 0, '20180126015157', '20180126015156')
 

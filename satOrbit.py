@@ -12,7 +12,9 @@ import datetime
 import jdutil
 import math
 import random
-
+import timeDataCoincidence
+import gpsOrbit
+import clockTimeCalibrate
 
 def satOrbSec(satFile, startTime, Num, shfit):
     if Num < shfit:
@@ -109,32 +111,221 @@ def distanceTest():
 
 
 #模拟计算定轨精度为X下，两地延时的误差范围
-def disUncertain(X,groStation,satellite,staCount):
+def disUncertain(X,groStation,satellite,staCount,sec):
     distance=0
     delay=0
     for i in range(staCount):
-        newSatellite=[satellite[1]*1000+0*random.uniform(-1,1),satellite[2]*1000+0*random.uniform(-1,1),satellite[3]*1000+X*random.uniform(-1,1)]
-        distance= math.sqrt((newSatellite[0]-satellite[1]*1000)**2+(newSatellite[1]-satellite[2]*1000)**2+(newSatellite[2]-satellite[3]*1000)**2)
-        newdistance1=math.sqrt((newSatellite[0]-groStation[1])**2+(newSatellite[1]-groStation[2])**2+(newSatellite[2]-groStation[3])**2)
-        newdistance2 = math.sqrt((newSatellite[0] - groStation[4]) ** 2 + (newSatellite[1] - groStation[5]) ** 2 + (
-        newSatellite[2] - groStation[6]) ** 2)
-        olddistance1 = math.sqrt((satellite[1]*1000 - groStation[1]) ** 2 + (satellite[2]*1000 - groStation[2]) ** 2 + (
-            satellite[3] * 1000 - groStation[3]) ** 2)
-        olddistance2 = math.sqrt((satellite[1]*1000 - groStation[4]) ** 2 + (satellite[2]*1000 - groStation[5]) ** 2 + (
-            satellite[3] * 1000 - groStation[6]) ** 2)
+        newSatellite=[satellite[1]+X[0]*random.uniform(-1,1),satellite[2]+X[1]*random.uniform(-1,1),satellite[3]+X[2]*random.uniform(-1,1)]
+        distance= math.sqrt((newSatellite[0]-satellite[1])**2+(newSatellite[1]-satellite[2])**2+(newSatellite[2]-satellite[3])**2)
+        newdistance1=math.sqrt((newSatellite[0]-groStation[0][1])**2+(newSatellite[1]-groStation[0][2])**2+(newSatellite[2]-groStation[0][3])**2)
+        newdistance2 = math.sqrt((newSatellite[0] - groStation[1][1]) ** 2 + (newSatellite[1] - groStation[1][2]) ** 2 + (
+        newSatellite[2] - groStation[1][2]) ** 2)
+        olddistance1 = math.sqrt((satellite[1] - groStation[0][1]) ** 2 + (satellite[2] - groStation[0][2]) ** 2 + (
+            satellite[3]  - groStation[0][3]) ** 2)
+        olddistance2 = math.sqrt((satellite[1] - groStation[1][1]) ** 2 + (satellite[2] - groStation[1][2]) ** 2 + (
+            satellite[3]  - groStation[1][2]) ** 2)
         delay= 1000000000000.0 * ((newdistance1-olddistance1) - (newdistance2-olddistance2)) / 299792458
-        print '%s\t%s\t%s\t%s'%(distance,(newdistance1-olddistance1),(newdistance2-olddistance2),delay)
+        # delay=((newdistance1-olddistance1) - (newdistance2-olddistance2))
+        print '%s\t%s\t%s\t%s\t%s'%(sec,distance,(newdistance1-olddistance1),(newdistance2-olddistance2),delay)
     #print '%s\t%s'%(distance/staCount,delay/staCount)
 
-def disUncertainTest(X,staCount,i):
-    goundFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\Result\\groundStationJ2000_Sec.txt', 'utf8')
-    satFile = unicode('E:\Experiment Data\时频传输数据处理\双站数据处理\\3.2\Result\\satellite_Sec.txt', 'utf8')
+def disUncertainTest(X,staCount):
+    goundFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\groundStationWGS84.txt', 'utf8')
+    satFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\satelliteWGS84_Sec.txt', 'utf8')
     goundList = fileToList.fileToList(goundFile)
     satList=fileToList.fileToList(satFile)
-    #length=len(goundList)
-    #for i in range(length):
-    disUncertain(X,goundList[i],satList[i],staCount)
+    length=len(satList)
+    for i in range(250):
+        disUncertain(X,goundList,satList[i],staCount,i)
+
+def J2000_Select():
+    dataFile=unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\FTP星历J2000.txt', 'utf8')
+    GPSFile=unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\KX02_1C_ED_044D_20180109T000000_0055_003_000.txt', 'utf8')
+    dataList= fileToList.fileToList(dataFile)
+    GPSList=fileToList.fileToList(GPSFile)
+    saveFile=dataFile[:-4]+'_coin.txt'
+    indexd=0
+    lend=len(dataList)
+    coinList=[]
+    for item in GPSList:
+        Find = False
+        timeG=item[0]*3600+item[1]*60+item[2]-2
+        while not Find:
+            if indexd<lend-1:
+                timeD=dataList[indexd][3]*3600+dataList[indexd][4]*60+dataList[indexd][5]
+                if timeG>timeD:
+                    indexd+=1
+                elif timeG==timeD:
+                    new=[timeG]+item+dataList[indexd]+[dataList[indexd][6]-item[4]*1000,dataList[indexd][7]-item[5]*1000,dataList[indexd][8]-item[6]*1000]
+                    print [dataList[indexd][6],item[4]*1000,dataList[indexd][7],item[5]*1000,dataList[indexd][8],item[6]*1000]
+                    coinList.append(new)
+                    Find=True
+                else:
+                    break
+            else:
+                break
+    fileToList.listToFile(coinList,saveFile)
+
+def sat_move(satList,move):
+    moveList=[]
+    for item in satList:
+        moveList.append([item[0],item[1]+move[0],item[2]+move[1],item[3]+move[2]])
+    return moveList
+
+def ground_move(groundList,move):
+    moveList=[]
+    moveList.append([groundList[0][0],groundList[0][1]+move[0],groundList[0][2]+move[1],groundList[0][3]+move[2]])
+    moveList.append([groundList[1][0],groundList[1][1] + move[3], groundList[1][2] + move[4], groundList[1][3] + move[5]])
+    # print moveList
+    # print groundList
+    return moveList
+
+def dataReduce(dataList,factor):
+    reduceList1=[]
+    reduceList2 = []
+    index=0
+    for i in range(len(dataList)):
+        if index==factor:
+            reduceList1.append([dataList[i][0]])
+            reduceList2.append([dataList[i][1]])
+            index=0
+        else:
+            index+=1
+    print len(reduceList1)
+    return reduceList1,reduceList2
+
+
+def satMoveSimulation(List1,List2,groundXYZList,satelliteXYZList,atmosphereList,gpsTimeList1,newgpsTimeList2,info):
+    [date,  startSec, endSec, gpsShift,move]=info
+    List2Delay = gpsOrbit.delayCalWGS84(groundXYZList, 0, 1, satelliteXYZList, 0, 5, atmosphereList)
+    coinfile = unicode(
+            'C:\Users\Levit\Experiment Data\双站数据\\%s\\result\\satellite_move-%s-%s-%s-Coin.txt' % (
+                date,move[0], move[1], move[2] ), 'utf8')
+    coindenceList,std = timeDataCoincidence.timeCoincidence(List1, List2, List2Delay, gpsTimeList1, newgpsTimeList2, startSec, endSec,
+                                        gpsShift , coinfile)
+    del coindenceList
+    return std
+
+
+def satMoveScan():
+    step=[1,1,1]
+    scanRange=[1,1,1]
+    offset=[10,-12,-20]
+    date = '20180109'
+    dataLJ = '20180110012855'
+    dataDLH = '20180110012854'
+    startSec = 137
+    endSec = 230
+    gpsShift = -22
+    tdcShift = 1
+    groundXYZList = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\\groundStationWGS84.txt', 'utf8'))
+    satelliteXYZList = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\\satelliteWGS84_Sec_new.txt' % date, 'utf8'))
+    atmosphereList = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\\天气参数.txt' % date, 'utf8'))
+    gpsTimeList1 = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\共视数据\\%s-tdc2_channel_1.txt' % (date, dataLJ), 'utf8'))
+    gpsTimeList2 = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\共视数据\\%s-tdc13_channel_1.txt' % (date, dataDLH), 'utf8'))
+    dataList = fileToList.fileToList(unicode(
+        'C:\Users\Levit\Experiment Data\双站数据\\%s\\result\\synCoincidence-137-240--21-1-Coin-紫台WGS84-atm-factor-neworbit-0120_filtered.txt' % (
+        date), 'utf8'))
+    List1,List2=dataReduce(dataList,100)
+    newgpsTimeList2 = []
+    if tdcShift >= 0:
+        for i in range(tdcShift):
+            newgpsTimeList2.append([gpsTimeList2[i][0]])
+        for i in range(len(gpsTimeList2)):
+            newgpsTimeList2.append([gpsTimeList2[i][0] + tdcShift * 1000000000000])
+    else:
+        for i in range(len(gpsTimeList2)):
+            gpsTime = gpsTimeList2[i][0] + tdcShift * 1000000000000
+            if gpsTime > 0:
+                newgpsTimeList2.append([gpsTime])
+
+    timeFactor1, offset1 = clockTimeCalibrate.clockTimeFactorFit(gpsTimeList1)
+    timeFactor2, offset2 = clockTimeCalibrate.clockTimeFactorFit(newgpsTimeList2)
+    gpsTimeList1 = clockTimeCalibrate.timeCalibrate(gpsTimeList1, timeFactor1, offset1)
+    newgpsTimeList2 = clockTimeCalibrate.timeCalibrate(newgpsTimeList2, timeFactor2, offset2)
+
+    for i in range(scanRange[0]/step[0]):
+        for j in range(scanRange[1]/step[1]):
+            for k in range(scanRange[2]/step[2]):
+                move=[i*step[0]-scanRange[0]/2+offset[0],j*step[1]-scanRange[1]/2+offset[1],k*step[2]-scanRange[2]/2+offset[2]]
+                info=[date,  startSec, endSec, gpsShift,move]
+                satelliteXYZListMove = sat_move(satelliteXYZList, move)
+                std=satMoveSimulation(List1,List2,groundXYZList,satelliteXYZListMove,atmosphereList,gpsTimeList1,newgpsTimeList2,info)
+                [x,y,z]=move
+                print '%s\t%s\t%s\t%s'%(x,y,z,std)
+
+def groundMoveScan():
+    # step=[3,3,3,2,2,2]
+    # scanRange=[9,9,9,4,4,6]
+    step = [1, 1, 1, 1, 1, 1]
+    scanRange = [1, 1, 1, 1, 1, 1]
+    offset=[-29,-32,15,-26,-42,9]
+    date = '20180121'
+    dataLJ = '20180122014609'
+    dataDLH = '20180122014608'
+    startSec = 120
+    endSec = 215
+    gpsShift = -17
+    tdcShift = 1
+    groundXYZList = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\\groundStationWGS84.txt', 'utf8'))
+    satelliteXYZList = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\\satelliteWGS84_Sec.txt' % date, 'utf8'))
+    atmosphereList = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\\天气参数.txt' % date, 'utf8'))
+    gpsTimeList1 = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\共视数据\\%s-tdc2_channel_1.txt' % (date, dataLJ), 'utf8'))
+    gpsTimeList2 = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\共视数据\\%s-tdc13_channel_1.txt' % (date, dataDLH), 'utf8'))
+    dataList = fileToList.fileToList(unicode(
+        'C:\Users\Levit\Experiment Data\双站数据\\%s\\result\\synCoincidence-120-220--16-1-Coin-紫台WGS84-atm-factor_filtered.txt' % (
+        date), 'utf8'))
+    List1,List2=dataReduce(dataList,100)
+    newgpsTimeList2 = []
+    if tdcShift >= 0:
+        for i in range(tdcShift):
+            newgpsTimeList2.append([gpsTimeList2[i][0]])
+        for i in range(len(gpsTimeList2)):
+            newgpsTimeList2.append([gpsTimeList2[i][0] + tdcShift * 1000000000000])
+    else:
+        for i in range(len(gpsTimeList2)):
+            gpsTime = gpsTimeList2[i][0] + tdcShift * 1000000000000
+            if gpsTime > 0:
+                newgpsTimeList2.append([gpsTime])
+
+    timeFactor1, offset1 = clockTimeCalibrate.clockTimeFactorFit(gpsTimeList1)
+    timeFactor2, offset2 = clockTimeCalibrate.clockTimeFactorFit(newgpsTimeList2)
+    gpsTimeList1 = clockTimeCalibrate.timeCalibrate(gpsTimeList1, timeFactor1, offset1)
+    newgpsTimeList2 = clockTimeCalibrate.timeCalibrate(newgpsTimeList2, timeFactor2, offset2)
+    minSTD=100000000
+    for i in range(scanRange[0]/step[0]):
+        for j in range(scanRange[1]/step[1]):
+            for k in range(scanRange[2]/step[2]):
+                for ii in range(scanRange[3]/step[3]):
+                    for jj in range(scanRange[4]/step[4]):
+                        for kk in range(scanRange[5]/step[5]):
+                            move=[i*step[0]-scanRange[0]/2+offset[0],j*step[1]-scanRange[1]/2+offset[1],k*step[2]-scanRange[2]/2+offset[2],
+                                  ii * step[3] - scanRange[3] / 2 + offset[3], jj * step[4] - scanRange[4] / 2 + offset[4], kk * step[5] - scanRange[5] / 2 + offset[5]]
+                            info=[date,  startSec, endSec, gpsShift,move]
+                            groundXYZListMove = ground_move(groundXYZList,move)
+                            std=satMoveSimulation(List1,List2,groundXYZListMove,satelliteXYZList,atmosphereList,gpsTimeList1,newgpsTimeList2,info)
+                            [x1, y1, z1, x2, y2, z2] = move
+                            print '%s\t%s\t%s\t%s\t%s\t%s\t%s'%(x1,y1,z1,x2,y2,z2,std)
+                            if std<minSTD:
+                                minSTD=std
+                                minMove=move
+    print 'best move: %s, std: %s'%(minMove,minSTD)
+
 
 if __name__=='__main__':
     # distanceTest()
-    groundSecTest()
+    # groundSecTest()
+    # J2000_Select()
+    # disUncertainTest([10,10,10], 80)
+    # satMoveScan()
+    groundMoveScan()

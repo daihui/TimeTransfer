@@ -296,19 +296,6 @@ def dataCoincidence(dataFile):
     fileToList.listToFile(resultList, dataFile[:-4] + '_diff.txt')
     return resultList
 
-def dataCountHistogram(timeList,channel,bin,range):
-    binCount=int(2*range/bin)
-    countList=np.zeros([1,binCount])
-    index=0
-    finish=False
-    while not finish:
-        for item in timeList:
-            if float(item[channel])<float(-range+(index+1)*bin) and float(item[channel])>float(-range+index*bin):
-                countList[0][index]+=1
-        print float(-range+index*bin),'\t',countList[0][index]
-        index+=1
-        if index>=binCount:
-            finish=True
 
 def coinDataStastistics(coinDataList):
     lenght=len(coinDataList)

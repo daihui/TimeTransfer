@@ -9,7 +9,7 @@ import numpy
 
 def clockTimeFactor(timeList):
     N=len(timeList)
-    print N
+    # print N
     # sec=[float(i+1) for i in range(N)]
     time=[timeList[i][0] for i in range(N)]
     detTime=time[N-1]-time[0]
@@ -19,7 +19,7 @@ def clockTimeFactor(timeList):
 
 def clockTimeFactorFit(timeList):
     N=len(timeList)
-    print N
+    # print N
     sec=[float(i+1) for i in range(N)]
     time=[timeList[i][0] for i in range(N)]
     matN=numpy.polyfit(sec,time,1)
@@ -27,11 +27,12 @@ def clockTimeFactorFit(timeList):
     # residualTime=fx(sec)-time
     # fig = plt.figure()
     # ax1 = fig.add_subplot(111)
-    # ax1.scatter(sec, residualTime, color='g', marker='o')
+    # ax1.scatter(sec, fx(sec), color='g', marker='o')
+    # ax1.scatter(sec, time, color='r', marker='*')
     # plt.show()
     factor=matN[0]/1000000000000
-    print factor,matN[1]/1000000000000
-    return factor
+    # print factor,matN[1]/1000000000000
+    return factor,matN[1]
 
 def clockTimeFactorSecSat(timeList,window):
     N=len(timeList)
@@ -103,11 +104,11 @@ def clockTimeFactorSecGro(timeList,Num):
     plt.show()
     return time
 
-def timeCalibrate(timeList,factor):
+def timeCalibrate(timeList,factor,offset):
     timeListCal=[]
     for item in timeList:
-        timeListCal.append([item[0]/factor])
-    print 'time calibrate finished !'
+        timeListCal.append([item[0]/factor+offset])
+    # print 'time calibrate finished !'
     return timeListCal
 
 def clockTimeFactorTest():
@@ -135,4 +136,4 @@ def clockTimeFactorSecSatTest():
 if __name__=='__main__':
     clockTimeFactorFitTest()
     # clockTimeFactorSecSatTest()
-    clockTimeFactorTest()
+    # clockTimeFactorTest()

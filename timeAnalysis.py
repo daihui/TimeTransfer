@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from scipy import optimize
 import fitting
 import filter
+import numpy as np
+import clockTimeCalibrate
 
 
 def adjacentAnalysis(timeList,filename):
@@ -135,3 +137,101 @@ def leastsqToSecTest():
     #R = interSec(R)
     #print R
     fileToList.listToFileLong(R, timeFile[:-4] + '_%smilliSec0422.txt'%(tau/1000000000))
+
+def GPS_Compare(gpsList1,gpsList2,shift):
+    timeFactor1, offset1 = clockTimeCalibrate.clockTimeFactorFit(gpsList1)
+    timeFactor2, offset2 = clockTimeCalibrate.clockTimeFactorFit(gpsList2)
+    gpsFitList1 = clockTimeCalibrate.timeCalibrate(gpsList1, timeFactor1, -offset1)
+    gpsFitList2 = clockTimeCalibrate.timeCalibrate(gpsList2, timeFactor2, -offset2)
+    N1=len(gpsFitList1)
+    N2=len(gpsFitList2)
+    Sec = []
+    coinList = []
+    residual = []
+    if shift>=0:
+        if N1-shift >= N2:
+            N = N2
+        else:
+            N = N1-shift
+
+        for i in range(N):
+            residual.append(gpsFitList1[i+shift][0]-(gpsFitList2[i][0]+shift*1000000000000))
+            Sec.append(i+1)
+            coinList.append([gpsFitList1[i+shift][0],gpsFitList2[i][0],residual[-1]])
+    else:
+        if N1+shift >= N2:
+            N = N2
+        else:
+            N = N1+shift
+        for i in range(N):
+            residual.append(gpsFitList1[i - shift][0] - (gpsFitList2[i][0] - shift * 1000000000000))
+            Sec.append(i + 1)
+            coinList.append([gpsFitList1[i - shift][0], gpsFitList2[i][0], residual[-1]])
+    rms=np.std(residual,ddof=1)
+    m=np.mean(residual)
+    print 'GPS Compare RMS:%s Mean:%s'%(rms,m)
+    return coinList,rms,m
+
+def GPS_CompareTest(date, dataLJ,dataDLH,shift):
+    gpsList1 = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\共视数据\\%s-tdc2_channel_1.txt' % (date, dataLJ), 'utf8'))
+    gpsList2 = fileToList.fileToList(
+        unicode('C:\Users\Levit\Experiment Data\双站数据\\%s\共视数据\\%s-tdc13_channel_1.txt' % (date, dataDLH), 'utf8'))
+    coinList,rms,m=GPS_Compare(gpsList1,gpsList2,shift)
+    X=[i+1 for i in range(len(coinList))]
+    residual=[coinList[i][2] for i in range(len(coinList))]
+    residualH = [[coinList[i][2]] for i in range(len(coinList))]
+    histList = dataHistogram(residualH, 0, 5000, 60000, 0)
+    xa = [histList[i][0] for i in range(len(histList))]
+    ya = [histList[i][1] for i in range(len(histList))]
+    fig = plt.figure()
+    ax1 = fig.add_subplot(121)
+    ax1.plot(X, residual, color='g', linestyle='-', marker='*')
+    ax1.xaxis.grid(True, which='major')  # x坐标轴的网格使用主刻度
+    ax1.yaxis.grid(True, which='major')  # y坐标轴的网格使用次刻度show()
+    ax1.set_ylabel('Difference (ps)' , fontsize=20)
+    ax1.set_xlabel('Time (s)', fontsize=20)
+    ax1.set_title('GPS Compare RMS:%d ps Mean:%d ps'%(rms,m), fontsize=24)
+    ax2 = fig.add_subplot(122)
+    ax2.plot(xa, ya, color='r', linestyle='-', marker='*')
+    ax2.xaxis.grid(True, which='major')  # x坐标轴的网格使用主刻度
+    ax2.yaxis.grid(True, which='major')  # y坐标轴的网格使用次刻度show()
+    ax2.set_ylabel('Count', fontsize=20)
+    ax2.set_xlabel('Time Difference (ps)', fontsize=20)
+    ax2.set_title('Histgram' , fontsize=24)
+    plt.show()
+
+
+
+def dataHistogram(timeList,channel,bin,binRange,offset):
+    binCount=int(2*binRange/bin)
+    print binCount
+    countList=np.zeros([1,binCount])
+    histList=[]
+    for data in timeList:
+        t=data[channel]-offset
+        if t>=0:
+            index=int(t/bin)+binCount/2
+        else:
+            index=int(t/bin)-1+binCount/2
+        if index<binCount and index>=0:
+            countList[0][index]+=1
+    # print countList
+    for i in range(binCount):
+        histList.append([offset+bin*(i-binCount/2),countList[0][i]])
+        print histList[-1]
+    return histList
+
+def dataHistogramTest():
+    file = unicode(
+        'C:\Users\Levit\Experiment Data\双站数据\\20180109\\result\\GPS 比对.txt',
+        'utf8')
+    offset=0
+    saveFile = file[:-4] + '_%s_hist.txt'%offset
+    timeList = fileToList.fileToList(file)
+    histList = dataHistogram(timeList,0,5000,60000,offset)
+    fileToList.listToFile(histList, saveFile)
+
+if __name__=='__main__':
+    # dataHistogramTest()
+    GPS_CompareTest('20180108', '20180109015114', '20180109015114', 0)

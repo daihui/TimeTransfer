@@ -79,7 +79,7 @@ def delayCalJ2000(groundXYZList, satelliteXYZList, detTime, Num):
 def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Num,atmosphereList):
     delayList = []
     lenght = len(satelliteXYZList)
-    print lenght
+    # print lenght
     for i in range(Num):
         distance1 = math.sqrt((groundXYZList[ground1][1] - satelliteXYZList[i][1]) ** 2 + (
         groundXYZList[ground1][2] - satelliteXYZList[i][2]) ** 2 \
@@ -143,7 +143,7 @@ def delayCalWGS84(groundXYZList, ground1, ground2, satelliteXYZList, detTime, Nu
         disDelay2=1000000000000.0 * delay2
         totDelay=disDelay1+atmDelay1-disDelay2-atmDelay2
         delayList.append([disDelay1+atmDelay1, disDelay2+atmDelay2,atmDelay1,atmDelay2,totDelay])
-        print i, disDelay1, disDelay2,atmDelay1,atmDelay2,totDelay
+        # print i, disDelay1, disDelay2,atmDelay1,atmDelay2,totDelay
 
     return delayList
 
