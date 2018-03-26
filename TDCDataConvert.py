@@ -260,13 +260,68 @@ def listMergeTest(date,dataDLH):
     fileToList.listToFile(mergeList2,saveFile)
     fileToList.listToFile(listCount,mergeCountFile)
 
+#德令哈系统延时测试
+def TDCDataParseDLHDelay():
+    dataFile = unicode('C:\Users\Levit\Experiment Data\德令哈测试\系统延时测试\\20180302\\20180302211447-15mPMD-信号线-1.dat', encoding='utf-8')
+    channelList = [1,2,3]
+    # channelList =[7]
+    tdc = 13
+    for channel in channelList:
+        saveFile = dataFile[:-4] + '_channel_%s.txt' % channel
+        # channelNo = str(50 + channel )
+        channelNo = str(40 + channel-1)
+        if channel==4:
+            print 'channel: %s' % channel
+            fineTimeFile = unicode(
+                'C:\Users\Levit\Experiment Data\FineTimeCali\\tdc%s\\1216_tdc%s_5C_channel_%s_4%s.txt',
+                encoding='utf-8') % (tdc, tdc, channel, channel - 1)
+            dataList = TDCDataParse(dataFile, fineTimeFile, 8, channelNo)
+            countList = TDCTest.countBySec(dataList)
+            countFile = saveFile[:-4] + '_count.txt'
+            fileToList.listToFile(dataList, saveFile)
+            fileToList.listToFile(countList, countFile)
+            filterFile = saveFile[:-4] + '_filtered.txt'
+            length = len(dataList)
+            for i in range(length):
+                dataList[i] = [dataList[i][0]]
+            filterList = filter.freqFilter(dataList,89985475, 6, 3000000)
+            filterList = filter.reflectNoiseFilter(filterList, 1000000, 0)
+            fileToList.listToFile(filterList, filterFile)
+        elif channel==1:
+            print 'channel: %s' % channel
+            fineTimeFile = unicode(
+                'C:\Users\Levit\Experiment Data\FineTimeCali\\tdc%s\\1216_tdc%s_5C_channel_%s_4%s.txt',
+                encoding='utf-8') % (tdc, tdc, 5, 4)
+            dataList = TDCDataParse(dataFile, fineTimeFile, 8, channelNo)
+            countList = TDCTest.countBySec(dataList)
+            fileToList.listToFile(dataList, saveFile)
+        else:
+            print 'channel: %s' % channel
+            fineTimeFile = unicode(
+                'C:\Users\Levit\Experiment Data\FineTimeCali\\tdc%s\\1216_tdc%s_5C_channel_%s_4%s.txt',
+                encoding='utf-8') % (tdc, tdc,5, 4)
+            dataList = TDCDataParse(dataFile, fineTimeFile, 8, channelNo)
+            countList = TDCTest.countBySec(dataList)
+            countFile = saveFile[:-4] + '_count.txt'
+            fileToList.listToFile(dataList, saveFile)
+            fileToList.listToFile(countList, countFile)
+            filterFile = saveFile[:-4] + '_filtered.txt'
+            length = len(dataList)
+            for i in range(length):
+                dataList[i] = [dataList[i][0]]
+            # filterList = filter.freqFilter(dataList, 500000350, 6, 1000000)
+            # filterList = filter.reflectNoiseFilter(filterList, 10000000, 0)
+            filterList=dataList
+            fileToList.listToFile(filterList, filterFile)
+
 
 if __name__=='__main__':
-    date='20180125'
-    dataDLH='20180126015156'
-    dataLJ='20180126015157'
-    TDCDataParseLJTest(date,dataLJ)
+    # date='20180301'
+    # dataDLH='20180302013004'
+    # dataLJ='20180126015157'
+    # TDCDataParseLJTest(date,dataLJ)
     # TDCDataParseDLHTest(date,dataDLH)
     # dataFile=unicode('E:\Experiment Data\时频传输数据处理\本地光路系统测试\\6.13\\6.13-1000-tdc-coin-128.txt',encoding='utf-8')
     # fileToList.fileLong(dataFile)
     # listMergeTest(date,dataDLH)
+    TDCDataParseDLHDelay()

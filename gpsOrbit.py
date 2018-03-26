@@ -9,24 +9,24 @@ import math
 import atmosphericDelayCorrect
 
 ## 以时间为变量，距离延时列表为目标值，输入需求插值函数的时间点，采用前后各Num秒的数据来计算返回插值函数
-def gpsLagInterFun(gpsTimeList1, gpsTimeList2, disDelayList, startNo, Num, shift, sec):
+def gpsLagInterFun( disDelayList, startNo, Num, shift, channel):
     if startNo < Num:
         print 'startNo should bigger than Num'
     # x1 = [float(gpsTimeList1[i + startNo - Num][0] / sec) for i in range(2 * Num + 1)]
     x1 = [float(i  + startNo - Num) for i in range(2 * Num + 1)]
-    fx1 = [float(disDelayList[i + startNo - Num + shift][0]) for i in range(2 * Num + 1)]
+    fx1 = [float(disDelayList[i + startNo - Num + shift][channel]) for i in range(2 * Num + 1)]
     # x2 = [float(gpsTimeList2[i + startNo - Num][0] / sec) for i in range(2 * Num + 1)]
-    x2 = [float(i  + startNo - Num) for i in range(2 * Num + 1)]
-    fx2 = [float(disDelayList[i + startNo - Num+shift][1]) for i in range(2 * Num + 1)]
+    # x2 = [float(i  + startNo - Num) for i in range(2 * Num + 1)]
+    # fx2 = [float(disDelayList[i + startNo - Num+shift][1]) for i in range(2 * Num + 1)]
     # print x1,fx1
     # delayX = [float(i + 1) for i in range(startNo - Num, startNo + Num + 1)]
     # delayY = [float(disDelayList[i + startNo - Num + shift][2]) for i in range(2 * Num + 1)]
     # delayfunc = lagInterpolation.get_Lxfunc(delayX, delayY)
     gpsfunc1 = lagInterpolation.get_Lxfunc(x1, fx1)
-    gpsfunc2 = lagInterpolation.get_Lxfunc(x2, fx2)
+    # gpsfunc2 = lagInterpolation.get_Lxfunc(x2, fx2)
     # print gpsfunc1(gpsTimeList1[startNo][0]/sec)
     # return gpsfunc1,gpsfunc2,delayfunc
-    return gpsfunc1, gpsfunc2
+    return gpsfunc1
 
 
 ##根据地面站置位J2000和卫星位置J2000坐标，插值计算距离延时

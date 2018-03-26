@@ -110,12 +110,14 @@ def mergeFilterTest():
 def countBySec(dataList):
     length=len(dataList)
     sec=int(dataList[0][0]/1000000000000)
+    # sec = int(dataList[0][0] )
     count=0
     sumSec=0
     sumCount=0
     countList=[]
     for index in range(length):
         if int(dataList[index][0]/1000000000000)==sec:
+        # if int(dataList[index][0] ) == sec:
             count+=1
         else:
             print '%s\t%s'%(sec,count)
@@ -128,20 +130,20 @@ def countBySec(dataList):
     return countList
 
 def countBySecTest():
-    dataFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180121\\result\\synCoincidence-50-250--16-1-Coarse_Coin_factor.txt', 'utf8')
+    dataFile = unicode('C:\Users\Levit\Experiment Data\阿里数据\\170829\\20170830031232_fineParse_1064_245-445_coincidence_0320_match.txt', 'utf8')
     dataList=fileToList.fileToList(dataFile)
     countList=countBySec(dataList)
 
     # return averSecCount
 
 if __name__ == '__main__':
-    # dataFile1 = unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171230\\20171230163026-elec_channel_5.txt', 'utf8')
-    # dataFile2 = unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171230\\20171230163026-elec_channel_6.txt', 'utf8')
+    # dataFile1 = unicode('C:\Users\Levit\Experiment Data\德令哈测试\系统延时测试\\20180302\\20180302211447-15mPMD-信号线-1_channel_2.txt', 'utf8')
+    # dataFile2 = unicode('C:\Users\Levit\Experiment Data\德令哈测试\系统延时测试\\20180302\\20180302211447-15mPMD-信号线-1_channel_3.txt', 'utf8')
     # saveFile = dataFile1[:-4] + '_coindence.txt'
     # datalist1 = fileToList.fileToList(dataFile1)
     # datalist2 = fileToList.fileToList(dataFile2)
     # coindenceTest(datalist1,datalist2,-999999849928,200000,saveFile)
-    # coindenceTest(datalist1, datalist2, 0, 20000, saveFile)
+    # coindenceTest(datalist1, datalist2, -35297770-105000 , 10000, saveFile)
     #mergeFilterTest()
     countBySecTest()
     # dataFile= unicode('C:\Users\Levit\Experiment Data\阿里数据\\170919\\20170919AliSat.txt', 'utf8')

@@ -31,7 +31,7 @@ def clockTimeFactorFit(timeList):
     # ax1.scatter(sec, time, color='r', marker='*')
     # plt.show()
     factor=matN[0]/1000000000000
-    # print factor,matN[1]/1000000000000
+    print factor,matN[1]/1000000000000
     return factor,matN[1]
 
 def clockTimeFactorSecSat(timeList,window):
@@ -134,6 +134,6 @@ def clockTimeFactorSecSatTest():
         print item[0], item[1]
 
 if __name__=='__main__':
-    clockTimeFactorFitTest()
-    # clockTimeFactorSecSatTest()
+    # clockTimeFactorFitTest()
+    clockTimeFactorSecSatTest()
     # clockTimeFactorTest()

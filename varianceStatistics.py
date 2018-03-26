@@ -91,7 +91,7 @@ def MDEVTest():
 def TDEVTest():
     # dataFile=unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171226\零基线实验\\20171227015305-tdc2_5_filterN_coindence_filtered_250-350s_residual-1-0.1s-ps.txt','utf8')
     dataFile = unicode(
-        'C:\Users\Levit\Experiment Data\双站数据\\20180110\\result\\synCoincidence-90-190--18-0-Coin-紫台WGS84-atm-factor_filtered_residual-2-0.1s-ps-10sfit.txt',
+        'C:\Users\Levit\Experiment Data\双站数据\\20180121\\result\\synCoincidence-124-216--17-1-Coin-紫台WGS84-atm-factor-haiji_laser改正_filtered_residual-2-0.1s-ps.txt',
         'utf8')
 
     dataList=fileToList.fileToList(dataFile)

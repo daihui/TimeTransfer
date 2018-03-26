@@ -75,6 +75,7 @@ def fitFilter(timeList,threshold,times,order):
     ya=[]
     filteredList=[]
     for i in range(len(timeList)):
+        # xa.append(timeList[i][0]-timeList[i][4])
         xa.append(timeList[i][0])
         ya.append(timeList[i][2])
         # ya.append((timeList[i][0] - timeList[i][1]))
@@ -193,6 +194,81 @@ def normalBySec(timeList,time,order,offset):
             # print 'len(xa) is < order !!!'
     return fitSecList
 
+def normalBySecLaser(timeList,time,order,offset):
+    timeSec=1000000000000.0
+    startSec=int(timeList[0][0]/time+1)
+    endSec=int(timeList[-1][0]/time)
+    length=len(timeList)
+    index=0
+    xa1=[]
+    xa2 = []
+    ya=[]
+    orbit1=[]
+    orbit2 = []
+    fitSecList=[]
+    for sec in range(startSec,endSec+1):
+        while index<length and timeList[index][0]<(sec+0.5)*time:
+            xa1.append(timeList[index][0]/timeSec)
+            xa2.append(timeList[index][1] / timeSec)
+            ya.append(timeList[index][2]+offset)
+            orbit1.append(timeList[index][3])
+            orbit2.append(timeList[index][4])
+            index+=1
+        if len(xa1)>200:
+            mat = numpy.polyfit(xa1, ya, order)
+            mat1 = numpy.polyfit(xa1, orbit1, order)
+            mat2 = numpy.polyfit(xa2, orbit2, order)
+            mat3=numpy.polyfit(xa1, xa2, order)
+            Fx = numpy.poly1d(mat)
+            Fx1 = numpy.poly1d(mat1)
+            Fx2 = numpy.poly1d(mat2)
+            Fx3=numpy.poly1d(mat3)
+            t=Fx(sec/(timeSec/time))
+            t1 = Fx1(sec / (timeSec / time))
+            sec2=Fx3(sec)
+            t2=Fx2(sec2)
+            fitSecList.append([sec,sec2,t,t1,t2])
+        else:
+            del xa1[:]
+            del xa2[:]
+            del ya[:]
+            del orbit1[:]
+            del orbit2[:]
+            num=len(fitSecList)
+
+            for i in range(order+1):
+                xa1.append(fitSecList[num-1-i][0])
+                xa2.append(fitSecList[num-1-i][1])
+                ya.append(fitSecList[num-1-i][2])
+                orbit1.append(fitSecList[num-1-i][3])
+                orbit2.append(fitSecList[num-1-i][4])
+            mat = numpy.polyfit(xa1, ya, order)
+            mat1 = numpy.polyfit(xa1, orbit1, order)
+            mat2 = numpy.polyfit(xa2, orbit2, order)
+            mat3 = numpy.polyfit(xa1, xa2, order)
+            Fx = numpy.poly1d(mat)
+            Fx1 = numpy.poly1d(mat1)
+            Fx2 = numpy.poly1d(mat2)
+            Fx3 = numpy.poly1d(mat3)
+            t = Fx(sec )
+            t1 = Fx1(sec )
+            sec2 = Fx3(sec)
+            t2 = Fx2(sec2)
+            fitSecList.append([sec, sec2, t, t1, t2])
+            print xa1,ya
+            print 'len(xa1) less 200'
+
+        del xa1[:]
+        del xa2[:]
+        del ya[:]
+        del orbit1[:]
+        del orbit2[:]
+        # else:
+        #     fitSecList.append([sec, 0,0,0])
+        #     print fitSecList[-1][0], fitSecList[-1][1],fitSecList[-1][2],fitSecList[-1][3]
+            # print 'len(xa) is < order !!!'
+    return fitSecList
+
 #时间单位转换
 def timeUnitConvert(timeList,timeUnit):
     result=[]
@@ -239,13 +315,23 @@ def freqFilterTest():
     fileToList.listToFile(result,saveFile)
 
 def fitFineFilterTest():
-    file = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180121\\result\\synCoincidence-120-220--16-1-Coarse_Coin_factor.txt', 'utf8')
+    file = unicode('C:\Users\Levit\Experiment Data\双站数据\\20170302\\result\\synCoincidence-85-250--19-0-Coin-紫台WGS84-atm-factor-haiji.txt', 'utf8')
     saveFile = file[:-4] + '_fitFilter.txt'
     timeList = fileToList.fileToList(file)
-    xa, ya, timeList, fitList, residual=fitFineFilter(timeList,2500/1000000000000.0,5,2)
+    xa, ya, timeList, fitList, residual=fitFineFilter(timeList,3500/1000000000000.0,5,2)
     fileToList.listToFile(timeList,saveFile)
+
+def normalBySecLaserTest():
+    file = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180109\\result\\synCoincidence-145-235--22-1-Coin-紫台WGS84-atm-factor-haiji_laser_filtered.txt',
+        'utf8')
+    saveFile = file[:-4] + '_Sec.txt'
+    timeList = fileToList.fileToList(file)
+    offset=-156000
+    fitList=normalBySecLaser(timeList,1000000000000.0,5,offset)
+    fileToList.listToFile(fitList,saveFile)
 
 if __name__=='__main__':
     # freqFilterTest()
-    reflectNoiseFilterTest()
-    # fitFineFilterTest()
+    # reflectNoiseFilterTest()
+    fitFineFilterTest()
+    # normalBySecLaserTest()

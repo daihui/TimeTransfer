@@ -11,6 +11,15 @@ import filter
 import clockTimeCalibrate
 import gpsOrbit
 from scipy import stats
+from scipy.optimize import leastsq
+
+def sphere_fun(P,x,y,z):
+    [x0,y0,z0,R]=P
+    # print P
+    return (numpy.sqrt((x-x0)**2+(y-y0)**2+(z-z0)**2)-R)
+
+def residual_fun(P,x,y,z):
+    return abs(sphere_fun(P,x,y,z))
 
 def polyLeastFit(x,y,order):
     matA = []
@@ -321,18 +330,18 @@ def polyLeastFitSegmentTest(date):
 def polyFitSegmentTest(date):
     order =2
     timeNormal=100000000000
-    timeFile = unicode('C:\Users\Levit\Experiment Data\双站数据\\20180121\\result\\satellite_move--29--32-15-Coin.txt' , 'utf8')
-    # timeFile=unicode('C:\Users\Levit\Experiment Data\双站数据\\3.10\\result\\synCoincidence-61-200-1-0-Coin-紫台WGS84-atm-new.txt','utf8')
+    # timeFile = unicode('C:\Users\Levit\Experiment Data\德令哈测试\\20171226\零基线实验\\20171227015305-tdc2_4_filterN_coindence_filtered_250-350s.txt' , 'utf8')
+    timeFile=unicode('C:\Users\Levit\Experiment Data\双站数据\\20180121\\result\\synCoincidence-124-216--17-1-Coin-紫台WGS84-atm-factor-haiji_laser改正_filtered.txt','utf8')
     timeList = fileToList.fileToList(timeFile)
     xa = []
     ya = []
 
-    for i in range(len(timeList)):
-        xa.append(timeList[i][0]-timeList[i][4])
-        ya.append((timeList[i][0] - timeList[i][1]))
-        # ya.append([(timeList[i][2])/1000000000000.0])
+    # for i in range(len(timeList)):
+    #     xa.append(timeList[i][0]-timeList[i][4])
+    #     # ya.append((timeList[i][0] - timeList[i][1]))
+    #     ya.append([(timeList[i][2])/1000000000000.0])
     #
-    xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,3000/1000000000000.0,1,2)
+    xa,ya,timeList,fitList,residual=filter.fitFilter(timeList,2500/1000000000000.0,1,2)
     # fileToList.listToFile(timeList,timeFile[:-4] + '_filtered.txt')
     # xa,ya,fitList, residual = polyFitSegment(xa, ya, 1, 0.1)
     # xa, ya, filteredList, residual=filter.thresholdFilter(xa,ya,residual,timeList,0,0.000000002)
@@ -418,8 +427,91 @@ def delayScan(timeList,step,scanRange,offset,plot):
 #     timeList=fileToList.fileToList(dataFile)
 #     delayScan(timeList,step,scanRange,offset)
 
+def sphere_point():
+    pointFile=unicode('C:\Users\Levit\Experiment Data\望远镜相位中心测试\\丽江测试定点.txt','utf8')
+    pointList=fileToList.fileToList(pointFile)
+    X=[]
+    Y=[]
+    Z=[]
+    count=4
+    for i,point in enumerate(pointList):
+        if i==count:
+            break
+        print point
+        X.append(point[0])
+        Y.append(point[1])
+        Z.append(point[2])
+
+    print X
+    # P0=[-993546.7949,5617880.218,2849392.09,1.78]
+    P0=[-993546.795 ,5617879.218 ,2849391.090,1.796 ]
+    # P0=[-682620.013,	5030974.020, 	3852841.370 ,	1.087 ]
+    minResi=1000
+    minP0=[]
+    for i in range(30):
+        R=i*0.01+1.78-0.15
+        detResi=1000
+        P0[3]=R
+        countX=0
+        oldResi = 1000
+        while detResi>0.05:
+            countX+=1
+            if countX==50:
+                break
+
+            result,order = leastsq(residual_fun,P0,args=(X,Y,Z))
+            P0=result
+            # print P0
+            newResi=0
+            for j in range(count):
+                # print j,P0,X[j],Y[j],Z[j]
+                # print sphere_fun(P0,X[j],Y[j],Z[j])
+                # print (P0[0]-X[j])**2,(P0[1]-Y[j])**2,(P0[2]-Z[j])**2,P0[3]**2,P0[3]
+                newResi+=residual_fun(P0,X[j],Y[j],Z[j])**2
+            detResi=abs(oldResi-numpy.sqrt(newResi/count))
+            oldResi=numpy.sqrt(newResi/count)
+            print numpy.sqrt(newResi/count)
+
+            print i,detResi
+        # if residual<minResi:
+        #     minResi=residual
+        #     minP0=P0
+        print R,P0,detResi
+    # print result
+
+def sphere_point_scan():
+    pointFile=unicode('C:\Users\Levit\Experiment Data\望远镜相位中心测试\\丽江测试定点.txt','utf8')
+    pointList=fileToList.fileToList(pointFile)
+    X=[]
+    Y=[]
+    Z=[]
+    count=4
+    for i,point in enumerate(pointList):
+        if i==count:
+            break
+        print point
+        X.append(point[0])
+        Y.append(point[1])
+        Z.append(point[2])
+    print X
+    for xi in range(20):
+        for yi in range(20):
+            for zi in range(20):
+                for ri in range(20):
+                    # P0=[-993546.7949,5617880.218,2849392.09,2.8]
+                    P0=[-993546.843-0.2+xi*0.02,	5617880.121-0.2+yi*0.02, 	2849392.069-0.2+zi*0.02 ,	1.796-0.2+ri*0.02]
+                    result, order = leastsq(residual_fun, P0, args=(X, Y, Z))
+                    newResi=0
+                    for j in range(count):
+                        # print j,P0,X[j],Y[j],Z[j]
+                        # print sphere_fun(P0,X[j],Y[j],Z[j])
+                        # print (P0[0]-X[j])**2,(P0[1]-Y[j])**2,(P0[2]-Z[j])**2,P0[3]**2,P0[3]
+                        newResi += residual_fun(result, X[j], Y[j], Z[j]) ** 2
+                    print result,numpy.sqrt(newResi / count)
 
 if __name__=='__main__':
     polyFitSegmentTest('3.10')
     # polyFitTest()
     # delayScanTest(0.000001,0.000001,-0.000682)
+    # sphere_point()
+    # sphere_point_scan()
